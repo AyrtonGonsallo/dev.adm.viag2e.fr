@@ -1,0 +1,94 @@
+{
+  "entrypoints": {
+    "app": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/app.5b67e248.js"
+      ],
+      "css": [
+        "https://dev.adm.viag2e.fr/build/app.987d29a0.css"
+      ]
+    },
+    "login": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/login.a89b0bf8.js"
+      ],
+      "css": [
+        "https://dev.adm.viag2e.fr/build/login.82b7b986.css"
+      ]
+    },
+    "mailing": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/mailing.3d8f84f2.js"
+      ],
+      "css": [
+        "https://dev.adm.viag2e.fr/build/mailing.06f9eae5.css"
+      ]
+    },
+    "mailings": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/mailings.e6796e16.js"
+      ]
+    },
+    "property": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/property.9147e46b.js"
+      ]
+    },
+    "property-billing": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/property-billing.1e4d3859.js"
+      ]
+    },
+    "wizard": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/wizard.a9081d8d.js"
+      ]
+    },
+    "warrant": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/warrant.806f951d.js"
+      ],
+      "css": [
+        "https://dev.adm.viag2e.fr/build/warrant.06f9eae5.css"
+      ]
+    },
+    "html-table.warrants": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/html-table.warrants.4eb8920f.js"
+      ]
+    },
+    "html-table.users": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/html-table.users.a70f8ae4.js"
+      ]
+    },
+    "html-table.bank": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/html-table.bank.83233cdc.js"
+      ]
+    },
+    "html-table.invoices_treat": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/html-table.invoices_treat.5a73f6cf.js"
+      ]
+    },
+    "html-table.mailings": {
+      "js": [
+        "https://dev.adm.viag2e.fr/build/runtime.5f9715f3.js",
+        "https://dev.adm.viag2e.fr/build/html-table.mailings.58aebc3b.js"
+      ]
+    }
+  }
+}

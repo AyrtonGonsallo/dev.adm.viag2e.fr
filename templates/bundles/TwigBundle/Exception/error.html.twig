@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Viag2e</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
+    <script>
+        WebFont.load({
+            google: {"families":["Montserrat:300,400,500,600,700","Roboto:300,400,500,600,700"]},
+            active: function() {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+
+    {{ encore_entry_link_tags('app') }}
+    <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}" />
+</head>
+
+<body class="m--skin- m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-dark m-aside-left--fixed m-aside-left--offcanvas m-footer--push m-aside--offcanvas-default">
+    <div class="m-grid m-grid--hor m-grid--root m-page">
+        <div class="m-grid__item m-grid__item--fluid m-grid  m-error-6" style="background-image: url({{ asset('img/bg_error.jpg') }});">
+            <div class="m-error_container">
+                <div class="m-error_subtitle m--font-light">
+                    <h1>Oops...</h1>
+                </div>
+                <p class="m-error_description m--font-light">
+                    Une erreur a eu lieu.<br>
+                    {{ status_code }} {{ status_text }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {{ encore_entry_script_tags('app') }}
+</body>
+
+<!-- end::Body -->
+</html>

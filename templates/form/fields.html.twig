@@ -1,0 +1,12 @@
+{%- block day_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{ block('form_widget_simple') }}
+    {%- else -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{- date_pattern|replace({
+                '{{ day }}':   form_widget(form.day),
+                '{{ month }}': form_widget(form.month),
+            })|raw -}}
+        </div>
+    {%- endif -%}
+{% endblock %}

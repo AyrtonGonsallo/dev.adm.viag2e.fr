@@ -1,0 +1,76 @@
+{% extends 'layout.html.twig' %}
+{% import "macros/forms.html.twig" as mforms %}
+
+{% block title %}Viag2e | Facture manuelle{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Facture manuelle</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Facture manuelle
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                {{ form_start(form) }}
+                    <div class="form-group row">
+                        <div class="col-lg-6">
+                            <label for="form-property" class="col-4 col-form-label">Propriété</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.property, {'attr': {'class': 'form-control m-input'}, 'id': 'form-property', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="form-target" class="col-4 col-form-label">Cible</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.target, {'attr': {'class': 'form-control m-input'}, 'id': 'form-target', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>  
+                    {{ mforms.group(form.period, 'period', 'Période', form.email, 'email', 'Email') }}
+                    {{ mforms.group(form.label, 'label', 'Label', form.reason, 'reason', 'Motif') }}
+                    {{ mforms.group(form.amount, 'amount', 'Montant de la rente', form.montantht, 'montantht', 'Montant honoraires HT') }}
+
+                    <input class="btn btn-outline-success btn-block" type="submit" value="Générer" />
+                    {{ form_rest(form) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

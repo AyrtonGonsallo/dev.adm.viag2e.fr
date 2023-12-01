@@ -1,0 +1,98 @@
+<style type="text/css">
+    <!--
+    table { vertical-align: top; }
+    tr    { vertical-align: top;}
+    td    { vertical-align: top; }
+    th {
+        background-color: #a1a1a1;
+        border-top: 2px solid #000;
+        }
+        th,td {
+  border: inherit;
+}
+    -->
+</style>
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt">
+    <bookmark title="Facture" level="0" ></bookmark>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px">
+        <tr>
+            <td style="text-align: left; width: 50%; border:none">
+                <img style="width: 200px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+            </td>
+            <td style="width: 50%; border:none">
+                <span style="font-size: 13pt;color:#b6bec5"><b style="color:#b6bec5">SPÉCIALISTE TRANSACTIONS VIAGÈRES<br />EXPERTISE ET ACCOMPAGNEMENT</b></span><br />
+                
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: left; width: 50%; display: flex; align-items: start; border:none">
+                Vincent GIBELIN - Directeur <br />
+                58, rue Fondaudège <br />
+                33000 BORDEAUX <br />
+                Tel : 05.56.21.91.44 - 06.67.11.61.8 <br />
+                Email : gestion@univers-viager.fr <br />
+                Site internet : www.univers-viager.fr <br />
+            </td>
+            <td style="width: 50%; border:none">
+               
+                {{ parameters.city|title }}, le {{ data.current_day }}
+                <br /><br />
+                <b style="text-align:left;">
+                    <br />{{data.form.civilite}} 
+                    {% if data.target =='Crédirentier' %} {{data.property.getFirstname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %} {% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}
+                    {% if data.target =='Crédirentier' %} {{data.property.getLastname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %} {% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}&nbsp;
+                    <br />
+                    {% if data.target =='Crédirentier' %} {{data.property.getAddress() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getAddresseDebirentier() }}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}
+                    <br />
+                    {% if data.target =='Crédirentier' %} {{data.property.getPostalCode() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getCodePostalDebirentier() }}{% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %} {% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %}
+                    {% if data.target =='Crédirentier' %} {{data.property.getCity() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getVilleDebirentier() }}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %}<br />
+                </b>
+            </td>
+        </tr>
+    </table>
+    <br />
+   <br />
+   <br />
+    <br />
+    {% for i in 0..5 %}
+        &nbsp;
+    {% endfor %}
+    {{data.form.civilite}} {{ data.property.getLastname1() }},
+   <br />
+   <br />
+   <br />
+    {% for i in 0..5 %}
+            &nbsp;
+    {% endfor %}
+    Votre rente viagère vient à révision à la date du {{data.fd_next_month_d_m_y}} pour le bien suivant :<br />
+    Réf. : {{ data.property.getTitle() }}<br />
+    {{data.property.getAddress() }}<br />
+    {{data.property.getPostalCode() }} {{data.property.getCity() }}<br /><br />
+    Pour rappel, la rente actuelle est de {{data.form.montant_mois_actuel }} €. <br /><br />
+    Suite à l’abandon de votre droit d’usage et d’habitation en date du {{data.property.date_duh |  date("d/m/Y")}}, le nouveau montant de la 
+    rente viagère applicable pour le virement de la rente du mois de {{data.fd_next_month_m_y}} sera augmenté de {{data.property.getAbandonmentIndex()*100}} %, 
+    conformément à ce qui était convenu dans l’acte de vente. <br /><br />
+
+    Le nouveau montant de rente applicable à compter du {{data.fd_next_month_d_m_y}} sera donc porté à {{data.montant_mois_suivant}} €. <br /><br />
+    Veuillez agréer, Monsieur, nos sincères salutations.
+    <br />
+    <br />
+     <br /> <br /> <br />
+{% for i in 0..300 %}
+    &nbsp;
+{% endfor %}
+Vincent GIBELIN,
+</page>
+<page_footer>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 10px;">
+        <tr>
+            <td style="width: 100%; border:none">
+                UNIVERS VIAGER - Siège social : 58 Rue Fondaudège 33000 BORDEAUX, SARL au capital de 5 000 €<br/>
+                TVA FR27523654408 - Immatriculée au RCS Bordeaux N°523 654 408<br />
+                Garantie financière GALIAN 89 rue de la Boétie 75008 PARIS Montant : 120 000 €<br />
+                Carte Professionnelle Transaction et Gestion immobilière n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br />
+                « Notre agence ne détient aucun fonds pour le compte de ses clients »
+            </td>
+        </tr>
+    </table>
+</page_footer>

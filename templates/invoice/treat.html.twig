@@ -1,0 +1,132 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Facturation{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Facturation</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Liste des factures | <a href="{{ path('invoices') }}"><small><i>Voir toutes les factures</i></small></a>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                    <div class="row align-items-center">
+                        <div class="col-xl-8 order-2 order-xl-1">
+                            <div class="form-group m-form__group row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="m-input-icon m-input-icon--left">
+                                        <input type="text" class="form-control m-input" placeholder="Recherche..." id="generalSearch">
+                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                            <span><i class="la la-search"></i></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="m-datatable-invoices" id="html_table" width="100%">
+                    <thead>
+                    <tr>
+                        <th title="Date" data-field="Date">Date</th>
+                        <th title="Number" data-field="Number">N°</th>
+                        <th title="Type" data-field="Type">Type</th>
+                        <th title="PropertyID" data-field="PropertyID">N° Prop</th>
+                        <th title="ID" data-field="ID">ID Client</th>
+                        <th title="CustomerID" data-field="CustomerID">N° Client</th>
+                        <th title="Customer" data-field="Customer">Client</th>
+                        <th title="Annuity" data-field="Annuity">Rente</th>
+                        <th title="HonoraryRates" data-field="HonoraryRates">Honoraires</th>
+                        <th title="Status" data-field="Status">Statut</th>
+                        <th title="Resend" data-field="Resend"></th>
+                        <th title="Download" data-field="Download"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for invoice in invoices %}
+                        <tr>
+                            <td>{{ invoice.date|date('d-m-Y H:i') }}</td>
+                            <td>{{ invoice.formattednumber }}</td>
+                            <td>{{ invoice.typestring }}</td>
+                            <td>{{ invoice.property.id }}</td>
+                            <td>{{ invoice.property.warrant.id }}</td>
+                            <td>{{ invoice.property.warrant.clientId }}</td>
+                            <td><a href="{{ path('warrant_view', {'type': invoice.property.warrant.typestring, 'warrantId': invoice.property.warrant.id}) }}">{{ invoice.property.warrant.firstname }} {{ invoice.property.warrant.lastname }}</a></td>
+                            <td>{{ invoice.data.property.annuity|number_format(2, '.', ' ') }}</td>
+                            <td>{{ invoice.data.property.honoraryRates|number_format(2, '.', ' ') }}</td>
+                            <td>{% if invoice.type == constant('App\\Entity\\Invoice::TYPE_RECEIPT') or invoice.status >= constant('App\\Entity\\Invoice::STATUS_PAYED') %}<span class="{{ invoice.statusclass }}">{{ invoice.statusstring }}</span>{% else %}<a href="#" data-id="{{ invoice.id }}" data-number="{{ invoice.formattednumber }}" data-toggle="modal" data-target="#m_modal_invoice_status" class="invoice-status m--font-bold {{ invoice.statusclass }}">{{ invoice.statusstring }}</a>{% endif %}</td>
+                            <td><a href="{{ path('invoice_resend', {'invoiceId': invoice.id}) }}"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a></td>
+                            <td><a href="{{ path('file_download', {'fileId': invoice.file.driveId}) }}" target="_blank"><i class="la la-cloud-download" title="Télécharger"></i> Télécharger</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="m_modal_invoice_status" tabindex="-1" role="dialog" aria-labelledby="invoice_status" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="invoice_status_h">Modification du status <span id="modal-title">-</span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <b>ATTENTION:</b> La validation du paiement provoque la génération de la quittance et est irréversible.
+                    <form action="{{ path('invoice_payed') }}?treat=1" method="post" id="payed-form"><input type="hidden" name="id" value="0" id="payment-form-id"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="validate-payment">Valider le paiement</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ encore_entry_script_tags('html-table.invoices_treat') }}
+    <script type="text/javascript">
+        $(function() {
+            $('.invoice-status').click(function () {
+                $('#payment-form-id').attr('value', $(this).attr('data-id'));
+                $('#modal-title').html($(this).attr('data-number'));
+            });
+
+            $('#validate-payment').click(function () {
+                $('#payed-form').submit();
+                $('#payment-form-id').attr('value', 0);
+            });
+        });
+    </script>
+{% endblock %}

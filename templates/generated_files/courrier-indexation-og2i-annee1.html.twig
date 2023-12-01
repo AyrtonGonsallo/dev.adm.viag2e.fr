@@ -1,0 +1,109 @@
+
+{% extends 'layout.html.twig' %}
+{% import "macros/forms.html.twig" as mforms %}
+
+{% block title %}Viag2e | Générer Courrier d’indexation OG2I Année 1 pour le bien #{{ property.id }} ({{ property.title }}){% endblock %}
+
+
+{% block body %}
+    {% if message %}
+            <div class="m-alert m-alert--icon alert alert-success" role="alert">
+                <div class="m-alert__icon">
+                    <i class="la la-check"></i>
+                </div>
+                <div class="m-alert__text">
+                    <strong>{{ message }} </strong> 
+                </div>
+            </div>
+        {% endif %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Courrier d’indexation OG2I Année 1 pour le bien #{{ property.id }} ({{ property.title }})</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Courrier d’indexation OG2I Année 1
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                {{ form_start(form) }}
+                    <div class="form-group row">
+                        <div class="col-lg-6">
+                            <label for="form-destinataire" class="col-4 col-form-label">Destinataire</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.destinataire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-destinataire', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="form-civilite" class="col-4 col-form-label">Civilité</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.civilite, {'attr': {'class': 'form-control m-input'}, 'id': 'form-civilite', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                     
+                        <div class="col-lg-6">
+                            <label for="form-formule" class="col-4 col-form-label">Formule</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.formule, {'attr': {'class': 'form-control m-input'}, 'id': 'form-formule', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div> 
+                        <div class="col-lg-6">
+                            <label class="col-12">date du virement:</label>
+                            {{ form_row(form.date_virement, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_virement', 'label': false}) }}
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="col-12">date de prochaine révision de l'indice:</label>
+                            {{ form_row(form.date_revision, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_revision', 'label': false}) }}
+                        </div>
+                        <input class="btn btn-outline-success btn-block" type="submit" value="Générer" />
+                    </div>
+                    {{ form_rest(form) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    
+            
+</script>
+{% endblock %}

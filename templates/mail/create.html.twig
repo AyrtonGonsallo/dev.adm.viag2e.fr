@@ -1,0 +1,178 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Messages{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Messagerie globale</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="m-portlet m-portlet--creative m-portlet--first m-portlet--bordered-semi">
+                    <div class="m-portlet__head m-portlet__head-no-height">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h2 class="m-portlet__head-label m-portlet__head-label--info">
+                                    <span>REDACTION</span>
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                    
+                        {{ form_start(form, {attr: {'id': 'mail-form'}}) }}
+                        <div class="form-group m-form__group row">
+                            <label for="form-mail-type_envoi" class="col-2 col-form-label">type d'envoi</label>
+                            <div class="col-10">
+                                {{ form_row(form.type_envoi, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail-type_envoi', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div id="option1" class="form-group m-form__group row">
+                            <label for="form-mail-target" class="col-2 col-form-label">Cible</label>
+                            <div class="col-10">
+                                {{ form_row(form.target, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail-target', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div id="option2" class="form-group m-form__group row">
+                            <label for="form-mail-single_target_id" class="col-2 col-form-label">Cible individuelle</label>
+                            <div class="col-10">
+                                {{ form_row(form.single_target_id, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail-single_target_id', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div id="option3" class="form-group m-form__group row">
+                            <label for="form-mail-single_target_email" class="col-2 col-form-label">Email</label>
+                            <div class="col-10">
+                                {{ form_row(form.single_target_email, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail-single_target_email', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label for="form-mail-object" class="col-2 col-form-label">Objet</label>
+                            <div class="col-10">
+                                {{ form_row(form.object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail-object', 'label': false}) }}
+                            </div>
+                        </div>
+                        {{ form_widget(form.content, {'id': 'form-mail-content', 'label': false}) }}
+                        <div class="col-lg-12">
+                            <label for="form-piece_jointe_drive_id" class="col-4 col-form-label">Pièce jointe<span class="m--font-danger">*</span></label>
+                            <div class="col-12">
+                                {{ form_row(form.piece_jointe_drive_id, {'attr': {'class': 'form-control m-input'}, 'id': 'form-piece_jointe_drive_id', 'label': false}) }}
+                            </div>
+                        </div>
+                        {{ form_rest(form) }}
+                        <br /><input class="btn btn-outline-info btn-block" id="btn-preview" type="button" value="Aperçu" data-toggle="modal" data-target="#m_modal_preview" />
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="m-portlet m-portlet--creative m-portlet--first m-portlet--bordered-semi">
+                    <div class="m-portlet__head m-portlet__head-no-height">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h2 class="m-portlet__head-label m-portlet__head-label--success">
+                                    <span>MOTS-CLES</span>
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-alert m-alert--icon alert alert-info" role="alert">
+                            <div class="m-alert__text">
+                                Les mots clés suivants seront automatiquement remplacés par les informations correspondant aux mandats. Vous pouvez les ajouter directement en cliquant dessus dans la liste. Ils doivent toujours être au format "{{ '{{ mot clé }}' }}".
+                            </div>
+                        </div>
+                        <ul class="list-keywords">
+                            <li data-keyword="{{ '{{ id }}' }}">Id: {{ '{{ id }}' }}</li>
+                            <li data-keyword="{{ '{{ numero }}' }}">Numéro client: {{ '{{ numero }}' }}</li>
+                            <li data-keyword="{{ '{{ prenom }}' }}">Prénom: {{ '{{ prenom }}' }}</li>
+                            <li data-keyword="{{ '{{ nom }}' }}">Nom: {{ '{{ nom }}' }}</li>
+                            <li data-keyword="{{ '{{ adresse }}' }}">Adresse: {{ '{{ adresse }}' }}</li>
+                            <li data-keyword="{{ '{{ cp }}' }}">Code postal: {{ '{{ cp }}' }}</li>
+                            <li data-keyword="{{ '{{ ville }}' }}">Ville: {{ '{{ ville }}' }}</li>
+                            <li data-keyword="{{ '{{ pays }}' }}">Pays: {{ '{{ pays }}' }}</li>
+                            <li data-keyword="{{ '{{ proprietes }}' }}">Nombre de propriétés: {{ '{{ proprietes }}' }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="m_modal_preview" tabindex="-1" role="dialog" aria-labelledby="Aperçu" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Aperçu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <label for="preview_warrant">Mandat de démonstration:</label>
+                        <select class="form-control m-input" data-query-url="{{ path('mailing_create_preview') }}" id="preview_warrant" name="preview_warrant">
+                            <option value="" id="warrant_placeholder" disabled selected>Selectionnez un mandat</option>
+                            {% for warrant in warrants %}<option value="{{ warrant.id }}">{{ warrant.id }} - {{ warrant.lastname }} {{ warrant.firstname }}</option>{% endfor %}
+                        </select>
+                    </p>
+                    <div class="m-separator m-separator--space m-separator--dashed"></div>
+                    <p id="preview_box"><span class="preview-wait">. . .</span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary" form="mail-form">Confirmer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+                $('#option2').hide();
+                $('#option3').hide();
+        $('#form-mail-type_envoi').on('change', function() {
+            console.log("type d'envoi: ")
+            if($(this).find(":selected").val()==1){
+                console.log("mail groupé")
+                $('#option1').show();
+                $('#option2').hide();
+                $('#option3').hide();
+            }else if($(this).find(":selected").val()==2){
+                console.log("mail mandat individuel")
+                $('#option2').show();
+                $('#option1').hide();
+                $('#option3').hide();
+            }else if($(this).find(":selected").val()==3){
+                console.log("mail individuel")
+                $('#option3').show();
+                $('#option2').hide();
+                $('#option1').hide();
+            }
+        })
+    </script>
+    {{ encore_entry_script_tags('mailing') }}
+{% endblock %}
+
+{% block styles %}
+    {{ encore_entry_link_tags('mailing') }}
+{% endblock %}

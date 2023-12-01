@@ -1,0 +1,143 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Honoraires{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">HONORAIRES</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Gestion des honoraires
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <div class="m-portlet m-portlet--creative m-portlet--first m-portlet--bordered-semi formulaire-honoraires">
+                    {{ form_start(form) }}
+                        <div class="row align-items-center mt-50 mb-20">
+                            <div class="col-xl-6">
+                                <h2 class="custom-header">
+                                    HONORAIRES avec rente*
+                                </h2>     
+                                
+                            </div>
+                            <div class="col-xl-6">
+                                 <h5>* honoraires en % de la rente TTC</h5> 
+                            </div> 
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-6">
+                                <h5>
+                                    Bien occupé individuel 
+                                </h5>     
+                                {{ form_row(form.vh1) }}
+                            </div>
+                            <div class="col-xl-6">
+                                <h5>Montant minimum TTC</h5>  
+                                {{ form_row(form.min1) }}
+                            </div> 
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-6">
+                                <h5>
+                                    Bien occupé en copropriété
+                                </h5>     
+                                {{ form_row(form.vh2) }}
+                            </div>
+                            <div class="col-xl-6">
+                                <h5>Montant minimum TTC</h5>  
+                                {{ form_row(form.min2) }}
+                            </div> 
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-6">
+                                <h5>
+                                    Bien libre de toute occupation
+                                </h5>     
+                                {{ form_row(form.vh3) }}
+                            </div>
+                            <div class="col-xl-6">
+                                <h5>Montant minimum TTC</h5>  
+                                {{ form_row(form.min3) }}
+                            </div> 
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-6">
+                                <h5>
+                                    Gestion + de 10 biens
+                                </h5>     
+                                {{ form_row(form.vh4) }}
+                            </div>
+                            
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-6">
+                                <h5>
+                                    Indexation annuelle de la rente viagère
+                                </h5>     
+                                {{ form_row(form.vh5) }}
+                            </div>
+                            <div class="col-xl-6">
+                                <h5>Montant minimum TTC</h5>  
+                                {{ form_row(form.min5) }}
+                            </div> 
+                        </div>
+                        <div class="mt-50 mb-20 row align-items-center">
+                            <div class="col-xl-6">
+                                <h2 class="custom-header">
+                                    HONORAIRES sans rente**
+                                </h2> 
+                                
+                            </div>
+                            <div class="col-xl-6">
+                                 <h5>** honoraires par an TTC</h5>  
+                            </div>   
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-6">
+                                <h5>
+                                    Bien occupé individuel sans rente
+                                </h5> 
+                                {{ form_row(form.vh6) }}
+                            </div>
+                            
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-6">
+                                <h5>
+                                    Bien occupé en copropriété sans rente
+                                </h5> 
+                                {{ form_row(form.vh7) }}
+                            </div>
+                            
+                        </div>
+                        <button type="submit" class="mt-50 btn btn-outline-success btn-block">Modifier</button>
+                    {{ form_end(form) }}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+{% endblock %}

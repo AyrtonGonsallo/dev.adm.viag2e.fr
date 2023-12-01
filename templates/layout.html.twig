@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>{% block title %}Viag2e{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="noindex, nofollow">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
+    <script>
+        WebFont.load({
+            google: {"families":["Montserrat:300,400,500,600,700","Roboto:300,400,500,600,700"]},
+            active: function() {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+
+    {{ encore_entry_link_tags('app') }}
+    {% block styles %}{% endblock %}
+    <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}" />
+</head>
+
+<body class="m-page--fluid m--skin- m-content--skin-light2 m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-dark m-aside-left--offcanvas m-footer--push m-aside--offcanvas-default">
+    <!-- begin:: Page -->
+    <div class="m-grid m-grid--hor m-grid--root m-page">
+
+        <!-- BEGIN: Header -->
+        <header id="m_header" class="m-grid__item m-header " m-minimize-offset="200" m-minimize-mobile-offset="200">
+            <div class="m-container m-container--fluid m-container--full-height">
+                <div class="m-stack m-stack--ver m-stack--desktop">
+
+                    <!-- BEGIN: Brand -->
+                    <div class="m-stack__item m-brand  m-brand--skin-dark">
+                        <div class="m-stack m-stack--ver m-stack--general">
+                            <div class="m-stack__item m-stack__item--middle m-stack__item--center m-brand__logo">
+                                <a href="{{ path('dashboard') }}" class="m-brand__logo-wrapper">
+                                    <img alt="" src="{{ asset('img/logo.png') }}" style="width: 150px;" />
+                                </a>
+                            </div>
+                            <div class="m-stack__item m-stack__item--middle m-brand__tools">
+
+                                <!-- BEGIN: Responsive Aside Left Menu Toggler -->
+                                <a href="javascript:;" id="m_aside_left_offcanvas_toggle" class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-tablet-and-mobile-inline-block">
+                                    <span></span>
+                                </a>
+
+                                <!-- END -->
+
+                                <!-- BEGIN: Topbar Toggler -->
+                                <a id="m_aside_header_topbar_mobile_toggle" href="javascript:;" class="m-brand__icon m--visible-tablet-and-mobile-inline-block">
+                                    <i class="flaticon-more"></i>
+                                </a>
+
+                                <!-- BEGIN: Topbar Toggler -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- END: Brand -->
+                    <div class="m-stack__item m-stack__item--fluid m-header-head" id="m_header_nav">
+                        <!-- BEGIN: Topbar -->
+                        {% set notifications = getNotifications() %}
+                        <div id="m_header_topbar" class="m-topbar  m-stack m-stack--ver m-stack--general">
+                            <div class="m-stack__item m-topbar__nav-wrapper">
+                                <ul class="m-topbar__nav m-nav m-nav--inline">
+                                    <li class="m-nav__item m-topbar__notifications m-topbar__notifications--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-right">
+                                        <a href="{{ path('users') }}" class="m-nav__link" title="Gestion des utilisateurs">
+                                            <span class="m-nav__link-icon"><i class="flaticon-users"></i></span>
+                                        </a>
+                                    </li>
+                                    <li class="m-nav__item m-topbar__notifications m-topbar__notifications--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-right">
+                                        <a href="{{ path('parameters') }}" class="m-nav__link" title="Paramètres">
+                                            <span class="m-nav__link-icon"><i class="flaticon-cogwheel-2"></i></span>
+                                        </a>
+                                    </li>
+                                    <li class="m-nav__item m-topbar__notifications m-topbar__notifications--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-right 	m-dropdown--mobile-full-width" m-dropdown-toggle="click"
+                                        m-dropdown-persistent="1">
+                                        <a href="#" class="m-nav__link m-dropdown__toggle" id="m_topbar_notification_icon" title="Notifications">
+                                            {% if notifications|length > 0 %}<span class="m-nav__link-badge m-badge m-badge--accent">{{ notifications|length }}</span>{% endif %}
+                                            <span class="m-nav__link-icon"><i class="flaticon-alert-2"></i></span>
+                                        </a>
+                                        <div class="m-dropdown__wrapper">
+                                            <span class="m-dropdown__arrow m-dropdown__arrow--right"></span>
+                                            <div class="m-dropdown__inner">
+                                                <div class="m-dropdown__header m--align-center" style="background: url({{ asset('img/notification_bg.jpg') }}); background-size: cover;">
+                                                    <span class="m-dropdown__header-title">{{ notifications|length }}</span>
+                                                    <span class="m-dropdown__header-subtitle">{% if notifications|length > 1 %}notifications{% else %}notification{% endif %}</span>
+                                                </div>
+                                                <div class="m-dropdown__body">
+                                                    <div class="m-dropdown__content">
+                                                        {% if notifications|length > 0 %}
+                                                            <div class="m-scrollable" data-scrollable="true" data-height="250" data-mobile-height="200">
+                                                                <div class="m-list-timeline m-list-timeline--skin-light">
+                                                                    <div class="m-list-timeline__items">
+                                                                        {% for notification in notifications %}
+                                                                        <div class="m-list-timeline__item">
+                                                                            <span class="m-list-timeline__badge -m-list-timeline__badge--state-success"></span>
+                                                                            <span class="m-list-timeline__text">{{ notification.text|raw }}</span>
+                                                                            <span class="m-list-timeline__time">{{ notification.time }}</span>
+                                                                        </div>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="m-stack m-stack--ver m-stack--general" style="min-height: 180px;">
+                                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle">
+                                                                    <span class="">RAS<br />Tout est en ordre</span>
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                        <div class="text-center"><i><small><a href="{{ path('notifications') }}">Voir toutes les notifications</a></small></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="m-nav__item m-topbar__notifications m-topbar__notifications--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-right">
+                                        <a href="{{ path('app_logout') }}" class="m-nav__link" title="Déconnexion">
+                                            <span class="m-nav__link-icon"><i class="flaticon-logout"></i></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- END: Topbar -->
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- END: Header -->
+
+        <!-- begin::Body -->
+        <div class="m-grid__item m-grid__item--fluid m-grid m-grid--ver-desktop m-grid--desktop m-body">
+
+            <!-- BEGIN: Left Aside -->
+            <button class="m-aside-left-close m-aside-left-close--skin-dark" id="m_aside_left_close_btn"><i class="la la-close"></i></button>
+            <div id="m_aside_left" class="m-grid__item	m-aside-left  m-aside-left--skin-dark ">
+
+                <!-- BEGIN: Aside Menu -->
+                <div id="m_ver_menu" class="m-aside-menu  m-aside-menu--skin-dark m-aside-menu--submenu-skin-dark m-aside-menu--dropdown " data-menu-vertical="true" m-menu-dropdown="1" m-menu-scrollable="0" m-menu-dropdown-timeout="500">
+                    <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
+                        <li class="m-menu__item{% if app.request.attributes.get('_route') == 'dashboard' %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('dashboard') }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-line-graph"></i><span class="m-menu__link-text">Accueil</span></a></li>
+                        <li class="m-menu__item{% if (app.request.attributes.get('_route') in ['warrants', 'warrant_view'] and app.request.get('type') == 'buyers') or (app.request.attributes.get('_route') == 'property_view' and property.warrant.typeString == 'buyers') %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('warrants', {'type': 'buyers'}) }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-shopping-basket"></i><span class="m-menu__link-text">Mandats acquéreurs</span></a></li>
+                        <li class="m-menu__item{% if (app.request.attributes.get('_route') in ['warrants', 'warrant_view'] and app.request.get('type') == 'sellers') or (app.request.attributes.get('_route') == 'property_view' and property.warrant.typeString == 'sellers') %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('warrants', {'type': 'sellers'}) }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-coins"></i><span class="m-menu__link-text">Mandats vendeurs</span></a></li>
+                        <li class="m-menu__item{% if app.request.attributes.get('_route') == 'invoices' %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('invoices') }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-doc"></i><span class="m-menu__link-text">Facturation</span></a></li>
+                        <li class="m-menu__item{% if app.request.attributes.get('_route') in ['mailing_create', 'mailing_list'] %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('mailing_list') }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-mail-1"></i><span class="m-menu__link-text">Messages</span></a></li>
+                        <li class="m-menu__item{% if app.request.attributes.get('_route') == 'invoice_export' %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('invoice_export') }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-download-1"></i><span class="m-menu__link-text">Export comptable</span></a></li>
+                        <li class="m-menu__item{% if app.request.attributes.get('_route') == 'bank_exports' %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('bank_exports') }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-piggy-bank"></i><span class="m-menu__link-text">Export banque</span></a></li>
+                        <li class="m-menu__item{% if app.request.attributes.get('_route') == 'Ipc' %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('ipc') }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-piggy-bank"></i><span class="m-menu__link-text">Ipc</span></a></li>
+                        <li class="m-menu__item{% if app.request.attributes.get('_route') == 'Honoraires' %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('honoraires_list') }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-piggy-bank"></i><span class="m-menu__link-text">Honoraires</span></a></li>
+
+                    </ul>
+                </div>
+
+                <!-- END: Aside Menu -->
+            </div>
+
+            <!-- END: Left Aside -->
+            <div class="m-grid__item m-grid__item--fluid m-wrapper">
+                {% if app.session.flashbag.peekAll is not empty %}
+                    <div class="m-content">
+                        {% for label, messages in app.flashes %}
+                            {% for message in messages %}
+                                <div class="alert alert-pad alert-{{ label }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% block body %}TODO{% endblock %}
+            </div>
+        </div>
+
+        <!-- end:: Body -->
+
+        <footer class="m-grid__item		m-footer ">
+            <div class="m-container m-container--fluid m-container--full-height m-page__container">
+                <div class="m-stack m-stack--flex-tablet-and-mobile m-stack--ver m-stack--desktop">
+                    <div class="m-stack__item m-stack__item--left m-stack__item--middle m-stack__item--last">
+							<span class="m-footer__copyright">
+                                <a href="https://www.edovel.com" target="_blank">www.eDovel.com</a> | En cas de bug merci de contacter : <a href="mailto:dev@edovel.com">dev@eDovel.com</a>
+							</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- end:: Page -->
+
+    <div id="m_scroll_top" class="m-scroll-top">
+        <i class="la la-arrow-up"></i>
+    </div>
+
+    {{ encore_entry_script_tags('app') }}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

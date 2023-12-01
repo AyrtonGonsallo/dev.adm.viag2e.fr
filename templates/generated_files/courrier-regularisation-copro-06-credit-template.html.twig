@@ -1,0 +1,201 @@
+<style type="text/css">
+    <!--
+    table { vertical-align: top; }
+    tr    { vertical-align: top;}
+    td    { vertical-align: top; }
+    th {
+        background-color: #a1a1a1;
+        border-top: 2px solid #000;
+        }
+        th,td {
+  border: inherit;
+}
+    -->
+</style>
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt">
+    <bookmark title="Facture" level="0" ></bookmark>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px">
+        <tr>
+            <td style="text-align: left; width: 50%; border:none">
+                <img style="width: 200px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+            </td>
+            <td style="width: 50%; border:none">
+                <span style="font-size: 13pt;color:#b6bec5"><b style="color:#b6bec5">SPÉCIALISTE TRANSACTIONS VIAGÈRES<br />EXPERTISE ET ACCOMPAGNEMENT</b></span><br />
+                
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: left; width: 50%; display: flex; align-items: start; border:none">
+                Vincent GIBELIN - Directeur <br />
+                58, rue Fondaudège <br />
+                33000 BORDEAUX <br />
+                Tel : 05.56.21.91.44 - 06.67.11.61.8 <br />
+                Email : gestion@univers-viager.fr <br />
+                Site internet : www.univers-viager.fr <br />
+            </td>
+            <td style="width: 50%; border:none">
+               
+                {{ parameters.city|title }}, le {{ data.current_day }}
+                <br /><br />
+                <b style="text-align:left;">
+                    <br />{{data.form.civilite}} 
+                    {% if data.target =='Crédirentier' %} {{data.property.getFirstname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %} {% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}
+                    {% if data.target =='Crédirentier' %} {{data.property.getLastname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %} {% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}&nbsp;
+                    <br />
+                    {% if data.target =='Crédirentier' %} {{data.property.getAddress() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getAddresseDebirentier() }}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}
+                    <br />
+                    {% if data.target =='Crédirentier' %} {{data.property.getPostalCode() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getCodePostalDebirentier() }}{% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %} {% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %}
+                    {% if data.target =='Crédirentier' %} {{data.property.getCity() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getVilleDebirentier() }}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %}<br />
+                </b>
+            </td>
+        </tr>
+    </table>
+    <br />
+    <br />
+    <h4 style="text-decoration:underline">Dossier : {{ data.property.getTitle() }}</h4>
+    
+    <br />
+    <br />
+    {% for i in 0..100 %}
+        &nbsp;
+    {% endfor %}
+    {{data.form.formule}} {{ data.property.getFirstname1() }},<br />
+    {% for i in 0..100 %}
+        &nbsp;
+    {% endfor %}
+Monsieur JACQUEMIN, représentant la société {% if data.debirentier_different %}{{ data.debirentier.nom_debirentier }}{% else %}{{ data.property.getWarrant().getFirstname() }} {% endif %}, nous a mandatés
+pour assurer la bonne gestion de son viager suite à l’acquisition de votre bien situé à l’adresse sus 
+indiquée.<br />
+    {% for i in 0..100 %}
+        &nbsp;
+    {% endfor %}
+Dans le cadre des missions qui nous ont été confiées, je vous informe que nous avons 
+procédé à la régularisation des charges de copropriété. Nous vous prions de bien vouloir trouver cidessous le décompte des charges pour les exercices non encore régularisés à savoir les exercices
+courants du {{data.period2}}.
+
+<br />
+    <br />
+    <table cellspacing="0" cellpadding="20px"  style="width: 100%; border: solid 1px black; font-size: 10pt;text-align:center;">
+    <tr >
+        <th>{{ data.nom_compte }}</th>
+        <th>ETAT DE VOTRE COMPTE</th>
+        <th>Debit</th>
+        <th>Credit</th>
+    </tr>
+   <tr>
+        <th></th>
+        <th>ACHAT {{data.property.getDosAuthenticInstrument() | date("d/m/Y") }}</th>
+        <th></th>
+        <th></th>
+    </tr>
+   {% set curr_year= null %}
+    {% set curr_debit= 0 %}
+     {% for facture in data.factures %}
+        {% if not curr_year %}
+            <tr>
+                <th>{{facture.year}}</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        {% elseif curr_year and curr_year!= facture.year %}
+            <tr>
+                <td>31/12/{{curr_year}}</td>
+                <td>Décompte de charges {{curr_year}}</td>
+                <td></td>
+                <td> </td>
+            </tr>
+            <tr style="background-color:#a1a1a1">
+                <td></td>
+                <td>Totaux</td>
+                <td></td>
+                <td>{{curr_debit}} €</td>
+            </tr>
+            <tr>
+                <th>{{facture.year}}</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            {% set curr_debit= 0 %}
+        {% endif %}
+        {% set curr_year = facture.year %}
+        {% set curr_debit = curr_debit + facture.montant %}
+        <tr>
+            <td>{{facture.trimestre}}</td>
+            <td>Chèque n°{{facture.numero}} du {{facture.date}} à Univers viagers</td>
+            <td></td>
+            <td>{{facture.montant}} €</td>
+        </tr>
+    {% endfor %}
+     <tr>
+        <td>31/12/{{curr_year}}</td>
+        <td>Décompte de charges {{curr_year}}</td>
+        <td></td>
+        <td> </td>
+    </tr>
+    <tr style="background-color:#a1a1a1">
+        <td></td>
+        <td>Totaux</td>
+        <td></td>
+        <td>{{curr_debit}} €</td>
+    </tr>
+    <tr style="background-color:#cde0eb">
+        <td>Régularisation</td>
+        <td>Totaux annuels</td>
+        <td>{{data.debit}} €</td>
+        <td>{{data.credit}} €</td>
+    </tr>
+    <tr style="background-color:#cde0eb">
+        <td></td>
+        <td>Solde au 31/12/{{curr_year}}</td>
+        <td>{{data.amount}}€</td>
+        <td></td>
+    </tr>
+    
+</table> 
+<br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    La régularisation affiche un solde créditeur de {{ data.amount}} € en votre faveur. <br />
+ Nous vous invitons à prendre contact avec nous afin de procéder au règlement de cette somme.  <br />
+
+{% if data.form.partie_accessoire %}
+    <br /><br /><br /><br />
+    {% for i in 0..100 %}
+        &nbsp;
+    {% endfor %}
+    Par ailleurs, pour ajuster les provisions aux charges réelles pour le prochain exercice, 
+    veuillez prendre note du réajustement des provisions qui vous seront appelées 
+    trimestriellement, et qui s’élèveront désormais à hauteur de {{data.form.montant_partie_accessoire}} € à compter du {{data.form.date_partie_accessoire  | date("d/m/Y") }}
+    <br />
+    {% for i in 0..100 %}
+        &nbsp;
+    {% endfor %}
+    Nous restons, bien entendu, à votre disposition pour tous renseignements complémentaires et 
+    vous prions de croire en l’expression de nos sincères salutations.
+{% endif %}
+ <br /> <br /> <br />
+{% for i in 0..300 %}
+    &nbsp;
+{% endfor %}
+Vincent GIBELIN,
+ <br /> <br /> <br /><br />
+<h5 style="text-decoration:underline">Pièces Jointes:</h5>
+{% for pieces_jointe in data.pieces_jointes %}
+- {{pieces_jointe.title}}<br />
+{% endfor %}
+</page>
+<page_footer>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 10px;">
+        <tr>
+            <td style="width: 100%; border:none">
+                UNIVERS VIAGER - Siège social : 58 Rue Fondaudège 33000 BORDEAUX, SARL au capital de 5 000 €<br/>
+                TVA FR27523654408 - Immatriculée au RCS Bordeaux N°523 654 408<br />
+                Garantie financière GALIAN 89 rue de la Boétie 75008 PARIS Montant : 120 000 €<br />
+                Carte Professionnelle Transaction et Gestion immobilière n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br />
+                « Notre agence ne détient aucun fonds pour le compte de ses clients »
+            </td>
+        </tr>
+    </table>
+</page_footer>

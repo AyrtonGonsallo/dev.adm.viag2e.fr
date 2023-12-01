@@ -1,0 +1,195 @@
+
+{% extends 'layout.html.twig' %}
+{% import "macros/forms.html.twig" as mforms %}
+
+{% block title %}Viag2e | Générer Courrier de régularisation des charges de copropriété pour le bien #{{ property.id }} ({{ property.title }}){% endblock %}
+
+
+{% block body %}
+    {% if message %}
+            <div class="m-alert m-alert--icon alert alert-success" role="alert">
+                <div class="m-alert__icon">
+                    <i class="la la-check"></i>
+                </div>
+                <div class="m-alert__text">
+                    <strong>{{ message }} </strong> 
+                </div>
+            </div>
+        {% endif %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Courrier de régularisation des charges de copropriété pour le bien #{{ property.id }} ({{ property.title }})</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Courrier de régularisation des charges de copropriété
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                {{ form_start(form) }}
+                    <div class="form-group row">
+                        
+                        <div class="col-lg-6">
+                            <label for="form-civilite" class="col-4 col-form-label">Civilité</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.civilite, {'attr': {'class': 'form-control m-input'}, 'id': 'form-civilite', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                     
+                        <div class="col-lg-6">
+                            <label for="form-formule" class="col-4 col-form-label">Formule</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.formule, {'attr': {'class': 'form-control m-input'}, 'id': 'form-formule', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div> 
+                        <div class="col-lg-6">
+                            <label class="col-12">Du :</label>
+                            {{ form_row(form.date_reg_debut, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_reg_debut', 'label': false}) }}
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="col-12">Au:</label>
+                            {{ form_row(form.date_reg_fin, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_reg_fin', 'label': false}) }}
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="col-12">Total crédit (crédit)</label>
+                            <input type="text" id="form-total-credit" name="total-credit" disabled="disabled" class="form-control m-input">
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="col-12">Décompte de charges (débit)</label>
+                            {{ form_row(form.debit, {'attr': {'class': 'form-control m-input'}, 'id': 'form-debit', 'label': false}) }}
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="col-12">Régul annuelle</label>
+                            {{ form_row(form.regul, {'attr': {'class': 'form-control m-input'}, 'id': 'form-regul', 'label': false}) }}
+
+                        </div>
+                        <div class="col-lg-6">
+                        <label class="col-12">Pièces jointes</label>
+                            {{ form_row(form.pieces_jointes, {'attr': {'class': 'form-control m-input'}, 'id': 'form-pieces_jointes', 'label': false}) }}
+
+                        </div>
+                        <div class="col-6">
+                            <label for="form-partie_accessoire" class="col-4 col-form-label">Partie accessoire de la facture</label>
+                            <div class="col-6">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.partie_accessoire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-partie_accessoire', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6" id="acc_1">
+                            <label class="col-12">Date:</label>
+                            {{ form_row(form.date_partie_accessoire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_partie_accessoire', 'label': false}) }}
+                        </div>
+                        <div class="col-lg-6" id="acc_2">
+                            <label class="col-12">Montant</label>
+                            {{ form_row(form.montant_partie_accessoire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-montant_partie_accessoire', 'label': false}) }}
+
+                        </div>
+                        <input class="btn btn-outline-success btn-block" type="submit" value="Générer" />
+                    </div>
+                    {{ form_rest(form) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    function get_invoices(){
+                /*
+                annee_vente
+                form_date_debut_gestion_copro_day
+                form_date_debut_gestion_copro_month
+                form_date_debut_gestion_copro_year
+                */
+                
+                s_j=$("#form_date_reg_debut_day").find(":selected").val()
+                s_m=$("#form_date_reg_debut_month").find(":selected").val()
+                s_a=$("#form_date_reg_debut_year").find(":selected").val()
+                e_j=$("#form_date_reg_fin_day").find(":selected").val()
+                e_m=$("#form_date_reg_fin_month").find(":selected").val()
+                e_a=$("#form_date_reg_fin_year").find(":selected").val()
+                pid = {{property.id}}
+                console.log(s_j,s_m,s_a,e_j,e_m,e_a,pid)
+                if(e_j>=1 && e_m>=1 && e_a>=1 && s_a>=1 && s_j>=1 && s_m>=1){
+                    console.log("request")
+                    
+                    let route = "{{ path('get_invoices', {'propertyId':'ppp','e_day':'e_ddd','e_month':'e_mmm','e_year':'e_yyy','s_day':'s_ddd','s_month':'s_mmm','s_year':'s_yyy'}) }}";
+                    changePath0 = route.replace('ppp', pid);
+                    changePath1 = changePath0.replace('e_ddd', e_j);
+                    changePath2 = changePath1.replace('e_mmm', e_m);
+                    changePath3 = changePath2.replace('e_yyy',e_a);
+                    changePath4 = changePath3.replace('s_ddd', s_j);
+                    changePath5 = changePath4.replace('s_mmm', s_m);
+                    changePath = changePath5.replace('s_yyy',s_a);
+                    
+                    $.ajax({
+                        method: "post",
+                        url:changePath,
+                        // url: '{{ path('get_ipcs', {'type':'Ménages'}) }}',
+                        data: { myid: 123456 },
+                        success: function(data) {
+                            console.log(data)
+                            $('#form-total-credit').val(data['credit'])
+                            
+                        }
+                    });
+                }
+                
+            }
+    $('#form_date_reg_debut_day').on('change', function() {get_invoices()})
+            $('#form_date_reg_debut_month').on('change', function() {get_invoices()})
+            $('#form_date_reg_debut_year').on('change', function() {get_invoices()})
+            $('#form_date_reg_fin_day').on('change', function() {get_invoices()})
+            $('#form_date_reg_fin_month').on('change', function() {get_invoices()})
+            $('#form_date_reg_fin_year').on('change', function() {get_invoices()})
+    $("#form-debit").on("input", function() {
+                credit=$('#form-total-credit').val()
+                debit=$(this).val()
+                $('#form-regul').val(credit-debit)
+            });
+            $("#acc_1").hide()
+            $("#acc_2").hide()
+            $('#form-partie_accessoire').click(function() {
+                $("#acc_1")[this.checked ? "show" : "hide"]();
+                $("#acc_2")[this.checked ? "show" : "hide"]();
+            });
+            
+</script>
+{% endblock %}

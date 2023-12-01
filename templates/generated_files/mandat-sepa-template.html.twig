@@ -1,0 +1,227 @@
+<style type="text/css">
+    <!--
+    table { vertical-align: top; }
+    tr    { vertical-align: top; }
+    td    { vertical-align: top; }
+    -->
+</style>
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt">
+    <bookmark title="Facture" level="0" ></bookmark>
+    <h1 style="text-decoration:underline">MANDAT SEPA </h1>
+    <h2> Référence Unique du Mandat de Prélèvement SEPA </h2>
+    {{ data.property.getBankRum() }}
+    <br />
+    <br />
+    En signant ce formulaire de mandat, vous autorisez UNIVERS VIAGER à envoyer des instructions à votre banque pour
+    débiter votre compte, et votre banque à débiter votre compte conformément aux instructions de UNIVERS VIAGER.
+    Vous bénéficiez du droit d’être remboursé par votre banque selon les conditions décrites dans la convention que vous
+    avez passée avec elle.
+    Une demande de remboursement doit être présentée :<br />
+    - dans les 8 semaines suivant la date de débit de votre compte pour un prélèvement autorisé,<br />
+    - dans les 13 mois en cas de prélèvement non autorisé.<br />
+    <br />
+    <br />
+    
+    <table cellspacing="0" style="width: 100%; border: solid 1px black; font-size: 10pt;">
+        <tr>
+            <td style="width: 20%;">
+                votre nom
+            </td>
+            <td style="width: 80%;">
+                <br /><br />
+                <table style="width: 100%;">
+                    <tr>
+                        <td>
+                           {% if data.form.destinataire =='Crédirentier' %} {{data.property.getLastname1()}} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %} {% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr style="border-top: solid 1px black;">
+            <td style="width: 20%;">
+                Votre adresse
+            </td>
+            <td style="width: 80%;">
+                <br /><br />
+                <table style="width: 100%;">
+                    <tr>
+                        <td>
+                            {% if data.form.destinataire =='Crédirentier' %} {{data.property.getAddress() }} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getAddresseDebirentier() }}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}<br />
+                            <span style="width: 100px; font-size: 7pt;">Numéro et nom de la rue</span>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td>
+                            {% if data.form.destinataire =='Crédirentier' %} {{data.property.getPostalCode() }} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getCodePostalDebirentier() }}{% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %} {% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %}<br />
+                            <span style="width: 100px; font-size: 7pt;">Ville Code postal</span>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td>
+                            {% if data.form.destinataire =='Crédirentier' %} {{data.property.getCountry() }} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPaysDebirentier() }}{% else %}{{data.property.getWarrant().getCountry() }}  {% endif %}{% else %}{{data.property.getWarrant().getCountry() }}  {% endif %}<br />
+                            <span style="width: 100px; font-size: 7pt;">Pays</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr style="border-top: solid 1px black;">
+            <td style="width: 20%;">
+               Les coordonnées de votre compte
+            </td>
+            <td style="width: 80%;">
+                <br /><br />
+                <table style="width: 100%;">
+                    <tr>
+                        <td>
+                            {% if data.form.destinataire =='Crédirentier' %} {{data.property.getBankIban() }} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getWarrant().getBankIban() }}{% else %}{{data.property.getWarrant().getBankIban() }}  {% endif %} {% else %}{{data.property.getBuyerBankIban() }}  {% endif %}<br />
+                            <span style="width: 100px; font-size: 7pt;">Numéro d'identification du compte bancaire - IBAN (International Bank Number)</span>                       
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {% if data.form.destinataire =='Crédirentier' %} {{data.property.getBankBic() }} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getWarrant().getBankBic() }}{% else %}{{data.property.getWarrant().getBankBic() }}  {% endif %} {% else %}{{data.property.getBuyerBankBic() }}  {% endif %}<br />
+                            <span style="width: 100px; font-size: 7pt;">Code internation d'identification de votre banque - BIC (Bank Identifier Code)</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {% if data.form.destinataire =='Crédirentier' %} {{data.property.getBankDomiciliation() }} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getWarrant().getBankDomiciliation() }}{% else %}{{data.property.getWarrant().getBankDomiciliation() }}  {% endif %} {% else %}{{data.property.getBuyerBankDomiciliation() }}  {% endif %}<br />
+                            <span style="width: 100px; font-size: 7pt;">Domiciliation bancaire</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr style="border-top: solid 1px black;">
+            <td style="width: 20%;">
+                Nom du Créancier
+            </td>
+            <td style="width: 80%;">
+                <br /><br />
+                <table style="width: 100%;">
+                    <tr>
+                        <td>
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 40%;">
+                                        E.U.R.L. V GIBELIN CONSEILS<br />
+                                        <span style="width: 100px; font-size: 7pt;">Nom du créancier</span>
+                                    </td>
+                                    <td style="width: 30%;">
+                                        
+                                    </td>
+                                    <td style="width: 10%;">
+                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 40%;">
+                                    FR12ZZZ886B32<br />
+                                    <span style="width: 100px; font-size: 7pt;">Identifiant Créancier SEPA</span>
+                                    </td>
+                                    <td style="width: 30%;">
+                                        
+                                    </td>
+                                    <td style="width: 10%;">
+                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 40%;">
+                                    58 rue Fondaudège<br />
+                                    <span style="width: 100px; font-size: 7pt;">Numéro et nom de la rue</span>
+                                    </td>
+                                    <td style="width: 30%;">
+                                        
+                                    </td>
+                                    <td style="width: 10%;">
+                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 40%;">
+                                    33000<br />
+                                    <span style="width: 100px; font-size: 7pt;">Code postal</span>
+                                    </td>
+                                    <td style="width: 30%;">
+                                        BORDEAUX<br />
+                                        <span style="width: 100px; font-size: 7pt;">Ville</span>
+                                    </td>
+                                    <td style="width: 10%;">
+                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 20%;">
+                                    France<br />
+                                    <span style="width: 100px; font-size: 7pt;">Pays</span>
+                                    </td>
+                                    <td style="width: 10%;">
+                                    </td>
+                                    <td style="width: 30%;">
+                                        <img style="width: 150px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <tr style="border-top: solid 1px black;">
+            <td style="width: 20%;">
+                Type de paiement
+            </td>
+
+            <td style="width: 80%;">
+                 <input type="checkbox" id="prr" name="prr value="prr" {% if data.form.mode_de_paiement == 'Paiement récurrent / répétitif' %} checked {% endif %}/>Paiement récurrent / répétitif
+                 <br />
+                 <input type="checkbox" id="pp" name="pp" value="pp" {% if data.form.mode_de_paiement == 'Paiement ponctuel' %} checked {% endif %}/>Paiement ponctuel
+            </td>
+           
+        </tr>
+        <tr>
+            <td style="width: 20%;">
+                Signé à
+            </td>
+            <td style="width: 80%;">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Le &nbsp;&nbsp;_ _ &nbsp;&nbsp;_ _ &nbsp;&nbsp;_ _ _ _
+                <br />
+                <span style="width: 100px; font-size: 7pt;">lieu</span>
+            </td> 
+        </tr>
+        <tr>
+            <td style="width: 20%;">
+                Signature(s)
+            </td>
+            <td style="width: 80%;">
+                <div style="border: solid 1px black; width:70%;height:70px"></div>
+            </td>
+           
+        </tr>
+                
+        <tr style="border-top: solid 1px black;">
+            <td style="width: 20%;border-right: solid 1px black;">
+                À retourner à :
+                Univers Viager, 58 rue Fondaudège
+                33000 BORDEAUX
+            </td>
+            <td style="width: 80%;">
+                <br /><br />
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="">
+                           Zone réservée à l'usage exclusif du créancier
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</page>
+<page_footer>
+    
+</page_footer>

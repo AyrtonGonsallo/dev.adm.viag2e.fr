@@ -1,0 +1,73 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Honoraires{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">HONORAIRES</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="m-content honoraires-list">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Liste des honoraires
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <table class="m-datatable-warrants kt-datatable" id="html_table1" width="100%">
+                    <thead>
+                        <tr>
+                            
+                            <th title="Nom" data-field="Nom">Nom</th>
+                            <th title="Valeur" data-field="Valeur">Valeur</th>
+                            <th title="Minimum" data-field="Minimum">Montant minimum TTC</th>
+                            <th title="DateMod" data-field="DateMod">Dernière modification</th>
+                            <th title="Actions" data-field="actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for honoraire in honoraires %}
+                        <tr>
+                            
+                            <td>{{ honoraire.nom }}</td>
+                            <td>{{ honoraire.valeur }} %</td>
+                            <td>{{ honoraire.minimum }} €</td>
+                            <td>{{ honoraire.DateMod |date('Y-m-d')}}</td>
+                            <td>
+                                <a class="btn btn-primary button-special" href="{{ path('modifier_honoraire', {'id': honoraire.id}) }}">modifier</a>
+                                <a class="btn btn-danger button-special" href="{{ path('supprimer_honoraire', {'id': honoraire.id}) }}">supprimer</a>
+                             </td>
+                            </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <a class="btn btn-primary button-special" href="honoraires">Gestion des honoraires</a>
+         <a class="btn btn-primary button-special" href="{{ path('add_honoraire') }}">Ajouter un honoraire</a>
+    </div>
+{% endblock %}
+{% block scripts %}
+    {{ encore_entry_script_tags('html-table.warrants') }}
+   
+{% endblock %}

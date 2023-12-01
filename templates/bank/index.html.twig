@@ -1,0 +1,144 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Exports banque{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Exports banque</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Liste des exports
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                    <div class="row align-items-center">
+                        <div class="col-xl-8 order-2 order-xl-1">
+                            <div class="form-group m-form__group row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="m-form__group m-form__group--inline">
+                                        <div class="m-form__label">
+                                            <label class="m-label m-label--single" for="m_form_type">Type:</label>
+                                        </div>
+                                        <div class="m-form__control">
+                                            <select class="form-control m-bootstrap-select" id="m_form_type">
+                                                <option value="">Tous</option>
+                                                <option value="Automatique">Automatique</option>
+                                                <option value="Manuel">Manuel</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="d-md-none m--margin-bottom-10"></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="m-input-icon m-input-icon--left">
+                                        <input type="text" class="form-control m-input" placeholder="Recherche..." id="generalSearch">
+                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                            <span><i class="la la-search"></i></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                            <button type="button" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill" data-toggle="modal" data-target="#m_modal_generate" id="btn-modal-generate">
+                                        <span>
+                                            <i class="la la-code"></i>
+                                            <span>Génération manuelle</span>
+                                        </span>
+                            </button>
+                            <div class="m-separator m-separator--dashed d-xl-none"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="m-datatable-exports" id="html_table" width="100%">
+                    <thead>
+                    <tr>
+                        <th title="Période" data-field="Période">Période</th>
+                        <th title="ID" data-field="ID">ID</th>
+                        <th title="Type" data-field="Type">Type</th>
+                        <th title="Date" data-field="Date">Date</th>
+                        <th title="Download" data-field="Download"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for export in exports %}
+                        <tr>
+                            <td>{{ export.period }}</td>
+                            <td>{{ export.messageId }}</td>
+                            <td>{{ export.typestring }}</td>
+                            <td>{{ export.date|date('d-m-Y H:i') }}</td>
+                            <td>{% if export.driveId == 'notstored' %}-{% else %}<a href="{{ path('file_export_download', {'fileId': export.driveId}) }}" target="_blank"><i class="la la-cloud-download" title="Télécharger"></i> Télécharger</a>{% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="m_modal_generate" tabindex="-1" role="dialog" aria-labelledby="generate" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Génération manuelle</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ path('bank_generate') }}" method="post" id="generate-form">
+                        <label class="col-xl-12 col-lg-12 col-form-label" for="form-dates">Dates:</label>
+                        <div class="col-xl-12 col-lg-12">
+                            <input type="text" class="form-control m-input" id="form-dates" name="range" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="generate-button">Générer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ encore_entry_script_tags('html-table.bank') }}
+    <script type="text/javascript">
+        $('input[name="range"]').daterangepicker({
+            autoApply: true,
+            startDate: moment().subtract(1, 'month').startOf('month').format('L'),
+            endDate: moment().subtract(1, 'month').endOf('month').format('L'),
+        });
+
+        $('#generate-button').click(function () {
+            $('#generate-form').submit();
+        });
+    </script>
+{% endblock %}

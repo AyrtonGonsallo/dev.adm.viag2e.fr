@@ -1,0 +1,75 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Export{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Export</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Export comptable
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <form action="{{ path('invoice_accounting') }}" method="post">
+                    <div class="form-group row">
+                        <div class="col-lg-6">
+                            <label>Type:</label>
+                            <div class="m-radio-list">
+                                <label class="m-radio m-radio--primary">
+                                    <input type="radio" name="type" value="{{ constant('App\\Entity\\Warrant::TYPE_BUYERS') }}" checked> Acquéreurs
+                                    <span></span>
+                                </label>
+                                <label class="m-radio m-radio--primary">
+                                    <input type="radio" name="type" value="{{ constant('App\\Entity\\Warrant::TYPE_SELLERS') }}"> Vendeurs
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="col-xl-12 col-lg-12 col-form-label" for="form-dates">Dates:</label>
+                            <div class="col-xl-12 col-lg-12">
+                                <input type="text" class="form-control m-input" id="form-dates" name="range" />
+                            </div>
+                        </div>
+                    </div>
+                    <input class="btn btn-outline-success btn-block" type="submit" value="Télécharger" />
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $('input[name="range"]').daterangepicker({
+            autoApply: true,
+            startDate: moment().subtract(1, 'month').startOf('month').format('L'),
+            endDate: moment().subtract(1, 'month').endOf('month').format('L'),
+        });
+    </script>
+{% endblock %}

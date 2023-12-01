@@ -1,0 +1,149 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Utilisateur{% endblock %}
+
+{% block body %}
+    <div class="m-content">
+        {% if not active %}
+            <div class="m-alert m-alert--icon alert alert-danger" role="alert">
+                <div class="m-alert__icon">
+                    <i class="la la-warning"></i>
+                </div>
+                <div class="m-alert__text">
+                    <strong>Attention !</strong> Ce compte est désactivé.
+                </div>
+                <div class="m-alert__actions" style="width: 160px;">
+                    <a class="btn btn-warning btn-sm m-btn m-btn--pill m-btn--wide" href="{{ path('user_activate', {'userId': userId}) }}">Activer</a>
+                </div>
+            </div>
+        {% endif %}
+        {% if app.user.id == userId %}
+            <div class="m-alert m-alert--icon alert alert-danger" role="alert">
+                <div class="m-alert__icon">
+                    <i class="la la-warning"></i>
+                </div>
+                <div class="m-alert__text">
+                    <strong>Attention !</strong> Vous éditez votre propre compte.
+                </div>
+            </div>
+        {% endif %}
+        <div class="m-portlet m-portlet--creative m-portlet--first m-portlet--bordered-semi">
+            <div class="m-portlet__head m-portlet__head-no-height">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h2 class="m-portlet__head-label m-portlet__head-label--info">
+                            <span>UTILISATEUR</span>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                {% if not form.vars.valid %}
+                <div class="m-alert m-alert--icon m-alert--outline m-alert--square alert alert-danger" role="alert">
+                    <div class="m-alert__icon"><i class="la la-exclamation-circle"></i></div>
+                    <div class="m-alert__text">
+                        {{ form_errors(form) }}
+                        {{ form_errors(form.email) }}
+                        {{ form_errors(form.firstname) }}
+                        {{ form_errors(form.lastname) }}
+                        {{ form_errors(form.society) }}
+                        {{ form_errors(form.address) }}
+                        {{ form_errors(form.postal_code) }}
+                        {{ form_errors(form.city) }}
+                        {{ form_errors(form.country) }}
+                    </div>
+                </div>
+                {% endif %}
+                {{ form_start(form) }}
+                    <div class="tab-pane active" id="m_tabs_user" role="tabpanel">
+                        <div class="form-group m-form__group row">
+                            <label for="form-email" class="col-2 col-form-label">Adresse e-mail <span class="m--font-danger">*</span></label>
+                            <div class="col-10">
+                                {{ form_row(form.email, {'attr': {'class': 'form-control m-input'}, 'id': 'form-email', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label for="form-plainPassword" class="col-2 col-form-label">Mot de passe</label>
+                            <div class="col-10">
+                                {{ form_row(form.plainPassword, {'attr': {'class': 'form-control m-input'}, 'id': 'form-plainPassword', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label for="form-firstname" class="col-2 col-form-label">Prénom <span class="m--font-danger">*</span></label>
+                            <div class="col-10">
+                                {{ form_row(form.firstname, {'attr': {'class': 'form-control m-input'}, 'id': 'form-firstname', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label for="form-lastname" class="col-2 col-form-label">Nom <span class="m--font-danger">*</span></label>
+                            <div class="col-10">
+                                {{ form_row(form.lastname, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lastname', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label for="form-society" class="col-2 col-form-label">Société</label>
+                            <div class="col-10">
+                                {{ form_row(form.society, {'attr': {'class': 'form-control m-input'}, 'id': 'form-society', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label for="form-address" class="col-2 col-form-label">Adresse</label>
+                            <div class="col-10">
+                                {{ form_row(form.address, {'attr': {'class': 'form-control m-input'}, 'id': 'form-address', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label for="form-postal_code" class="col-2 col-form-label">Code Postal</label>
+                            <div class="col-10">
+                                {{ form_row(form.postal_code, {'attr': {'class': 'form-control m-input'}, 'id': 'form-postal_code', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label for="form-city" class="col-2 col-form-label">Ville</label>
+                            <div class="col-10">
+                                {{ form_row(form.city, {'attr': {'class': 'form-control m-input'}, 'id': 'form-city', 'label': false}) }}
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label for="form-country" class="col-2 col-form-label">Pays</label>
+                            <div class="col-10">
+                                <div class="m-typeahead">
+                                    {{ form_row(form.country, {'attr': {'class': 'form-control m-input'}, 'id': 'form-country', 'label': false}) }}
+                                </div>
+                            </div>
+                        </div>
+                        {{ form_rest(form) }}
+                    </div>
+                    <input class="btn btn-outline-success btn-block" type="submit" value="Enregistrer" />
+                {{ form_end(form) }}
+            </div>
+        </div>
+        {% if active %}
+            <a class="btn btn-outline-danger btn-block" href="#" data-toggle="modal" data-target="#m_modal_activate">Désactiver</a>
+            <div class="modal fade" id="m_modal_activate" tabindex="-1" role="dialog" aria-labelledby="user_activate" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="buyer_add">Désactiver l'utilisateur</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="m-alert m-alert--icon m-alert--outline m-alert--square alert alert-danger" role="alert">
+                                <div class="m-alert__icon"><i class="la la-exclamation-circle"></i></div>
+                                <div class="m-alert__text">
+                                    Êtes-vous sûr de vouloir désactiver l'utilisateur ?
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <a class="btn btn-primary" href="{{ path('user_activate', {'userId': userId}) }}">Continuer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

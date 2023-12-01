@@ -1,0 +1,434 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Facturation{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Facturation</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+<div id="partie-reponse" class="m-content"></div>
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Liste des factures | <a id="pending-only" href="#"><small><i id="pending-label">Voir les factures en attente de paiement</i></small></a>
+                        </h3>
+                    </div>
+                </div>
+                <div class="m-portlet__head-tools">
+                    <form action="{{ path('invoices') }}" method="post">
+                        <div class="form-group m-form__group m--margin-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control m-input m--margin-top-5" id="form-dates" name="range" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" id="reload_data" type="button">Valider</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                    <div class="row align-items-center">
+                        <div class="col-xl-8 order-2 order-xl-1">
+                            <div class="form-group m-form__group row align-items-center">
+                                <div class="col-md-2">
+                                    <div class="m-form__group m-form__group--inline">
+                                        <div class="m-form__label">
+                                            <label class="m-label m-label--single" for="m_form_status">Statut:</label>
+                                        </div>
+                                        <div class="m-form__control">
+                                            <select class="form-control m-bootstrap-select" id="m_form_status">
+                                                <option value="">Tous</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::STATUS_TREATED') }}">Traitées</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::STATUS_PAYED') }}">Payées</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::STATUS_UNSENT') }}">Erreur d'envoi</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::STATUS_SENT') }}">Envoyées</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::STATUS_GENERATED') }}">Générées</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="d-md-none m--margin-bottom-10"></div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="m-form__group m-form__group--inline">
+                                        <div class="m-form__label">
+                                            <label class="m-label m-label--single" for="m_form_category">Catégorie:</label>
+                                        </div>
+                                        <div class="m-form__control">
+                                            <select class="form-control m-bootstrap-select" id="m_form_category">
+                                                <option value="">Tous</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_ANNUITY') }}">Rente</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_CONDOMINIUM_FEES') }}">Frais de co-pro</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_GARBAGE') }}">Ordures ménagères</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_MANUAL') }}">Manuelle</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="d-md-none m--margin-bottom-10"></div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="m-form__group m-form__group--inline">
+                                        <div class="m-form__label">
+                                            <label class="m-label m-label--single" for="m_form_type">Type:</label>
+                                        </div>
+                                        <div class="m-form__control">
+                                            <select class="form-control m-bootstrap-select" id="m_form_type">
+                                                <option value="">Tous</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') }}">Avis d'échéance</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::TYPE_RECEIPT') }}">Quittance</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="d-md-none m--margin-bottom-10"></div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="m-input-icon m-input-icon--left">
+                                        <input type="text" class="form-control m-input" placeholder="Recherche..." id="generalSearch">
+                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                            <span><i class="la la-search"></i></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-primary" id="valider-tous">Valider sélection</button>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-primary" id="télécharger-tous">Télécharger sélection</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="m-datatable-invoices" id="html_table" width="100%"></table>
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="modal fade" id="m_modal_invoice_status" tabindex="-1" role="dialog" aria-labelledby="invoice_status" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="invoice_status_h">Modification du status <span id="modal-title">-</span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <b>ATTENTION:</b> La validation du paiement provoque la génération de la quittance et est irréversible.
+                    <form action="{{ path('invoice_payed') }}" method="post" id="payed-form"><input type="hidden" name="id" value="0" id="payment-form-id"><input type="hidden" name="sort" value="0" id="payment-form-sort"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="validate-payment">Valider le paiement</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+{% endblock %}
+
+{% block scripts %}
+    {# encore_entry_script_tags('html-table.invoices') #}
+    <script type="text/javascript">
+        $(function() {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const parameter = urlParams.get('sorts')
+            if(parameter){
+                console.log(parameter.split("-"))
+            }
+            $('#html_table').on('click', '.invoice-status', function () {
+                $('#payment-form-id').attr('value', $(this).attr('data-id'));
+                $('#modal-title').html($(this).attr('data-number'));
+            });
+
+            $('#validate-payment').click(function () {
+                let route = "{{ path('get_selected_invoices',{'type':'valider-tous'}) }}";
+                selected_ids=[]
+                id=$('#payment-form-id').attr('value');
+                status='#invoice_'+id
+                selected_ids.push(
+                    {
+                        
+                        "id":id,
+                    }
+                )
+                $('#m_modal_invoice_status').modal('hide');
+                 $.ajax({
+                    type: 'POST',
+                    dataType: "json",
+                    url:route,
+                    data: {"ids":selected_ids},
+                    success: function(data) {
+                        console.log('received: ',data)
+                        $(status).parent().parent().html('<span class="m--font-success" style="width: 110px;">Payée</span>')
+                        $('#partie-reponse').html('<div class="m-content"><div class="alert alert-pad alert-success">Facture marquée comme payée</div></div>');
+                        
+                    }
+                });
+                 
+            });
+
+            $('input[name="range"]').daterangepicker({
+                autoApply: true,
+                startDate: "{{ range_start }}",
+                endDate: "{{ range_end }}",
+            });
+
+            let DatatableHtmlInvoices = function() {
+                let datatable = false;
+                let pending_only = false;
+
+                let table = function() {
+                    datatable = $('.m-datatable-invoices').mDatatable({
+                        data: {
+                            saveState: {cookie: false},
+                            pageSize: 50,
+                            type: 'remote',
+                            source: {
+                                read: {
+                                    url: '{{ path('invoices_data') }}',
+                                    method: 'POST',
+                                    map: function(raw) {
+                                        let dataSet = raw;
+                                        if (typeof raw.data !== 'undefined') {
+                                            dataSet = raw.data;
+                                        }
+                                        return dataSet;
+                                    },
+                                }
+                            },
+                            serverPaging: true,
+                            serverFiltering: true,
+                        },
+                        search: {
+                            input: $('#generalSearch'),
+                        },
+                        columns: [
+                             {
+                                field: 'Selected',
+                            },
+                            {
+                                field: 'Date',
+                                title: 'Date',
+                            },
+                            {
+                                field: 'Number',
+                                title: 'N°',
+                            },
+                            {
+                                field: 'Category',
+                                title: 'Categorie',
+                                type: 'string',
+                            },
+                            {
+                                field: 'Type',
+                                title: 'Type',
+                                type: 'string',
+                            },
+                            {
+                                field: 'Customer',
+                                title: 'Client',
+                            },
+                            {
+                                field: 'Title',
+                                title: 'Titre',
+                            },
+                            {
+                                field: 'Amount',
+                                title: 'Montant',
+                            },
+                            {
+                                field: 'HonoraryRates',
+                                title: 'Honoraires',
+                            },
+                            {
+                                field: 'Status',
+                                title: 'Statut',
+                                type: 'string',
+                            },
+                            {
+                                field: 'Resend',
+                            },
+                            {
+                                field: 'Download',
+                            },
+                        ],
+                        toolbar: {
+                            items: {
+                                pagination: {
+                                    pageSizeSelect: [50, 100, 150, 200, 250, 500]
+                                }
+                            }
+                        }
+                    });
+
+$('#html_table > thead > tr > th:nth-child(1) > span').html("<input type='checkbox' id='select_all'>")
+$('#select_all').click(function() {
+
+            elements=$('input[type="checkbox"]')
+            if( $('#select_all').is(':checked') ){
+                $.each(elements, function(key, value) {
+                    $(value).prop( "checked", true );
+                });
+            }else{
+                $.each(elements, function(key, value) {
+                    $(value).prop( "checked", false );
+                });
+            }
+            
+    });
+                    $('#m_form_status').selectpicker().on('change', function() {
+                        datatable.search($(this).val().toLowerCase(), 'Status');
+                    });
+
+                    $('#m_form_category').selectpicker().on('change', function() {
+                        datatable.search($(this).val().toLowerCase(), 'Category');
+                    });
+
+                    $('#m_form_type').selectpicker().on('change', function() {
+                        datatable.search($(this).val().toLowerCase(), 'Type');
+                    });
+
+                    $('#reload_data').on('click', function () {
+                        let query = datatable.getDataSourceParam('query');
+                        if(typeof query === 'object' && query !== null) {
+                            query = Object.assign(query, { 'range': $('input[name="range"]').val() });
+                        }
+                        else {
+                            query = { 'range': $('input[name="range"]').val() };
+                        }
+
+                        datatable.setDataSourceParam('pagination.page', 1);
+                        datatable.setDataSourceParam('query', query);
+                        datatable.reload();
+                    });
+
+                    $('#pending-only').on('click', function () {
+                        pending_only = !pending_only;
+                        $('#pending-label').html(pending_only ? 'Voir toutes les factures' : 'Voir les factures en attente de paiement');
+
+                        let query = datatable.getDataSourceParam('query');
+                        if(typeof query === 'object' && query !== null) {
+                            query = Object.assign(query, { 'pending_only': pending_only ? 1 : 0 });
+                        }
+                        else {
+                            query = { 'pending_only': pending_only ? 1 : 0 };
+                        }
+
+                        datatable.setDataSourceParam('pagination.page', 1);
+                        datatable.setDataSourceParam('query', query);
+                        datatable.reload();
+                    });
+                };
+
+                return {
+                    //== Public functions
+                    init: function() {
+                        // init table
+                        table();
+                    },
+                };
+            }();
+
+            jQuery(document).ready(function() {
+                DatatableHtmlInvoices.init();
+            });
+        });
+
+        $('#valider-tous').click(function() {
+            let route = "{{ path('get_selected_invoices',{'type':'valider-tous'}) }}";
+            selected_ids=[];
+            elements=$('input[type="checkbox"]').filter(':checked')
+            //console.log( 'elements: ',elements );
+             $.each(elements, function(key, value) {
+                name=$(value).attr("name");
+                fullname=name;
+                id=name.split("_")[1];
+                status='#invoice_'+id
+                $(status).parent().parent().html('<span class="m--font-success" style="width: 110px;">Payée</span>')
+                selected_ids.push(
+                    {
+                        "fullname":fullname,
+                        "id":id,
+                    }
+                )
+            });
+            //console.log( 'sent: ',selected_ids );
+            $.ajax({
+                type: 'POST',
+                dataType: "json",
+                url:route,
+                data: {"ids":selected_ids},
+                success: function(data) {
+                    console.log('received: ',data)
+                    $('#partie-reponse').html('<div class="m-content"><div class="alert alert-pad alert-success">Factures marquées comme payées</div></div>');
+
+                    
+                }
+            });
+    });
+    $('#télécharger-tous').click(function() {
+            let route = "{{ path('get_selected_invoices',{'type':'télécharger-tous'}) }}";
+            selected_ids=[];
+            elements=$('input[type="checkbox"]').filter(':checked')
+            //console.log( 'elements: ',elements );
+             $.each(elements, function(key, value) {
+                name=$(value).attr("name");
+                fullname=name;
+                id=name.split("_")[1];
+                selected_ids.push(
+                    {
+                        "fullname":fullname,
+                        "id":id,
+                    }
+                )
+            });
+            //console.log( 'sent: ',selected_ids );
+            $.ajax({
+                type: 'POST',
+                dataType: "json",
+                url:route,
+                data: {"ids":selected_ids},
+                success: function(data) {
+                    
+                    results=data["results"]
+                    console.log('received: ',results)
+                    $.each(results, function(key, value) {
+                        lien=value[0]
+                        console.log(lien)
+                        window.open(lien, '_blank');
+                        
+                    });
+                    $('#partie-reponse').html('<div class="m-content"><div class="alert alert-pad alert-success">Fichiers téléchargés</div></div>');
+
+                    
+                }
+            });
+    });
+    
+    </script>
+{% endblock %}

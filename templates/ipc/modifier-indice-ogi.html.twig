@@ -1,0 +1,96 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | IPC{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">IPC</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+   <div class="m-content honoraires-list">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            modifier un indice ogi
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body add-form">
+                
+                {{ form_start(form) }}
+                <div class="row align-items-center mt-50 mb-20">
+                        <div class="row align-items-center">
+                            
+                            <div class="col-xl-6">
+                                <h5>
+                                    Valeur
+                                </h5>     
+                            </div>
+                            <div class="col-xl-6">
+                                {{ form_row(form.value) }}
+                            </div> 
+                            <div class="col-xl-6">
+                                <h5>
+                                    Date
+                                </h5>     
+                            </div>
+                            <div class="col-xl-6">
+                                {{ form_row(form.date) }}
+                            </div> 
+                            <div class="col-xl-6">
+                                <h5>
+                                    Commentaire
+                                </h5>     
+                            </div>
+                            <div class="col-xl-6">
+                                {{ form_row(form.comment) }}
+                            </div> 
+                        </div>
+                        
+                        
+                        
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-xl-3">
+                        <button type="submit" class="mt-50 btn btn-outline-success btn-block">Modifier</button>
+                    </div>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+       
+    </div>
+{% endblock %}
+{% block scripts %}
+<script>
+  
+  $("#revaluation_history_form_type_ogi_value").bind({
+    keydown: function(e) {
+        
+        if (e.which==188) {
+            return false;
+        }
+        return true;
+    }
+});
+</script>
+{{ encore_entry_script_tags('html-table.warrants') }}
+{% endblock %}

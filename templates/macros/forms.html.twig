@@ -1,0 +1,36 @@
+{% macro input(identifier, id, label, country = false) %}
+    <div class="col-lg-6">
+        <label for="form-{{ id }}" class="col-4 col-form-label">{{ label }}</label>
+        <div class="col-12">
+            {% if country %}<div class="m-typeahead">
+                {{ form_row(identifier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-' ~ id, 'label': false}) }}
+                </div>{% else %}
+                {{ form_row(identifier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-' ~ id, 'label': false}) }}
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro group(identifier1, id1, label1, identifier2, id2, label2, country1 = false, country2 = false) %}
+    <div class="form-group row">
+        {{ _self.input(identifier1, id1, label1, country1) }}
+        {% if identifier2 is not null %}
+            {{ _self.input(identifier2, id2, label2, country2) }}
+        {% else %}
+            <div class="col-lg-6"></div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro input_wizard(identifier, id, label, required = false, country = false) %}
+    <div class="form-group m-form__group row">
+        <label class="col-xl-3 col-lg-3 col-form-label" for="form-{{ id }}">{% if required %}*{% endif %} {{ label }}:</label>
+        <div class="col-xl-9 col-lg-9">
+            {% if country %}<div class="m-typeahead">
+                {{ form_row(identifier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-' ~ id, 'label': false}) }}
+            </div>{% else %}
+                {{ form_row(identifier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-' ~ id, 'label': false}) }}
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}

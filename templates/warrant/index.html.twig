@@ -1,0 +1,627 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Acquéreurs{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Liste des mandats {% if app.request.get('type') == 'buyers' %}acquéreurs{% else %}vendeurs{% endif %}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Liste des mandats {% if app.request.get('type') == 'buyers' %}acquéreurs{% else %}vendeurs{% endif %}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <ul class="nav nav-tabs  m-tabs-line m-tabs-line--brand" role="tablist">
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link active" data-toggle="tab" href="#m_tabs_customers" role="tab"><i class="flaticon-user-settings"></i> Clients</a>
+                    </li>
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_properties" role="tab"><i class="flaticon-home-2"></i> Biens</a>
+                    </li>
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_files" role="tab"><i class="flaticon-attachment"></i> Fichiers</a>
+                    </li>
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_mails" role="tab"><i class="flaticon-mail"></i> Message</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="m_tabs_customers" role="tabpanel">
+                        <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                            <div class="row align-items-center">
+                                <div class="col-xl-8 order-2 order-xl-1">
+                                    <div class="form-group m-form__group row align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="m-form__group m-form__group--inline">
+                                                <div class="m-form__label">
+                                                    <label class="m-label m-label--single" for="m_form_warrants_active">Actif:</label>
+                                                </div>
+                                                <div class="m-form__control">
+                                                    <select class="form-control m-bootstrap-select" id="m_form_warrants_active">
+                                                        <option value="">Tous</option>
+                                                        <option value="Oui" selected>Oui</option>
+                                                        <option value="Non">Non</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="d-md-none m--margin-bottom-10"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="m-input-icon m-input-icon--left">
+                                                <input type="text" class="form-control m-input" placeholder="Recherche..." id="generalSearchWarrants">
+                                                <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                    <span><i class="la la-search"></i></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                                    <button type="button" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill" data-toggle="modal" data-target="#m_modal_add" id="btn-modal-add">
+                                        <span>
+                                            <i class="la la-user-plus"></i>
+                                            <span>Nouveau Mandat</span>
+                                        </span>
+                                    </button>
+                                    <div class="m-separator m-separator--dashed d-xl-none"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="m-datatable-warrants kt-datatable" id="html_table1" width="100%">
+                            <thead>
+                                <tr>
+                                    <th title="ID" data-field="ID">ID</th>
+                                    <th title="Numéro de client" data-field="ClientID">N° de mandant </th>
+                                    <th title="Prénom" data-field="Firstname">Prénom</th>
+                                    <th title="Nom" data-field="Lastname">Nom ou Raison Sociale</th>
+                                    <th title="Biens" data-field="Properties">Biens</th>
+                                    <th title="Email" data-field="Email">Email</th>
+                                    <th title="Actif" data-field="WarrantActive">Active</th>
+                                    <th title="Profil"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for warrant in warrants %}
+                                <tr>
+                                    <td>{{ warrant.id }}</td>
+                                    <td>{{ warrant.clientId }}</td>
+                                    <td>{{ warrant.firstname }}</td>
+                                    <td>{{ warrant.lastname }}</td>
+                                    <td>{{ warrant.properties.count }}</td>
+                                    <td>{% if warrant.mail1 is empty %}<i class="flaticon-email m--font-danger"></i>{% else %}<i class="flaticon-email m--font-success"></i>{% endif %}</td>
+                                    <td>{% if warrant.active %}Oui{% else %}Non{% endif %}</td>
+                                    <td><a href="{{ path('warrant_view', {type: app.request.get('type'), warrantId: warrant.id}) }}">Voir le profil</a></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="m_tabs_properties" role="tabpanel">
+                        <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                            <div class="row align-items-center">
+                                <div class="col-xl-8 order-2 order-xl-1">
+                                    <div class="form-group m-form__group row align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="m-form__group m-form__group--inline">
+                                                <div class="m-form__label">
+                                                    <label class="m-label m-label--single" for="m_form_properties_active">Actif:</label>
+                                                </div>
+                                                <div class="m-form__control">
+                                                    <select class="form-control m-bootstrap-select" id="m_form_properties_active">
+                                                        <option value="">Tous</option>
+                                                        <option value="Oui" selected>Oui</option>
+                                                        <option value="Non">Non</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="d-md-none m--margin-bottom-10"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="m-input-icon m-input-icon--left">
+                                                <input type="text" class="form-control m-input" placeholder="Recherche..." id="generalSearchProperties">
+                                                <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                    <span><i class="la la-search"></i></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="m-datatable-properties kt-datatable" id="html_table2" width="100%">
+                            <thead>
+                            <tr>
+                                <th title="PropID" data-field="PropID">ID</th>
+                                <th title="Titre" data-field="PropTitle">Titre</th>
+                                <th title="ID Client" data-field="PropCustID">ID Client</th>
+                                <th title="Numéro de client" data-field="PropCustomerID">N° de mandant </th>
+                                <th title="Prénom" data-field="PropFirstname">Prénom</th>
+                                <th title="Nom" data-field="PropLastname">Nom ou Raison Sociale</th>
+                                <th title="Actif" data-field="PropActive">Active</th>
+                                <th title="Facturation" data-field="PropFact">Facturation</th>
+                                <th title="Profil" data-field="PropProfil"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for property in properties %}
+                                <tr>
+                                    <td>{{ property.id }}</td>
+                                    <td>{{ property.title }}</td>
+                                    <td>{{ property.warrant.id }}</td>
+                                    <td>{{ property.warrant.clientId }}</td>
+                                    <td>{{ property.firstname1 }}</td>
+                                    <td>{{ property.lastname1 }}</td>
+                                    <td>{% if property.active %}Oui{% else %}Non{% endif %}</td>
+                                    <td>{% if property.billingDisabled %}<i class="flaticon-doc m--font-danger" title="Facturation désactivée"></i>{% else %}<i class="flaticon-doc m--font-success" title="Facturation activée"></i>{% endif %}</td>
+                                    <td><a href="{{ path('property_view', {propertyId: property.id}) }}">Voir le bien</a></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="m_tabs_files" role="tabpanel">
+                        <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                            <div class="row align-items-center">
+                                <div class="col-xl-8 order-2 order-xl-1">
+                                    <div class="form-group m-form__group row align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="m-form__group m-form__group--inline">
+                                                <div class="m-form__label">
+                                                    <label class="m-label m-label--single" for="m_form_active">Type:</label>
+                                                </div>
+                                                <div class="m-form__control">
+                                                    <select class="form-control m-bootstrap-select" id="m_form_type">
+                                                        <option value="">Tous</option>
+                                                        <option value="Document">Documents</option>
+                                                        <option value="Facture">Factures</option>
+                                                        <option value="Recap">Recap</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="d-md-none m--margin-bottom-10"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="m-input-icon m-input-icon--left">
+                                                <input type="text" class="form-control m-input" placeholder="Recherche..." id="fileSearch">
+                                                <span class="m-input-icon__icon m-input-icon__icon--left">
+                                            <span><i class="la la-search"></i></span>
+                                        </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                                   
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="m-datatable-files" id="html_table" width="100%">
+                            <thead>
+                            <tr>
+                                <th title="Nom" data-field="Name">Nom</th>
+                                <th title="Number" data-field="Number">N° Fact</th>
+                                <th title="Type" data-field="Type">Type</th>
+                                <th data-field="Download"></th>
+                                <th data-field="Delete"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for file in fichiers %}
+                                <tr>
+                                    <td>{{ file.name }}</td>
+                                    <td>{% if file.type is constant('App\\Entity\\File::TYPE_INVOICE') and file.invoice is not empty %}{{ file.invoice.formattednumber }}{% endif %}</td>
+                                    <td>{% if file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
+                                    <td><a href="{{ path('file_download', {'fileId': file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
+                                    <td>{% if file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': file.driveId}) }}" data-name="{{ file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td align="center" colspan="4">Aucun Fichier</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="tab-pane" id="m_tabs_mails" role="tabpanel">
+                        <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                            <div class="row align-items-center">
+                                <div class="col-xl-8 order-2 order-xl-1">
+                                    <div class="form-group m-form__group row align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="m-form__group m-form__group--inline">
+                                                <div class="m-form__label">
+                                                    <label class="m-label m-label--single" for="m_form_status">Statut:</label>
+                                                </div>
+                                                <div class="m-form__control">
+                                                    <select class="form-control m-bootstrap-select" id="m_form_status">
+                                                        <option value="">Tous</option>
+                                                        <option value="Envoyé">Envoyé</option>
+                                                        <option value="Erreur">Erreur</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="d-md-none m--margin-bottom-10"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="m-input-icon m-input-icon--left">
+                                                <input type="text" class="form-control m-input" placeholder="Recherche..." id="mailSearch">
+                                                <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                <span><i class="la la-search"></i></span>
+                                            </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                                    <a href="#" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill" data-toggle="modal" data-target="#m_modal_send_mail">
+                                    <span>
+                                        <i class="la la-envelope"></i>
+                                        <span>Envoyer un e-mail</span>
+                                    </span>
+                                    </a>
+                                    <div class="m-separator m-separator--dashed d-xl-none"></div>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <table class="m-datatable-mails" id="html_table" width="100%">
+                            <thead>
+                            <tr>
+                                <th title="Date" data-field="Date">Date</th>
+                                <th title="Object" data-field="Object">Objet</th>
+                                <th title="Status" data-field="Status">Statut</th>
+                                <th title="Sender" data-field="Sender">Expéditeur</th>
+                                <th title="Resend" data-field="Resend"></th>
+                                <th title="View" data-field="View"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if messages %}
+                                {% for mail in messages %}
+                                    {% if mail.warrant.type == id_type %}
+                                        <tr>
+                                            <td>{{ mail.date|date('d-m-Y H:i') }}</td>
+                                            <td>{{ mail.object }}</td>
+                                            <td><span class="{{ mail.statusclass }}">{{ mail.statusstring }}</span></td>
+                                            <td>
+                                            {% if mail.user %}
+                                                {{ mail.user.firstname }} {{ mail.user.lastname }}
+                                            {% endif %}
+                                            </td>
+                                            <td><a href="{{ path('mail_resend', {'mailId': mail.id}) }}"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a></td>
+                                            <td><a href="#" data-id="{{ mail.id }}" data-toggle="modal" data-target="#m_modal_view_mail" class="view-mail"><i class="la la-eye" title="Voir"></i> Voir</a></td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td align="center" colspan="4">Aucun Message</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal fade" id="m_modal_view_mail" tabindex="-1" role="dialog" aria-labelledby="mail_view" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="file_add">Voir un mail (<span id="mail-id"></span>)</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="mail-content"></div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal fade" id="m_modal_send_mail" tabindex="-1" role="dialog" aria-labelledby="mail_add2" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="file_add">Envoyer un mail</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {{ form_start(form_mail, {attr: {'id': 'mail-form'}}) }}
+                                    <div class="form-group m-form__group row">
+                                        <label for="form-mail-object" class="col-2 col-form-label">Objet</label>
+                                        <div class="col-10">
+                                            {{ form_row(form_mail.object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail-object', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                    
+                                    {{ form_widget(form_mail.content, {'id': 'form-mail-content', 'label': false}) }}
+                                    {{ form_rest(form_mail) }}
+                                    {{ form_end(form_mail) }}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                                    <button class="btn btn-primary" form="mail-form">Envoyer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="m_modal_add" tabindex="-1" role="dialog" aria-labelledby="buyer_add" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="buyer_add">Ajouter un mandat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {{ form_start(form) }}
+                <div class="modal-body">
+                    {%  if not form.vars.valid %}
+                        <div class="m-alert m-alert--icon m-alert--outline m-alert--square alert alert-danger" role="alert">
+                            <div class="m-alert__icon"><i class="la la-exclamation-circle"></i></div>
+                            <div class="m-alert__text">
+                                {{ form_errors(form) }}
+                                {{ form_errors(form.firstname) }}
+                                {{ form_errors(form.lastname) }}
+                                {{ form_errors(form.address) }}
+                                {{ form_errors(form.postal_code) }}
+                                {{ form_errors(form.city) }}
+                                {{ form_errors(form.country) }}
+                                {{ form_errors(form.clientId) }}
+                                {{ form_errors(form.phone1) }}
+                                {{ form_errors(form.phone2) }}
+                                {{ form_errors(form.mail1) }}
+                                {{ form_errors(form.mail2) }}
+                                {{ form_errors(form.comment) }}
+                                {{ form_errors(form.bank_establishment_code) }}
+                                {{ form_errors(form.bank_code_box) }}
+                                {{ form_errors(form.bank_account_number) }}
+                                {{ form_errors(form.bank_key) }}
+                                {{ form_errors(form.bank_domiciliation) }}
+                                {{ form_errors(form.bank_iban) }}
+                                {{ form_errors(form.bank_bic) }}
+                                {{ form_errors(form.bank_ics) }}
+                                {{ form_errors(form.fact_address) }}
+                                {{ form_errors(form.fact_postal_code) }}
+                                {{ form_errors(form.fact_city) }}
+                                {{ form_errors(form.fact_country) }}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="form-group m-form__group row">
+                        <label for="form-firstname" class="col-2 col-form-label">Prénom <span class="m--font-danger">*</span></label>
+                        <div class="col-10">
+                            {{ form_row(form.firstname, {'attr': {'class': 'form-control m-input'}, 'id': 'form-firstname', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-lastname" class="col-2 col-form-label">Nom ou Raison Sociale <span class="m--font-danger">*</span></label>
+                        <div class="col-10">
+                            {{ form_row(form.lastname, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lastname', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-address" class="col-2 col-form-label">Adresse <span class="m--font-danger">*</span></label>
+                        <div class="col-10">
+                            {{ form_row(form.address, {'attr': {'class': 'form-control m-input'}, 'id': 'form-address', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-postal_code" class="col-2 col-form-label">Code Postal <span class="m--font-danger">*</span></label>
+                        <div class="col-10">
+                            {{ form_row(form.postal_code, {'attr': {'class': 'form-control m-input'}, 'id': 'form-postal_code', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-city" class="col-2 col-form-label">Ville <span class="m--font-danger">*</span></label>
+                        <div class="col-10">
+                            {{ form_row(form.city, {'attr': {'class': 'form-control m-input'}, 'id': 'form-city', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-country" class="col-2 col-form-label">Pays <span class="m--font-danger">*</span></label>
+                        <div class="col-10">
+                            <div class="m-typeahead">
+                                {{ form_row(form.country, {'attr': {'class': 'form-control m-input'}, 'id': 'form-country', 'label': false}) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-clientId" class="col-2 col-form-label">N° de mandant</label>
+                        <div class="col-10">
+                            {{ form_row(form.clientId, {'attr': {'class': 'form-control m-input'}, 'id': 'form-clientId', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-phone1" class="col-2 col-form-label">Téléphone</label>
+                        <div class="col-10">
+                            {{ form_row(form.phone1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-phone1', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-phone2" class="col-2 col-form-label">Téléphone 2</label>
+                        <div class="col-10">
+                            {{ form_row(form.phone2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-phone2', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-mail1" class="col-2 col-form-label">Adresse mail</label>
+                        <div class="col-10">
+                            {{ form_row(form.mail1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail1', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-mail2" class="col-2 col-form-label">Adresse mail 2</label>
+                        <div class="col-10">
+                            {{ form_row(form.mail2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail2', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-comment" class="col-2 col-form-label">Commentaire</label>
+                        <div class="col-10">
+                            {{ form_row(form.comment, {'attr': {'class': 'form-control m-input autosize'}, 'id': 'form-comment', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="m-divider"><span></span>Relevé d'Identité Bancaire<span></span></div>
+                    <div class="m--margin-bottom-10"></div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-bank_establishment_code" class="col-2 col-form-label">Code banque</label>
+                        <div class="col-10">
+                            {{ form_row(form.bank_establishment_code, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_establishment_code', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-bank_code_box" class="col-2 col-form-label">Code guichet</label>
+                        <div class="col-10">
+                            {{ form_row(form.bank_code_box, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_code_box', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-bank_account_number" class="col-2 col-form-label">N° de compte</label>
+                        <div class="col-10">
+                            {{ form_row(form.bank_account_number, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_account_number', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-bank_key" class="col-2 col-form-label">Clé RIB</label>
+                        <div class="col-10">
+                            {{ form_row(form.bank_key, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_key', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-bank_domiciliation" class="col-2 col-form-label">Domiciliation</label>
+                        <div class="col-10">
+                            {{ form_row(form.bank_domiciliation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_domiciliation', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="m-divider"><span></span>Numéro International de Compte Bancaire (IBAN)<span></span></div>
+                    <div class="m--margin-bottom-10"></div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-bank_iban" class="col-2 col-form-label">IBAN</label>
+                        <div class="col-10">
+                            {{ form_row(form.bank_iban, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_iban', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-bank_bic" class="col-2 col-form-label">Code banque (BIC)</label>
+                        <div class="col-10">
+                            {{ form_row(form.bank_bic, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_bic', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="m-divider"><span></span>Identifiant Créancier SEPA<span></span></div>
+                    <div class="m--margin-bottom-10"></div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-bank_ics" class="col-2 col-form-label">N° ICS</label>
+                        <div class="col-10">
+                            {{ form_row(form.bank_ics, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_ics', 'label': false}) }}
+                        </div>
+                    </div>
+                     <div class="form-group m-form__group row">
+                        <label for="form-rum" class="col-2 col-form-label">N° RUM</label>
+                        <div class="col-10">
+                            {{ form_row(form.rum, {'attr': {'class': 'form-control m-input'}, 'id': 'form-rum', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="m-divider"><span></span>Adresse de facturation<span></span></div>
+                    <div class="m--margin-bottom-10"></div>
+                    <div class="m-alert m-alert--icon m-alert--outline m-alert--square alert alert-info" role="alert">
+                        <div class="m-alert__icon"><i class="la la-exclamation-circle"></i></div>
+                        <div class="m-alert__text">Il est inutile de remplir l'adresse de facturation si elle est identique à l'adresse du mandat.</div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-fact_address" class="col-2 col-form-label">Adresse</label>
+                        <div class="col-10">
+                            {{ form_row(form.fact_address, {'attr': {'class': 'form-control m-input'}, 'id': 'form-fact_address', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-fact_postal_code" class="col-2 col-form-label">Code Postal</label>
+                        <div class="col-10">
+                            {{ form_row(form.fact_postal_code, {'attr': {'class': 'form-control m-input'}, 'id': 'form-fact_postal_code', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-fact_city" class="col-2 col-form-label">Ville</label>
+                        <div class="col-10">
+                            {{ form_row(form.fact_city, {'attr': {'class': 'form-control m-input'}, 'id': 'form-fact_city', 'label': false}) }}
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row">
+                        <label for="form-fact_country" class="col-2 col-form-label">Pays</label>
+                        <div class="col-10">
+                            {{ form_row(form.fact_country, {'attr': {'class': 'form-control m-input'}, 'id': 'form-fact_country', 'label': false}) }}
+                        </div>
+                    </div>
+                    {{ form_rest(form) }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <input type="submit" class="btn btn-primary" value="Créer" />
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ encore_entry_script_tags('html-table.warrants') }}
+    {{ encore_entry_script_tags('warrant') }}
+    <script type="text/javascript">
+        $(function() {
+            $('#m_form_properties_active').change();
+            $('#m_form_warrants_active').change();
+            {% if not form.vars.valid %}$("#btn-modal-add").click();{% endif %}
+        });
+    </script>
+    <script type="text/javascript">
+    $('#form-rum').attr("disabled", true) 
+        $(function() {
+            $('.view-mail').click(function () {
+                $('#mail-id').html($(this).attr('data-id'));
+                $('#mail-content').html('Chargement ...').load("{{ path('mail_content') }}?id=" + $(this).attr('data-id'));
+            });
+        });
+    </script>
+{% endblock %}
+{% block styles %}
+    {{ encore_entry_link_tags('warrant') }}
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'layout.html.twig' %}
+
+{% import "macros/forms.html.twig" as mforms %}
+{% block title %}Viag2e | Liste des documents{% endblock %}
+
+{% block body %}
+
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">LISTE DES DOCUMENTS</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="" id="" role="">
+        <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+            <div class="row align-items-center">
+                <div class="col-xl-8 order-2 order-xl-1">
+                   <div class="form-group m-form__group row align-items-center">
+                        <div class="col-md-4">
+                            <div class="m-form__group m-form__group--inline">
+                                <div class="m-form__label">
+                                    <label class="m-label m-label--single" for="m_form_active">Type:</label>
+                                </div>
+                                <div class="m-form__control">
+                                    <select class="form-control m-bootstrap-select" id="m_form_type">
+                                        <option value="">Tous</option>
+                                        <option value="Document">Documents</option>
+                                        <option value="Facture">Factures</option>
+                                        <option value="Recap">Recap</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-md-none m--margin-bottom-10"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="m-input-icon m-input-icon--left">
+                                <input type="text" class="form-control m-input" placeholder="Recherche..." id="fileSearch">
+                                <span class="m-input-icon__icon m-input-icon__icon--left">
+                            <span><i class="la la-search"></i></span>
+                        </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                   
+                </div>
+            </div>
+        </div>
+
+        <table class="m-datatable-files" id="html_table" width="100%">
+            <thead>
+            <tr>
+                <th title="Nom" data-field="Name">Nom</th>
+                <th title="Number" data-field="Number">N° Fact</th>
+                <th title="Type" data-field="Type">Type</th>
+                <th data-field="Download"></th>
+                <th data-field="Delete"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for file in fichiers %}
+                <tr>
+                    <td>{{ file.name }}</td>
+                    <td>{% if file.type is constant('App\\Entity\\File::TYPE_INVOICE') and file.invoice is not empty %}{{ file.invoice.formattednumber }}{% endif %}</td>
+                    <td>{% if file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
+                    <td><a href="{{ path('file_download2', {'fileId': file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
+                    <td>{% if file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': file.driveId}) }}" data-name="{{ file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td align="center" colspan="4">Aucun Fichier</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+{% block scripts %}
+ {{ encore_entry_script_tags('property') }}
+    {{ encore_entry_script_tags('property-billing') }}
+    {{ encore_entry_script_tags('html-table.warrants') }}
+    {{ encore_entry_script_tags('warrant') }}
+{% endblock %}
+
+{% block styles %}
+    {{ encore_entry_link_tags('warrant') }}
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | IPC{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">IPC</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+   <div class="m-content honoraires-list">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Liste des indices ogi
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <table class="m-datatable-warrants kt-datatable" id="html_table1" width="100%">
+                <!--SELECT rh.value as 'valeur',rh.date as 'date_rev', p.property_type,p.comment FROM property p , revaluation_history rh WHERE p.id=rh.property_id;-->                    <thead>
+                        <tr>
+                           
+                            <th title="Comment" data-field="Comment">Année</th>
+                            <th title="date_rev" data-field="date_rev">Mois</th>
+                            <th title="Valeur" data-field="Valeur">Valeur</th>
+                             <th title="Commentaire" data-field="Commentaire">Commentaire</th>
+                            <th title="Actions" data-field="actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for indice in indices %}
+                        <tr>
+                            <td>{{ indice.date_rev |date('Y')}}</td>
+                            <td>{{ indice.date_rev |date('M')}}</td>
+                            <td>{{ indice.valeur }} </td>
+                            <td>{{ indice.commentaire }} </td>
+                             <td>
+                                <a class="btn btn-primary button-special" href="{{ path('modifier_indice_menage', {'id': indice.id}) }}">modifier</a>
+                                <a class="btn btn-danger button-special" href="{{ path('supprimer_indice_menage', {'id': indice.id}) }}">supprimer</a>
+                             </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <a class="btn btn-primary button-special" href="{{ path('add_indice_ogi') }}">Ajouter un indice</a>
+    </div>
+{% endblock %}
+{% block scripts %}
+    {{ encore_entry_script_tags('html-table.warrants') }}
+   
+{% endblock %}

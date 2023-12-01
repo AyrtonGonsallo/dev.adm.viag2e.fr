@@ -1,0 +1,120 @@
+<style type="text/css">
+    <!--
+    table { vertical-align: top; }
+    tr    { vertical-align: top; }
+    td    { vertical-align: top; }
+    -->
+</style>
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt">
+    <bookmark title="Facture" level="0" ></bookmark>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px">
+        <tr>
+            <td style="text-align: left; width: 50%;">
+                <img style="width: 150px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+                {{ parameters.address|raw }}<br />
+                {{ parameters.postalcode }} {{ parameters.city|upper }}<br /><br />
+                Téléphone: {{ parameters.phone }}<br />
+                Mail: {{ parameters.mail }}<br />
+                {{ parameters.site }}
+            </td>
+            <td style="width: 50%; padding-top: 25px;">
+                {{ parameters.city|title }}, le {{ data.date.current_day }}
+            </td>
+        </tr>
+    </table>
+    <br>
+    <br>
+    <table cellspacing="0" style="width: 100%; text-align: left; font-size: 11pt;">
+        <tr>
+            <td style="width:70%;"></td>
+            <td style="width:30%;">
+                {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                {{ data.warrant.address }}<br />
+                {{ data.warrant.postalcode }} {{ data.warrant.city }}
+            </td>
+        </tr>
+    </table>
+
+    <br />
+    <br />
+    <br />
+    <br />
+
+    <table cellspacing="0" style="width: 100%; text-align: left; font-size: 11pt;">
+        <colgroup>
+            <col style="width: 10%;">
+            <col style="width: 70%; text-align: left">
+            <col style="width: 10%; text-align: right">
+            <col style="width: 10%;">
+        </colgroup>
+        <tbody>
+        <tr>
+            <td></td>
+            <td>
+                Monsieur, Madame,<br /><br />
+                Veuillez trouver ci-après le décompte annuel des rentes viagères perçues pour l'année {{ data.year }}.<br /><br /><br /><br />
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="4" style="width:100%;background: #757575;font-weight: bold;text-align: center;">DÉCOMPTE ANNUEL {{ data.year }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <br /><br /><br />
+                Référence du dossier : {{ data.property.title }}<br /><br />
+                Adresse du bien : {{ data.property.address }} {{ data.property.postalcode }} {{ data.property.city }}<br /><br />
+                Débirentier: {{ data.buyer.firstname }} {{ data.buyer.lastname }}<br /><br /><br />
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="width: 10%;"></td>
+                        <td style="width: 50%;">
+                            Période du 01/01/{{ data.year }} au 31/12/{{ data.year }}:
+                        </td>
+                        <td style="width: 30%; text-align: right;">
+                            <span style="font-weight: bold;">{{ data.totals.warrant }} €</span>
+                        </td>
+                        <td style="width: 10%;"></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td colspan="2">
+                <br /><br /><br /><br /><br /><br />
+                Nous restons à votre disposition pour toute information complémentaire.<br />
+                Veuillez agréer, Monsieur, Madame, nos sincères salutations.
+                <br /><br /><br /><br /><br /><br />
+            </td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+    <table cellspacing="0" style="width: 100%; text-align: left; font-size: 11pt;">
+        <tr>
+            <td style="width: 65%"></td>
+            <td style="width: 35%">Vincent GIBELIN,</td>
+        </tr>
+    </table>
+</page>
+<page_footer>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 10px;">
+        <tr>
+            <td style="width: 100%;">
+                UNIVERS VIAGER - Siège social : 58 Rue Fondaudège 33000 BORDEAUX, SARL au capital de 5 000 € - Immatriculée au RCS Bordeaux N°523 654 408<br />
+                Garantie financière GALIAN 89 rue de la Boétie 75008 PARIS Montant : 120 000 €<br />
+                Carte Professionnelle Transaction n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br />
+                « Notre agence ne détient aucun fonds pour le compte de ses clients »
+            </td>
+        </tr>
+    </table>
+</page_footer>

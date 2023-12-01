@@ -1,0 +1,611 @@
+{% extends 'layout.html.twig' %}
+{% import "macros/forms.html.twig" as mforms %}
+
+{% block title %}Viag2e | Acquéreurs{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="{{ path('warrants', {'type': warrant.typeString}) }}" class="m-nav__link">
+                            <span class="m-nav__link-text">Liste des mandats {% if warrant.typeString == 'buyers' %}acquéreurs{% else %}vendeurs{% endif %}</span>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="{{ path('warrant_view', {'type': warrant.typeString, 'warrantId': warrant.id}) }}" class="m-nav__link">
+                            <span class="m-nav__link-text">Mandat #{{ warrant.id }}</span>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Ajout d'un bien</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Ajout d'un bien
+                            <small><a href="{{ path('warrant_view', {'type': warrant.typeString, 'warrantId': warrant.id}) }}">{{ warrant.firstname }} {{ warrant.lastname }} #{{ warrant.id }}</a></small>
+                        </h3>
+                    </div>
+                </div>
+                <div class="m-portlet__head-tools">
+                    <ul class="m-portlet__nav">
+                        <li class="m-portlet__nav-item">
+                            <a href="#" data-toggle="m-tooltip" class="m-portlet__nav-link m-portlet__nav-link--icon" data-direction="left" data-width="auto" title="Get help with filling up this form">
+                                <i class="flaticon-info m--icon-font-size-lg3"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="m-wizard m-wizard--1 m-wizard--success" id="m_wizard">
+
+                <div class="m-portlet__padding-x">
+                    <!-- Here you can put a message or alert -->
+                </div>
+
+                <div class="m-wizard__head m-portlet__padding-x">
+                    <div class="m-wizard__progress">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <div class="m-wizard__nav">
+                        <div class="m-wizard__steps">
+                            <div class="m-wizard__step m-wizard__step--current" m-wizard-target="m_wizard_form_step_1">
+                                <div class="m-wizard__step-info">
+                                    <a href="#" class="m-wizard__step-number">
+                                        <span><span>1</span></span>
+                                    </a>
+                                    <div class="m-wizard__step-line">
+                                        <span></span>
+                                    </div>
+                                    <div class="m-wizard__step-label">
+                                        Profil
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="m-wizard__step" m-wizard-target="m_wizard_form_step_2">
+                                <div class="m-wizard__step-info">
+                                    <a href="#" class="m-wizard__step-number">
+                                        <span><span>2</span></span>
+                                    </a>
+                                    <div class="m-wizard__step-line">
+                                        <span></span>
+                                    </div>
+                                    <div class="m-wizard__step-label">
+                                        Propriétés
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="m-wizard__step" m-wizard-target="m_wizard_form_step_3">
+                                <div class="m-wizard__step-info">
+                                    <a href="#" class="m-wizard__step-number">
+                                        <span><span>3</span></span>
+                                    </a>
+                                    <div class="m-wizard__step-line">
+                                        <span></span>
+                                    </div>
+                                    <div class="m-wizard__step-label">
+                                        Informations
+                                    </div>
+                                </div>
+                            </div>{% if warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
+                            <div class="m-wizard__step" m-wizard-target="m_wizard_form_step_4">
+                                <div class="m-wizard__step-info">
+                                    <a href="#" class="m-wizard__step-number">
+                                        <span><span>4</span></span>
+                                    </a>
+                                    <div class="m-wizard__step-line">
+                                        <span></span>
+                                    </div>
+                                    <div class="m-wizard__step-label">
+                                        Acheteur
+                                    </div>
+                                </div>
+                            </div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="m-wizard__form">
+                    <!--
+1) Use m-form--label-align-left class to alight the form input lables to the right
+2) Use m-form--state class to highlight input control borders on form validation
+-->
+                    {{ form_start(form, {'attr': {'class': 'm-form m-form--label-align-left- m-form--state-', 'id': 'm_form'}}) }}
+                        <div class="m-portlet__body">
+
+                            <!--begin: Form Wizard Step 1-->
+                            <div class="m-wizard__form-step m-wizard__form-step--current" id="m_wizard_form_step_1">
+                                <div class="row">
+                                    <div class="col-xl-8 offset-xl-2">
+                                        <div class="m-form__section m-form__section--first">
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-title">* Titre:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.title, {'attr': {'class': 'form-control m-input'}, 'id': 'form-title', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                                        <div class="m-form__section">
+                                            <div class="m-form__heading">
+                                                <h3 class="m-form__heading-title">Profils</h3>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-firstname1">* Prénom:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.firstname1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-firstname1', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-lastname1">* Nom:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.lastname1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lastname1', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-dateofbirth1">* Date de naissance:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.dateofbirth1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dateofbirth1', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-mail1">Adresse mail:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.mail1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail1', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-firstname2">Prénom 2:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.firstname2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-firstname2', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-lastname2">Nom 2:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.lastname2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lastname2', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-dateofbirth2">Date de naissance 2:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.dateofbirth2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dateofbirth2', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-mail2">Adresse mail 2:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.mail2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail2', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                                        <div class="m-form__section">
+                                            <div class="m-form__heading">
+                                                <h3 class="m-form__heading-title">
+                                                    Adresse
+                                                </h3>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-address">* Adresse:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.address, {'attr': {'class': 'form-control m-input'}, 'id': 'form-address', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-postalCode">* Code postal:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.postalCode, {'attr': {'class': 'form-control m-input'}, 'id': 'form-postalCode', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-city">* Ville:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.city, {'attr': {'class': 'form-control m-input'}, 'id': 'form-city', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-country">* Pays:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    <div class="m-typeahead">
+                                                        {{ form_row(form.country, {'attr': {'class': 'form-control m-input'}, 'id': 'form-country', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end: Form Wizard Step 1-->
+
+                            <!--begin: Form Wizard Step 2-->
+                            <div class="m-wizard__form-step" id="m_wizard_form_step_2">
+                                <div class="row">
+                                    <div class="col-xl-8 offset-xl-2">
+                                        <div class="m-form__section m-form__section--first">
+                                            <div class="m-form__heading">
+                                                <h3 class="m-form__heading-title">Propriétés</h3>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-goodType">* Type de viager:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.goodType, {'attr': {'class': 'form-control m-input'}, 'id': 'form-goodType', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-propertyType">Type de bien:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    <div class="m-typeahead">
+                                                        {{ form_row(form.propertyType, {'attr': {'class': 'form-control m-input'}, 'id': 'form-propertyType', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-constructionYear">Année de construction:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.constructionYear, {'attr': {'class': 'form-control m-input'}, 'id': 'form-constructionYear', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-livingSpace">Surface habitable:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.livingSpace, {'attr': {'class': 'form-control m-input'}, 'id': 'form-livingSpace', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-groundSurface">Surface du terrain:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.groundSurface, {'attr': {'class': 'form-control m-input'}, 'id': 'form-groundSurface', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-heatingType">* Type de chauffage:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.heatingType, {'attr': {'class': 'form-control m-input'}, 'id': 'form-heatingType', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-fireplace">Cheminée:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.fireplace, {'attr': {'class': 'form-control m-input'}, 'id': 'form-fireplace', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-garage">Garage:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.garage, {'attr': {'class': 'form-control m-input'}, 'id': 'form-garage', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-parking">Parking:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.parking, {'attr': {'class': 'form-control m-input'}, 'id': 'form-parking', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-cellar">Cave:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.cellar, {'attr': {'class': 'form-control m-input'}, 'id': 'form-cellar', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end: Form Wizard Step 2-->
+
+                            <!--begin: Form Wizard Step 3-->
+                            <div class="m-wizard__form-step" id="m_wizard_form_step_3">
+                                <div class="row">
+                                    <div class="col-xl-8 offset-xl-2">
+                                        <div class="m-form__section m-form__section--first">
+                                            <div class="m-form__heading">
+                                                <h3 class="m-form__heading-title">Informations</h3>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-billingDisabled">Désactiver la facturation:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                        <label>
+                                                            {{ form_widget(form.billingDisabled, {'attr': {'class': 'form-control m-input'}, 'id': 'form-billingDisabled', 'label': false}) }}
+                                                            <span></span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-honorariesDisabled">Désactiver les honoraires:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                        <label>
+                                                            {{ form_widget(form.honorariesDisabled, {'attr': {'class': 'form-control m-input'}, 'id': 'form-honorariesDisabled', 'label': false}) }}
+                                                            <span></span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div id="billingBox">
+                                                <div class="form-group m-form__group row">
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-revaluationIndex">Indice de revalorisation:</label>
+                                                    <div class="col-xl-9 col-lg-9">
+                                                        {{ form_row(form.revaluationIndex, {'attr': {'class': 'form-control m-input'}, 'id': 'form-revaluationIndex', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group m-form__group row">
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-initialIndex">* Indice initial du bien:</label>
+                                                    <div class="col-xl-9 col-lg-9">
+                                                        {{ form_row(form.initialIndex, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initialIndex', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group m-form__group row">
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-abandonmentIndex">Indice d'abandon:</label>
+                                                    <div class="col-xl-9 col-lg-9">
+                                                        {{ form_row(form.abandonmentIndex, {'attr': {'class': 'form-control m-input'}, 'id': 'form-abandonmentIndex', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group m-form__group row">
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-revaluationDate">Date de revalorisation:</label>
+                                                    <div class="col-xl-9 col-lg-9">
+                                                        {{ form_row(form.revaluationDate, {'attr': {'class': 'form-control m-input'}, 'id': 'form-revaluationDate', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group m-form__group row">
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-initialAmount">* Montant initial:</label>
+                                                    <div class="col-xl-9 col-lg-9">
+                                                        {{ form_row(form.initialAmount, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initialAmount', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group m-form__group row">
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-honoraryRates">Taux honoraires:</label>
+                                                    <div class="col-xl-9 col-lg-9">
+                                                        {{ form_row(form.honoraryRates, {'attr': {'class': 'form-control m-input'}, 'id': 'form-honoraryRates', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group m-form__group row">
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-condominiumFees">Charges de co-pro (trimestrielles):</label>
+                                                    <div class="col-xl-9 col-lg-9">
+                                                        {{ form_row(form.condominiumFees, {'attr': {'class': 'form-control m-input'}, 'id': 'form-condominiumFees', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group m-form__group row">
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-garbageTax">Montant ordures ménagères:</label>
+                                                    <div class="col-xl-9 col-lg-9">
+                                                        {{ form_row(form.garbageTax, {'attr': {'class': 'form-control m-input'}, 'id': 'form-garbageTax', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                                        <div class="m-form__section">
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-dosAuthenticInstrument">Date de signature de l'acte authentique:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.dosAuthenticInstrument, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dosAuthenticInstrument', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-startDateManagement">* Date de début de gestion viagère:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.startDateManagement, {'attr': {'class': 'form-control m-input'}, 'id': 'form-startDateManagement', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-endDateManagement">Date de fin de contrat:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.endDateManagement, {'attr': {'class': 'form-control m-input'}, 'id': 'form-endDateManagement', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                                        <div class="m-form__section">
+                                            <div class="m-form__heading">
+                                                <h3 class="m-form__heading-title">Relevé d'Identité Bancaire</h3>
+                                            </div>
+
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-bank_establishment_code">Code banque:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.bank_establishment_code, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_establishment_code', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-bank_code_box">Code guichet:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.bank_code_box, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_code_box', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-bank_account_number">N° de compte:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.bank_account_number, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_account_number', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-bank_key">Clé RIB:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.bank_key, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_key', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-bank_domiciliation">Domiciliation:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.bank_domiciliation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_domiciliation', 'label': false}) }}
+                                                </div>
+                                            </div>
+
+                                            <div class="m-form__heading">
+                                                <h3 class="m-form__heading-title">Numéro International de Compte Bancaire (IBAN)</h3>
+                                            </div>
+
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-bank_iban">N° de compte:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.bank_iban, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_iban', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-bank_bic">Code banque (BIC):</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.bank_bic, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_bic', 'label': false}) }}
+                                                </div>
+                                            </div>
+
+                                            <div class="m-form__heading">
+                                                <h3 class="m-form__heading-title">Identifiant Créancier SEPA</h3>
+                                            </div>
+
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-bank_iban">N° ICS:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.bank_ics, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_ics', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                                        <div class="form-group m-form__group row">
+                                            <label class="col-xl-3 col-lg-3 col-form-label" for="form-hide_export_monthly">Masquer les rentes de l'export:</label>
+                                            <div class="col-xl-9 col-lg-9">
+                                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                    <label>
+                                                        {{ form_widget(form.hide_export_monthly, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_export_monthly', 'label': false}) }}
+                                                        <span></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group m-form__group row">
+                                            <label class="col-xl-3 col-lg-3 col-form-label" for="form-hide_export_quarterly">Masquer les frais de co-pro de l'export:</label>
+                                            <div class="col-xl-9 col-lg-9">
+                                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                    <label>
+                                                        {{ form_widget(form.hide_export_quarterly, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_export_quarterly', 'label': false}) }}
+                                                        <span></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group m-form__group row">
+                                            <label class="col-xl-3 col-lg-3 col-form-label" for="form-hide_export_otp">Masquer les factures exceptionnelles de l'export (ex: poubelles):</label>
+                                            <div class="col-xl-9 col-lg-9">
+                                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                    <label>
+                                                        {{ form_widget(form.hide_export_otp, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_export_otp', 'label': false}) }}
+                                                        <span></span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                                        <div class="m-form__section">
+                                            <label class="col-xl-3 col-lg-3 col-form-label" for="form-comment">Commentaires:</label>
+                                            <div class="col-xl-9 col-lg-9">
+                                                {{ form_row(form.comment, {'attr': {'class': 'form-control m-input autosize'}, 'id': 'form-comment', 'label': false}) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end: Form Wizard Step 3-->{% if warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
+
+                            <!--begin: Form Wizard Step 4-->
+                            <div class="m-wizard__form-step" id="m_wizard_form_step_4">
+                                <div class="row">
+                                    <div class="col-xl-8 offset-xl-2">
+                                        <div class="m-form__section m-form__section--first">
+                                            <div class="m-form__heading">
+                                                <h3 class="m-form__heading-title">Acheteur</h3>
+                                            </div>
+                                            {{ mforms.input_wizard(form.buyerFirstname, 'buyer_firstname', 'Prénom', true) }}
+                                            {{ mforms.input_wizard(form.buyerLastname, 'buyer_lastname', 'Nom', true) }}
+                                            {{ mforms.input_wizard(form.buyerAddress, 'buyer_address', 'Adresse', true) }}
+                                            {{ mforms.input_wizard(form.buyerPostalCode, 'buyer_postal_code', 'Code postal', true) }}
+                                            {{ mforms.input_wizard(form.buyerCity, 'buyer_city', 'Ville', true) }}
+                                            {{ mforms.input_wizard(form.buyerCountry, 'buyer_country', 'Pays', true, true) }}
+                                            {{ mforms.input_wizard(form.buyerPhone1, 'buyer_phone1', 'Téléphone') }}
+                                            {{ mforms.input_wizard(form.buyerPhone2, 'buyer_phone2', 'Téléphone2') }}
+                                            {{ mforms.input_wizard(form.buyerMail1, 'buyer_mail1', 'Adresse mail') }}
+                                            {{ mforms.input_wizard(form.buyerMail2, 'buyer_mail2', 'Adresse mail 2') }}
+                                            <div class="m-divider"><span></span>Relevé d'Identité Bancaire<span></span></div>
+                                            {{ mforms.input_wizard(form.buyer_bank_establishment_code, 'buyer_bank_establishment_code', 'Code banque') }}
+                                            {{ mforms.input_wizard(form.buyer_bank_code_box, 'buyer_bank_code_box', 'Code guichet') }}
+                                            {{ mforms.input_wizard(form.buyer_bank_account_number, 'buyer_bank_account_number', 'N° de compte') }}
+                                            {{ mforms.input_wizard(form.buyer_bank_key, 'buyer_bank_key', 'Clé RIB') }}
+                                            {{ mforms.input_wizard(form.buyer_bank_domiciliation, 'buyer_bank_domiciliation', 'Domiciliation') }}
+                                            <div class="m-divider"><span></span>Numéro International de Compte Bancaire (IBAN)<span></span></div>
+                                            {{ mforms.input_wizard(form.buyer_bank_iban, 'buyer_bank_iban', 'N° de compte') }}
+                                            {{ mforms.input_wizard(form.buyer_bank_bic, 'buyer_bank_bic', 'Code banque (BIC)') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end: Form Wizard Step 4-->
+                            {% endif %}
+                        </div>
+                        <!--end: Form Body -->
+
+                        <!--begin: Form Actions -->
+                        <div class="m-portlet__foot m-portlet__foot--fit m--margin-top-40">
+                            <div class="m-form__actions m-form__actions">
+                                <div class="row">
+                                    <div class="col-lg-2"></div>
+                                    <div class="col-lg-4 m--align-left">
+                                        <button class="btn btn-secondary m-btn m-btn--custom m-btn--icon" data-wizard-action="prev">
+                                            <span>
+                                                <i class="la la-arrow-left"></i>&nbsp;&nbsp;
+                                                <span>Retour</span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                    <div class="col-lg-4 m--align-right">
+                                        <button class="btn btn-primary m-btn m-btn--custom m-btn--icon" data-wizard-action="submit">
+                                            <span>
+                                                <i class="la la-check"></i>&nbsp;&nbsp;
+                                                <span>Valider</span>
+                                            </span>
+                                        </button>
+                                        <button class="btn btn-warning m-btn m-btn--custom m-btn--icon" data-wizard-action="next">
+                                            <span>
+                                                <span>Continuer</span>&nbsp;&nbsp;
+                                                <i class="la la-arrow-right"></i>
+                                            </span>
+                                        </button>
+                                    </div>
+                                    <div class="col-lg-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ encore_entry_script_tags('wizard') }}
+    {{ encore_entry_script_tags('property-billing') }}
+{% endblock %}
