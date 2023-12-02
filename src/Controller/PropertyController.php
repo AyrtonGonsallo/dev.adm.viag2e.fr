@@ -477,7 +477,11 @@ class PropertyController extends AbstractController
             ->orderBy('rh.id', 'DESC');
         $query = $qb->getQuery();
         // Execute Query
-        $indice_og2i = $query->getResult()[0];
+        if($query->getResult()){
+            $indice_og2i = $query->getResult()[0];
+        }else{
+            $indice_og2i = (object) array('value' => 0);
+        }
         // recuperer Valeur Indice de référence* (indexation)
         function get_label($i){
             if($i==1){
@@ -500,7 +504,11 @@ class PropertyController extends AbstractController
             ->orderBy('rh.id', 'DESC');
         $query4 = $qb4->getQuery();
         // Execute Query
-        $indice_m_u = $query4->getResult()[0]; 
+        if($query4->getResult()){
+            $indice_m_u = $query4->getResult()[0]; 
+        }else{
+            $indice_m_u = (object) array('value' => 0);; 
+        }
         if ($form_payment->isSubmitted() and $form_payment->isValid()) {
             $manager = $this->getDoctrine()->getManager();
             $data = $form_payment->getData();

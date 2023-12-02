@@ -72,6 +72,26 @@
                 </div>
             </div>
         {% endif %}
+         {% if indice_m_u.value == 0 %}
+            <div class="m-alert m-alert--icon alert alert-danger" role="alert">
+                <div class="m-alert__icon">
+                    <i class="la la-warning"></i>
+                </div>
+                <div class="m-alert__text">
+                    <strong>Attention !</strong> L'indice ménage/urbain n'est pas renseigné pour ce mois
+                </div>
+            </div>
+        {% endif %}
+         {% if indice_og2i.value == 0 %}
+            <div class="m-alert m-alert--icon alert alert-danger" role="alert">
+                <div class="m-alert__icon">
+                    <i class="la la-warning"></i>
+                </div>
+                <div class="m-alert__text">
+                    <strong>Attention !</strong> L'indice og2i n'est pas renseigné pour ce mois
+                </div>
+            </div>
+        {% endif %}
         <div class="m-portlet m-portlet--creative m-portlet--first m-portlet--bordered-semi">
             <div class="m-portlet__head m-portlet__head-no-height">
                 <div class="m-portlet__head-caption">
