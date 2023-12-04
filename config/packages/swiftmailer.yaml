@@ -5,8 +5,8 @@ swiftmailer:
     host: smtp.gmail.com
     port: 465
     auth_mode: login
-    username: heroku05072022@gmail.com
-    password: MAda12car
+    username: roquetigrinho@gmail.com
+    password: mada12car
     encryption: ssl
     stream_options:
         ssl:
