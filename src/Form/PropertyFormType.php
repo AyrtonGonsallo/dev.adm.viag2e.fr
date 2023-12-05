@@ -96,29 +96,6 @@ class PropertyFormType extends AbstractType
             ->add('telephone_debirentier', TextType::class, ['required' => false])
             ->add('email_debirentier', TextType::class, ['required' => false]);
 
-        if($builder->getData()->getType() == Warrant::TYPE_SELLERS) {
-            $builder
-                ->add('buyerFirstname', TextType::class, ['required' => false])
-                ->add('buyerLastname', TextType::class, ['required' => false])
-                ->add('buyerAddress', TextType::class, ['required' => false])
-                ->add('buyerPostalCode', TextType::class, ['required' => false])
-                ->add('buyerCity', TextType::class, ['required' => false])
-                ->add('buyerCountry', TextType::class, ['required' => false])
-                ->add('buyerPhone1', TextType::class, ['required' => false])
-                ->add('buyerPhone2', TextType::class, ['required' => false])
-                ->add('buyerMail1', TextType::class, ['required' => false])
-                ->add('buyerMail2', TextType::class, ['required' => false])
-
-                ->add('buyer_bank_establishment_code', TextType::class, ['required' => false])
-                ->add('buyer_bank_code_box', TextType::class, ['required' => false])
-                ->add('buyer_bank_account_number', TextType::class, ['required' => false])
-                ->add('buyer_bank_key', TextType::class, ['required' => false])
-                ->add('buyer_bank_domiciliation', TextType::class, ['required' => false])
-                ->add('buyer_bank_iban', TextType::class, ['required' => false])
-                ->add('buyer_bank_bic', TextType::class, ['required' => false])
-                ->add('buyer_bank_ics', TextType::class, ['required' => false])
-            ;
-        }
         /*$builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
             $property = $event->getData();
             $form = $event->getForm();

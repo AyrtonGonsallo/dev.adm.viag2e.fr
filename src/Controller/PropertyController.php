@@ -14,6 +14,7 @@ use App\Entity\Honoraire;
 use App\Entity\Warrant;
 use App\Form\PropertyFormType;
 use App\Form\PropertyCoproFormType;
+use App\Form\PropertyFormBuyerType;
 use App\Form\PropertyPaymentFormType;
 use App\Form\PropertyCommentFormType;
 use App\Form\FileFormType;
@@ -200,6 +201,9 @@ class PropertyController extends AbstractController
         $old_index = $property->getRevaluationIndex();
         $form_payment= $this->createForm(PropertyPaymentFormType::class, $property);
         $form_copro = $this->createForm(PropertyCoproFormType::class, $property);
+        if($property->getType() == Warrant::TYPE_SELLERS) {
+            $form_buyer = $this->createForm(PropertyFormBuyerType::class, $property);
+        }
         $form = $this->createForm(PropertyFormType::class, $property);
         $form_mail = $this->createForm(MailFormType::class, new Mail(), ['action' => $this->generateUrl('mail_add3', ['p_id' => $property->getId()])]);
         $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
@@ -214,7 +218,27 @@ class PropertyController extends AbstractController
         $form->handleRequest($request);
         $form_copro->handleRequest($request);
         $form_payment->handleRequest($request);
-        
+        if($property->getType() == Warrant::TYPE_SELLERS) {
+            $form_buyer->handleRequest($request);
+            if ($form_buyer->isSubmitted() and $form_buyer->isValid()) {
+                $manager = $this->getDoctrine()->getManager();
+                $manager->persist($property);
+                $manager->flush();
+                $this->addFlash('success', 'Bien édité');
+            }
+            else if($form_buyer->isSubmitted() and !$form_buyer->isValid()){
+                $errors ='';
+                foreach ($form_buyer as $fieldName => $formField) {
+                    // each field has an array of errors
+                    if(strlen($formField->getErrors())>=3){
+                        $errors .= 'Champ: '.$fieldName.'- Erreur: '.$formField->getErrors().'<br/>';
+                    }
+                }
+                $this->addFlash('error', 'Problème lors de l\'enregistrement <br/>'.$errors);
+                return $this->redirectToRoute('property_view',['propertyId' => $property->getId(),'onglet' => 'm_tabs_buyer']);
+    
+            }
+        }
         if ($form->isSubmitted() && $form->isValid()) {
             if($property->getPropertyType()=="Appartement" && $property->date_fin_exercice_copro==null){
                 $errors = ' la date de fin d\'exercice de copropriété est obligatoire pour un bien de type appartement.';
@@ -257,6 +281,7 @@ class PropertyController extends AbstractController
             }
             $this->addFlash('error', 'Problème lors de l\'enregistrement <br/>'.$errors);
         }
+       
         if ($form_copro->isSubmitted() and $form_copro->isValid()) {
             if($property->getPropertyType()=="Appartement" && $property->date_fin_exercice_copro==null){
                 $errors = ' la date de fin d\'exercice de copropriété est obligatoire pour un bien de type appartement.';
@@ -570,6 +595,7 @@ class PropertyController extends AbstractController
             'form_comment'      => $form_comment->createView(),
             'form_file'  => $form_file->createView(),
             'form_copro'  => $form_copro->createView(),
+            'form_buyer'  => ($property->getType() == Warrant::TYPE_SELLERS) ?$form_buyer->createView():null,
             'messages'  => $messages,
             'form_payment'  => $form_payment->createView(),
             'form_mail'  => $form_mail->createView(),

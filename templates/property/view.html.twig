@@ -580,7 +580,7 @@
                                     </div>
                                 </div>
                             </div>
-                        
+                       
                        
                         <input id="bouton_envoyer" class="btn btn-outline-success btn-block" type="submit" value="Enregistrer" />
                         {{ form_end(form) }}
@@ -1348,29 +1348,35 @@
                             </div>
                         </div>
                     </div>
+                     {% if property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
+                     
+                        <div class="tab-pane {% if buyer_tab %} active{% endif %}" id="m_tabs_buyer" role="tabpanel">buyer
+                            {{ form_start(form_buyer, {'attr': {'class': 'm-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed'}}) }}
+                                {{ mforms.group(form_buyer.buyerFirstname, 'buyer_firstname', 'Prénom', form_buyer.buyerLastname, 'buyer_lastname', 'Nom') }}
+                                {{ mforms.group(form_buyer.buyerAddress, 'buyer_address', 'Adresse', form_buyer.buyerPhone1, 'buyer_phone1', 'Téléphone') }}
+                                {{ mforms.group(form_buyer.buyerPostalCode, 'buyer_postal_code', 'Code postal', form_buyer.buyerPhone2, 'buyer_phone2', 'Téléphone2') }}
+                                {{ mforms.group(form_buyer.buyerCity, 'buyer_city', 'Ville', form_buyer.buyerMail1, 'buyer_mail1', 'Adresse mail') }}
+                                {{ mforms.group(form_buyer.buyerCountry, 'buyer_country', 'Pays', form_buyer.buyerMail2, 'buyer_mail2', 'Adresse mail 2', true) }}
+                                <div class="m-divider"><span></span>Relevé d'Identité Bancaire<span></span></div>
+                                {{ mforms.group(form_buyer.buyer_bank_establishment_code, 'buyer_bank_establishment_code', 'Code banque', form_buyer.buyer_bank_code_box, 'buyer_bank_code_box', 'Code guichet') }}
+                                {{ mforms.group(form_buyer.buyer_bank_account_number, 'buyer_bank_account_number', 'N° de compte', form_buyer.buyer_bank_key, 'buyer_bank_key', 'Clé RIB') }}
+                                {{ mforms.group(form_buyer.buyer_bank_domiciliation, 'buyer_bank_domiciliation', 'Domiciliation', null, null, null) }}
+                                <div class="m-divider"><span></span>Numéro International de Compte Bancaire (IBAN)<span></span></div>
+                                {{ mforms.group(form_buyer.buyer_bank_iban, 'buyer_bank_iban', 'N° de compte', form_buyer.buyer_bank_bic, 'buyer_bank_bic', 'Code banque (BIC)') }}
+                                <div class="m-divider"><span></span>Identifiant Créancier SEPA<span></span></div>
+                                {{ mforms.group(form_buyer.buyer_bank_ics, 'buyer_bank_ics', 'N° ICS', null, null, null) }}
+                                <input id="bouton_envoyer" class="btn btn-outline-success btn-block" type="submit" value="Enregistrer" />
+                            {{ form_end(form_buyer) }}
+                        </div>
+                    
+                    {% endif %}
                 </div>
                 
             </div>
         </div>
 
         
-                    {% if property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}buyer
-                    <div class="tab-pane {% if buyer_tab %} active{% endif %}" id="m_tabs_buyer" role="tabpanel">
-                        {{ mforms.group(form.buyerFirstname, 'buyer_firstname', 'Prénom', form.buyerLastname, 'buyer_lastname', 'Nom') }}
-                        {{ mforms.group(form.buyerAddress, 'buyer_address', 'Adresse', form.buyerPhone1, 'buyer_phone1', 'Téléphone') }}
-                        {{ mforms.group(form.buyerPostalCode, 'buyer_postal_code', 'Code postal', form.buyerPhone2, 'buyer_phone2', 'Téléphone2') }}
-                        {{ mforms.group(form.buyerCity, 'buyer_city', 'Ville', form.buyerMail1, 'buyer_mail1', 'Adresse mail') }}
-                        {{ mforms.group(form.buyerCountry, 'buyer_country', 'Pays', form.buyerMail2, 'buyer_mail2', 'Adresse mail 2', true) }}
-                        <div class="m-divider"><span></span>Relevé d'Identité Bancaire<span></span></div>
-                        {{ mforms.group(form.buyer_bank_establishment_code, 'buyer_bank_establishment_code', 'Code banque', form.buyer_bank_code_box, 'buyer_bank_code_box', 'Code guichet') }}
-                        {{ mforms.group(form.buyer_bank_account_number, 'buyer_bank_account_number', 'N° de compte', form.buyer_bank_key, 'buyer_bank_key', 'Clé RIB') }}
-                        {{ mforms.group(form.buyer_bank_domiciliation, 'buyer_bank_domiciliation', 'Domiciliation', null, null, null) }}
-                        <div class="m-divider"><span></span>Numéro International de Compte Bancaire (IBAN)<span></span></div>
-                        {{ mforms.group(form.buyer_bank_iban, 'buyer_bank_iban', 'N° de compte', form.buyer_bank_bic, 'buyer_bank_bic', 'Code banque (BIC)') }}
-                        <div class="m-divider"><span></span>Identifiant Créancier SEPA<span></span></div>
-                        {{ mforms.group(form.buyer_bank_ics, 'buyer_bank_ics', 'N° ICS', null, null, null) }}
-                    </div>
-                    {% endif %}
+                    
                     {{ form_rest(form) }}
                     
                 </div>
