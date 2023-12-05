@@ -644,7 +644,7 @@ class InvoiceController extends AbstractController
                 'Title' => '<a href="'.$this->generateUrl('property_view', ['propertyId' => $invoice->getProperty()->getId()]).'">'.$invoice->getProperty()->getTitle().'</a>',
                 'Amount' => $amount,
                 'HonoraryRates' => $honoraire,
-                'Status' => ($invoice->getType() === Invoice::TYPE_RECEIPT || $invoice->getStatus() >= Invoice::STATUS_PAYED) ? '<span class="'.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</span>' : '<a id="invoice_'.$invoice->getId().'" href="#" data-id="'.$invoice->getId().'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_status" class="invoice-status m--font-bold '.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</a>',
+                'Status' => ($invoice->getStatus() >= Invoice::STATUS_PAYED) ? '<span class="'.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</span>' : '<a id="invoice_'.$invoice->getId().'" href="#" data-id="'.$invoice->getId().'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_status" class="invoice-status m--font-bold '.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</a>',
                 'Resend' => '<a href="'.$this->generateUrl('invoice_resend', ['invoiceId' => $invoice->getId()]).'"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>',
                 'Download' => $lien_telechargements,
             ];

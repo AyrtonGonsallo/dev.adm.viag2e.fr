@@ -16,7 +16,7 @@ class HonoraireFormType extends AbstractType
         $builder
         ->add('nom', TextType::class)
         ->add('valeur', TextType::class)
-        ->add('comment', TextareaType::class, array('required' => false, 'attr' => ['class' => 'tinymce'],'label' => false))
+        ->add('comment', TextareaType::class, ['required' => false])
         ->add('minimum', TextType::class)
         ;
     }

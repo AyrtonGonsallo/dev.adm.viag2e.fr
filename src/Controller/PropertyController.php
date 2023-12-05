@@ -297,7 +297,7 @@ class PropertyController extends AbstractController
                 $now_date=new DateTime();
                 $data = [
                     'date'       => $now_date,
-                    'current_day'       => utf8_encode(strftime("%A %d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
+                    'current_day'       => strftime("%A %d %B %Y", strtotime( $now_date->format('d-m-Y') )),
                     'annee'       => $now_date->format('Y'),
                     'date_a_f'       => $now_date->format('d/m/Y'),
                     'date_d_f'       => $date_reg_debut->format('d/m/Y'),
