@@ -147,6 +147,9 @@ class Notification  implements JsonSerializable
                 } else {
                     return "ERROR #{$this->getId()}";
                 }
+            case 'notification-libre':
+                return "Texte: \"{$this->getData()['message']}\". Date d'expiration: {$this->getData()['date']}";
+                
             default:
                 return $this->getType();
         }
