@@ -360,11 +360,10 @@ class CronInvoicesCommand extends Command
                     ->select("rh")
                     ->from('App\Entity\RevaluationHistory', 'rh')
                     ->where('rh.type LIKE :key')
-                    ->andWhere('rh.date BETWEEN :start AND :end')
+                    ->andWhere('rh.date <= :end')
                     ->setParameter('key', 'OGI')
-                    ->setParameter('start', $startDate)
                     ->setParameter('end', $endDate)
-                        ->orderBy('rh.id', 'DESC');
+                        ->orderBy('rh.date', 'DESC');
                     $query4 = $qb4->getQuery();
                     // Execute Query
                     $indice_og2i_ma = $query4->getResult()[0]; 

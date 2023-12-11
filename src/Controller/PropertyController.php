@@ -495,11 +495,10 @@ class PropertyController extends AbstractController
         $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
         ->select("rh")
         ->from('App\Entity\RevaluationHistory', 'rh')
-        ->where('rh.type LIKE :key and rh.date BETWEEN :start AND :end')
+        ->where('rh.type LIKE :key and rh.date <= :end')
         ->setParameter('key', 'OGI')
-        ->setParameter('start', $startDate)
         ->setParameter('end', $endDate)
-            ->orderBy('rh.id', 'DESC');
+            ->orderBy('rh.date', 'DESC');
         $query = $qb->getQuery();
         // Execute Query
         if($query->getResult()){
@@ -522,11 +521,10 @@ class PropertyController extends AbstractController
         ->select("rh")
         ->from('App\Entity\RevaluationHistory', 'rh')
         ->where('rh.type LIKE :key')
-        ->andWhere('rh.date BETWEEN :start AND :end')
+        ->andWhere('rh.date <= :end')
         ->setParameter('key', get_label($property->getIntitulesIndicesInitial()))
-        ->setParameter('start', $startDate)
         ->setParameter('end', $endDate)
-            ->orderBy('rh.id', 'DESC');
+            ->orderBy('rh.date', 'DESC');
         $query4 = $qb4->getQuery();
         // Execute Query
         if($query4->getResult()){
