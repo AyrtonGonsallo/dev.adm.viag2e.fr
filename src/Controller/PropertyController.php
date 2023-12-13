@@ -488,50 +488,71 @@ class PropertyController extends AbstractController
         
         $startDate = \DateTime::createFromFormat('d-n-Y', "01-".date('m')."-".date('Y'));
         $startDate->setTime(0, 0 ,0);
-
         $endDate = \DateTime::createFromFormat('d-n-Y', "01-".(date('m')+1)."-".date('Y'));
         $endDate->setTime(0, 0, 0);
-        //recuperer 
-        $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
-        ->select("rh")
-        ->from('App\Entity\RevaluationHistory', 'rh')
-        ->where('rh.type LIKE :key and rh.date <= :end')
-        ->setParameter('key', 'OGI')
-        ->setParameter('end', $endDate)
-            ->orderBy('rh.date', 'DESC');
-        $query = $qb->getQuery();
-        // Execute Query
-        if($query->getResult()){
-            $indice_og2i = $query->getResult()[0];
+        if($property->initial_index_object){
+            $month_m_u=$property->initial_index_object->getDate()->format('m');
+            $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
+            $endDate_m_u->setTime(0, 0, 0);
+            // recuperer Valeur Indice de référence* (indexation)
+            function get_label($i){
+                if($i==1){
+                    return 'Urbains';
+                }else if($i==2){
+                    return 'Ménages';
+                }else{
+                    return 'Ménages';
+                }
+
+            }
+            $qb4=$this->getDoctrine()->getManager()->createQueryBuilder()
+            ->select("rh")
+            ->from('App\Entity\RevaluationHistory', 'rh')
+            ->where('rh.type LIKE :key')
+            ->andWhere('rh.date <= :end')
+            ->andWhere('rh.date like  :endmonth')
+            ->setParameter('key', get_label($property->getIntitulesIndicesInitial()))
+            ->setParameter('endmonth',  "%-%".$month_m_u."-%")
+            ->setParameter('end', $endDate_m_u)
+                ->orderBy('rh.date', 'DESC');
+            $query4 = $qb4->getQuery();
+            // Execute Query
+            if($query4->getResult()){
+                $indice_m_u = $query4->getResult()[0]; 
+            }else{
+                $indice_m_u = (object) array('value' => 0);
+            }
+        }else{
+            $indice_m_u = (object) array('value' => 0);
+        }
+        if($property->valeur_indice_ref_og2_i_object){
+            $month_og2i=$property->valeur_indice_ref_og2_i_object->getDate()->format('m');
+            $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month_og2i."-".date('Y'));
+            $endDate_og2i->setTime(0, 0, 0);
+            //recuperer 
+            $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
+            ->select("rh")
+            ->from('App\Entity\RevaluationHistory', 'rh')
+            ->where('rh.type LIKE :key and rh.date <= :end')
+            ->andWhere('rh.date like  :endmonth')
+            ->setParameter('key', 'OGI')
+            ->setParameter('end', $endDate_og2i)
+            ->setParameter('endmonth',  "%-%".$month_og2i."-%")
+                ->orderBy('rh.date', 'DESC');
+            $query = $qb->getQuery();
+            // Execute Query
+            if($query->getResult()){
+                $indice_og2i = $query->getResult()[0];
+            }else{
+                $indice_og2i = (object) array('value' => 0);
+            }
         }else{
             $indice_og2i = (object) array('value' => 0);
         }
-        // recuperer Valeur Indice de référence* (indexation)
-        function get_label($i){
-            if($i==1){
-                return 'Urbains';
-            }else if($i==2){
-                return 'Ménages';
-            }else{
-                return 'Ménages';
-            }
-
-        }
-        $qb4=$this->getDoctrine()->getManager()->createQueryBuilder()
-        ->select("rh")
-        ->from('App\Entity\RevaluationHistory', 'rh')
-        ->where('rh.type LIKE :key')
-        ->andWhere('rh.date <= :end')
-        ->setParameter('key', get_label($property->getIntitulesIndicesInitial()))
-        ->setParameter('end', $endDate)
-            ->orderBy('rh.date', 'DESC');
-        $query4 = $qb4->getQuery();
-        // Execute Query
-        if($query4->getResult()){
-            $indice_m_u = $query4->getResult()[0]; 
-        }else{
-            $indice_m_u = (object) array('value' => 0);; 
-        }
+        
+        
+        
+        
         if ($form_payment->isSubmitted() and $form_payment->isValid()) {
             $manager = $this->getDoctrine()->getManager();
             $data = $form_payment->getData();
@@ -645,7 +666,30 @@ class PropertyController extends AbstractController
             $i++;
             if($i==1){continue;}
         }
-        return new JsonResponse(['data' => $rhs,'options'=> $options]);
+
+        
+        $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month."-".date('Y'));
+        $endDate_m_u->setTime(0, 0, 0);
+        // recuperer Valeur Indice de référence* (indexation)
+       
+        $qb4=$this->getDoctrine()->getManager()->createQueryBuilder()
+        ->select("rh")
+        ->from('App\Entity\RevaluationHistory', 'rh')
+        ->where('rh.type LIKE :key')
+        ->andWhere('rh.date <= :end')
+        ->andWhere('rh.date like  :endmonth')
+        ->setParameter('key',  $type)
+        ->setParameter('endmonth',  "%-%".$month."-%")
+        ->setParameter('end', $endDate_m_u)
+            ->orderBy('rh.date', 'DESC');
+        $query4 = $qb4->getQuery();
+        // Execute Query
+        if($query4->getResult()){
+            $indice_m_u = $query4->getResult()[0]; 
+        }else{
+            $indice_m_u = (object) array('value' => 0);
+        }
+        return new JsonResponse(['data' => $rhs,'options'=> $options,"valeur_indice_de_référence"=> $indice_m_u->getValue(),]);
     }
     /**
      *@Route(name="get_currents_ipcs",path="/get_currents_ipcs/{type}")
@@ -720,6 +764,7 @@ class PropertyController extends AbstractController
         ->setParameter('property', $property)
         ->setParameter('start', $startDate)
         ->setParameter('end', $endDate)
+        
             ->orderBy('inv.id', 'DESC');
         $query = $qb->getQuery();
         // Execute Query
@@ -771,7 +816,26 @@ class PropertyController extends AbstractController
             $i++;
             if($i==1){continue;}
         }
-        return new JsonResponse(['data' => $rhs,'options'=> $options]);
+            $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month."-".date('Y'));
+            $endDate_og2i->setTime(0, 0, 0);
+            //recuperer 
+            $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
+            ->select("rh")
+            ->from('App\Entity\RevaluationHistory', 'rh')
+            ->where('rh.type LIKE :key and rh.date <= :end')
+            ->andWhere('rh.date like  :endmonth')
+            ->setParameter('key', 'OGI')
+            ->setParameter('endmonth',  "%-%".$month."-%")
+            ->setParameter('end', $endDate_og2i)
+                ->orderBy('rh.date', 'DESC');
+            $query = $qb->getQuery();
+            // Execute Query
+            if($query->getResult()){
+                $indice_og2i = $query->getResult()[0];
+            }else{
+                $indice_og2i = (object) array('value' => 0);
+            }
+        return new JsonResponse(['data' => $rhs,'options'=> $options,"valeur_indice_de_référence"=> $indice_og2i->getValue(),]);
     }
 
 /**
