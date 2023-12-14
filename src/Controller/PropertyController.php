@@ -570,7 +570,13 @@ class PropertyController extends AbstractController
                 return $this->redirectToRoute('property_view',['propertyId' => $property->getId(),'onglet' => 'm_tabs_pay']);
 
             }
-            $property->valeur_indexation_normale=$indice_m_u->getValue();
+            if($property->initial_index_object){
+                $property->valeur_indexation_normale=$indice_m_u->getValue();
+
+            }else{
+                $property->valeur_indexation_normale=0;
+
+            }
             //$manager->persist($propertyComment);
             $manager->flush();
             $this->addFlash('success', 'Bien édité');
