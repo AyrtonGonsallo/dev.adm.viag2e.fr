@@ -256,7 +256,7 @@ class CronInvoicesCommand extends Command
         }
 
         if (date('d') >= 20) {
-            // Quarterly invoices
+            // Quarterly invoices ce sont les charges de copro
             if(in_array(date('m'), [12, 3, 6, 9])) { //$d->format('m')
                 $date=new DateTime('last day of last month');
                 $last_day=new DateTime('last day of next month');
@@ -328,7 +328,7 @@ class CronInvoicesCommand extends Command
                 ->findInvoicesToDo(self::PROCESS_MAX);
 
             // $last_month = new DateTime('last day of last month');
-
+            // fin charges de copro
             $done = 0;
             /** @var Property $property */
             foreach ($properties as $property) {
@@ -428,17 +428,16 @@ class CronInvoicesCommand extends Command
                         ]
                     ];
 
-                    for ($i = 1; $i <= 2; $i++) {
+                    
                         $number = $last_number->getValue() + ($this->isDryRun() ? $i : 1);
 
                         $data = $data_full;
-                        $data['separation_type'] = $i;
                         $data['number'] = Invoice::formatNumber($number, Invoice::TYPE_NOTICE_EXPIRY);
                         $data['number_int'] = $number;
 
-                        if ($i == Property::BUYERS_ANNUITY) {
-                            $data['property']['honoraryRates'] = 0.0;
-                            $data['property']['honoraryRatesTax'] = 0.0;
+                       
+                            $data['property']['honoraryRates'] = $honoraryRates;
+                            $data['property']['honoraryRatesTax'] = $honoraryRatesTax;
                             $data['seller'] = [
                                 'firstname'  => $property->getWarrant()->getFirstname(),
                                 'lastname'   => $property->getWarrant()->getLastname(),
@@ -452,24 +451,23 @@ class CronInvoicesCommand extends Command
                                 'postalcode' => $property->getBuyerPostalCode(),
                                 'city'       => $property->getBuyerCity(),
                             ];
-                        }
-                        else {
-                            $data['property']['annuity'] = 0.0;
-                        }
+                    
+                            $data['property']['annuity'] = $annuity;
+                        
 
                         if (!$this->isDryRun()) {
                             $last_number->setValue($number);
                         }
 
-                        if (($i === Property::BUYERS_HONORARIES && $data['property']['honoraryRates'] > 0) || ($i === Property::BUYERS_ANNUITY && $data['property']['annuity'] > 0)) {
+                        if (($data['property']['honoraryRates'] > 0) || ( $data['property']['annuity'] > 0)) {
                             $this->generateInvoice($io, $data, $parameters, $property);
 
-                            $io->note("Invoice ({$data['type']} - {$data['separation_type']}) generated for id {$property->getId()}");
+                            $io->note("Invoice ({$data['type']} ) generated for id {$property->getId()}");
                         }
                         else {
-                            $io->note("Invoice skipped ({$data['type']} - {$data['separation_type']}) for id {$property->getId()}, amount was 0");
+                            $io->note("Invoice skipped ({$data['type']} ) for id {$property->getId()}, amount was 0");
                         }
-                    }
+                    
 
                     if (!$this->isDryRun()) {
                         $property->setLastInvoice(new DateTime());

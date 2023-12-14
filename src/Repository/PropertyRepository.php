@@ -52,6 +52,32 @@ class PropertyRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+
+/*
+
+pour faire les tests sur les charges de copro
+
+    public function findQuarterlyInvoicesToDo(int $max)
+    {// 15 83 24
+        return $this->createQueryBuilder('p')
+            ->where('p.id =:id')
+            ->setParameter('id', 16)
+            ->setMaxResults(0)
+            ->getQuery()
+            ->getResult();
+    }
+
+    pour faire les tests sur les rentes et honoraires
+
+    public function findInvoicesToDo(int $max)
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.id =:id')
+            ->setParameter('id', 83)
+            ->setMaxResults($max)
+            ->getQuery()
+            ->getResult();
+    }*/
     public function findLast()
     {
         return $this->createQueryBuilder('p')
