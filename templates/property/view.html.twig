@@ -842,15 +842,15 @@
                                 </div>
                                 <h4 class="titre-sous-partie"> INDEXATION</h4>
                                 <div class="form-group row">
-                                    <input type="text" id="form-indice_m_u_hide" style="display:none" name="form-indice_m_u_hide" value="{{indice_m_u.value}}"  disabled="disabled" class="form-control m-input">
-                                    <input type="text" id="form-indice_og2i_hide" style="display:none" name="form-indice_og2i_hide" value="{{indice_og2i.value}}"  disabled="disabled" class="form-control m-input">
-
+                                    <input type="text" id="form-indice_m_u_hide" style="display:none" name="form-indice_m_u_hide" value="{{indice_m_u.id}}"  disabled="disabled" class="form-control m-input">
+                                    <input type="text" id="form-indice_og2i_hide" style="display:none" name="form-indice_og2i_hide" value="{{indice_og2i.id}}"  disabled="disabled" class="form-control m-input">
                                     <div class="col-lg-6">
-                                        <label for="form-valeur_indexation_normale" class="col-4 col-form-label">Valeur Indice de référence<span class="m--font-danger">*</span></label>
-                                        <div class="col-12">
-                                            <input type="text" id="form-indice_m_u" name="form-indice_m_u" {% if property.ClauseOG2I %} value="{{indice_og2i.value}}" {% else %} value="{{indice_m_u.value}}" {% endif %} disabled="disabled" class="form-control m-input">
+                                            <label for="form-valeur_indice_reference_object" class="col-12 col-form-label">Valeur Indice de référence<span class="m--font-danger">*</span></label>
+                                            <div class="col-12">
+                                                {{ form_row(form_payment.valeur_indice_reference_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-valeur_indice_reference_object', 'label': false}) }}
+                                            </div>
                                         </div>
-                                    </div>
+                                    
                                     <div class="col-lg-6">
                                     Nouveau montant de rente
                                         <div class="col-12">
@@ -1490,7 +1490,7 @@ function load_payment_datas(){
                 
                 setTimeout(function(){ 
                         rdb=parseFloat($('#montant_rente').html().split(" ")[0])
-                        vir=$('#form-indice_m_u').val()
+                        vir=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
                         p=($('#form-plafonnement_index_og2_i').val())?$('#form-plafonnement_index_og2_i').val():2;
                         viog2ir=$("#form-valeur_indice_ref_og2_i_object").find(":selected").val()
                         get_nv_montant_rente_og2i(viog2ir,vir,rdb,p)
@@ -1507,7 +1507,7 @@ function load_payment_datas(){
                 console.log("bien sans og2i")
                 
                 ia=$('#form-initialAmount').val()
-                ri=$("#form-indice_m_u").val()
+                ri=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
                 ii=$('#form-initial_index_object').find(":selected").val()
                 if(ia>0 && ri>0 && ii>0){
                     get_nv_montant_rente(ri,ii,ia)
@@ -1524,7 +1524,7 @@ function load_payment_datas(){
             
 }
  $("#form-plafonnement_index_og2_i").on("input", function() {
-            ri=$('#form-indice_m_u').val()
+            ri=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
             ia=$(this).val()
             ii=$('#form-initial_index_object').find(":selected").val()
             if(ia>0 && ri>0 && ii>0 && !$('#form-clause_OG2I').is(":checked")){
@@ -1632,6 +1632,14 @@ function load_payment_datas(){
     }else{
         $('#date_assurance_habitation').hide()
     };
+    if($('#form-clause_OG2I').is(":checked")){
+        val_indice_m_u=$('#form-indice_og2i_hide').val() 
+        $('#form-valeur_indice_reference_object option[value="'+val_indice_m_u+'"]').prop('selected', true)
+    }else{
+        val_indice_m_u=$('#form-indice_m_u_hide').val()
+        $('#form-valeur_indice_reference_object option[value="'+val_indice_m_u+'"]').prop('selected', true)
+    }
+       
     if($('#form-chaudiere').is(":checked")){
         $('#date_chaudiere').show()
     }else{
@@ -1720,7 +1728,7 @@ function load_payment_datas(){
                 success: function(data) {
                     console.log(data)
                     $('#form-initial_index_object').html(data['options'])
-                    $('#form-indice_m_u').val(data['valeur_indice_de_référence'])
+                    $('#form-valeur_indice_reference_object option[value="'+data['valeur_indice_de_référence_id']+'"]').prop('selected', true)
                 }
             });
         }, 1000);
@@ -1752,7 +1760,7 @@ function load_payment_datas(){
                 success: function(data) {
                     console.log(data)
                     $('#form-initial_index_object').html(data['options'])
-                    $('#form-indice_m_u').val(data['valeur_indice_de_référence'])
+                    $('#form-valeur_indice_reference_object option[value="'+data['valeur_indice_de_référence_id']+'"]').prop('selected', true)
                 }
             });
         }, 1000);
@@ -1784,7 +1792,7 @@ function load_payment_datas(){
                 success: function(data) {
                     console.log(data)
                     $('#form-initial_index_object').html(data['options'])
-                    $('#form-indice_m_u').val(data['valeur_indice_de_référence'])
+                    $('#form-valeur_indice_reference_object option[value="'+data['valeur_indice_de_référence_id']+'"]').prop('selected', true)
                 }
             });
         }, 1000);
@@ -1800,8 +1808,7 @@ function load_payment_datas(){
                 data: { myid: 123456 },
                 success: function(data) {
                     console.log(data)
-                    $('#form-indice_m_u').val(data['options']['value'])
-                    
+                    $('#form-valeur_indice_reference_object option[value="'+data['options']['id']+'"]').prop('selected', true)
                 }
             });
         }, 2000);
@@ -1831,7 +1838,9 @@ function load_payment_datas(){
                 });
             {% endfor %}
         });
+
         
+
        $('#property_payment_form_mois_indice_initial_day').val("1").change();
         $('#adresse_crédirentier').hide();
         $('#partie-debirentier').hide();
@@ -1839,7 +1848,7 @@ function load_payment_datas(){
             $('#ogi2')[this.checked ? "show" : "hide"]();
             $("#property_payment_form_mois_indice_ref_og2_i_day").val("1").change();
             val_indice_m_u=(this.checked ? $('#form-indice_og2i_hide').val() : $('#form-indice_m_u_hide').val())
-            $('#form-indice_m_u').val(val_indice_m_u)
+            $('#form-valeur_indice_reference_object option[value="'+val_indice_m_u+'"]').prop('selected', true)
             //form-indice_m_u
             //form-indice_m_u_hide
             //form-indice_og2i_hide
@@ -1975,7 +1984,7 @@ function load_payment_datas(){
             load_payment_datas()
         });
         $("#form-initialAmount").on("input", function() {
-            ri=$('#form-indice_m_u').val()
+            ri=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
             ia=$(this).val()
             ii=$('#form-initial_index_object').find(":selected").val()
             if(ia>0 && ri>0 && ii>0 && !$('#form-clause_OG2I').is(":checked")){
@@ -2000,13 +2009,13 @@ function load_payment_datas(){
             
             
         });
-        
+         $("#form-valeur_indice_reference_object").on('change', function()
+        {
+                load_payment_datas()
+        });
         $("#form-valeur_indice_ref_og2_i_object").on('change', function()
         {
-            
                 load_payment_datas()
-            
-            
         });
         $("#property_payment_form_mois_indice_ref_og2_i_month").on('change', function()
         {

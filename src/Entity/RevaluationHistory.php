@@ -25,7 +25,10 @@ class RevaluationHistory implements JsonSerializable
      * @ORM\Column(type="datetime")
      */
     private $date;
-    
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Property", mappedBy="valeur_indice_reference_object")
+     */
+    public $properties_vir;
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Property", mappedBy="valeur_indice_ref_og2_i_object")
      */

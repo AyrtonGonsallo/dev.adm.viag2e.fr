@@ -253,6 +253,10 @@ class Property
      * @ORM\ManyToOne(targetEntity="App\Entity\RevaluationHistory", inversedBy="properties_i")
      */
     public $initial_index_object;
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\RevaluationHistory", inversedBy="properties_vir")
+     */
+    public $valeur_indice_reference_object;
      /**
      * @ORM\Column(type="float")
      */

@@ -173,6 +173,47 @@ class PropertyController extends AbstractController
             $this->addFlash('danger', 'Bien introuvable');
             return $this->redirectToRoute('dashboard', [], 302);
         }
+        if($property->initial_index_object){
+            if(!$property->valeur_indice_reference_object){
+                $month_m_u=$property->initial_index_object->getDate()->format('m');
+                $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
+                $endDate_m_u->setTime(0, 0, 0);
+                // recuperer Valeur Indice de référence* (indexation)
+                function get_label($i){
+                    if($i==1){
+                        return 'Urbains';
+                    }else if($i==2){
+                        return 'Ménages';
+                    }else{
+                        return 'Ménages';
+                    }
+
+                }
+                $qb4=$this->getDoctrine()->getManager()->createQueryBuilder()
+                ->select("rh")
+                ->from('App\Entity\RevaluationHistory', 'rh')
+                ->where('rh.type LIKE :key')
+                ->andWhere('rh.date <= :end')
+                ->andWhere('rh.date like  :endmonth')
+                ->setParameter('key', get_label($property->getIntitulesIndicesInitial()))
+                ->setParameter('endmonth',  "%-%".$month_m_u."-%")
+                ->setParameter('end', $endDate_m_u)
+                    ->orderBy('rh.date', 'DESC');
+                $query4 = $qb4->getQuery();
+                // Execute Query
+                if($query4->getResult()){
+                    $indice_m_u = $query4->getResult()[0]; 
+                    $property->valeur_indice_reference_object=$query4->getResult()[0];
+                }else{
+                    $indice_m_u = (object) array('value' => 0,'id'=>0);
+                }
+            }else{
+                $indice_m_u = $property->valeur_indice_reference_object;
+            }
+            
+        }else{
+            $indice_m_u = (object) array('value' => 0,'id'=>0);
+        }
         $propertyComment=new PropertyComment(); 
         $form_comment = $this->createForm(PropertyCommentFormType::class, $propertyComment);
         $form_comment->handleRequest($request);
@@ -490,41 +531,7 @@ class PropertyController extends AbstractController
         $startDate->setTime(0, 0 ,0);
         $endDate = \DateTime::createFromFormat('d-n-Y', "01-".(date('m')+1)."-".date('Y'));
         $endDate->setTime(0, 0, 0);
-        if($property->initial_index_object){
-            $month_m_u=$property->initial_index_object->getDate()->format('m');
-            $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
-            $endDate_m_u->setTime(0, 0, 0);
-            // recuperer Valeur Indice de référence* (indexation)
-            function get_label($i){
-                if($i==1){
-                    return 'Urbains';
-                }else if($i==2){
-                    return 'Ménages';
-                }else{
-                    return 'Ménages';
-                }
-
-            }
-            $qb4=$this->getDoctrine()->getManager()->createQueryBuilder()
-            ->select("rh")
-            ->from('App\Entity\RevaluationHistory', 'rh')
-            ->where('rh.type LIKE :key')
-            ->andWhere('rh.date <= :end')
-            ->andWhere('rh.date like  :endmonth')
-            ->setParameter('key', get_label($property->getIntitulesIndicesInitial()))
-            ->setParameter('endmonth',  "%-%".$month_m_u."-%")
-            ->setParameter('end', $endDate_m_u)
-                ->orderBy('rh.date', 'DESC');
-            $query4 = $qb4->getQuery();
-            // Execute Query
-            if($query4->getResult()){
-                $indice_m_u = $query4->getResult()[0]; 
-            }else{
-                $indice_m_u = (object) array('value' => 0);
-            }
-        }else{
-            $indice_m_u = (object) array('value' => 0);
-        }
+        
         if($property->valeur_indice_ref_og2_i_object){
             $month_og2i=$property->valeur_indice_ref_og2_i_object->getDate()->format('m');
             $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month_og2i."-".date('Y'));
@@ -544,10 +551,10 @@ class PropertyController extends AbstractController
             if($query->getResult()){
                 $indice_og2i = $query->getResult()[0];
             }else{
-                $indice_og2i = (object) array('value' => 0);
+                $indice_og2i = (object) array('value' => 0,'id'=>0);
             }
         }else{
-            $indice_og2i = (object) array('value' => 0);
+            $indice_og2i = (object) array('value' => 0,'id'=>0);
         }
         
         
@@ -571,7 +578,7 @@ class PropertyController extends AbstractController
 
             }
             if($property->initial_index_object){
-                $property->valeur_indexation_normale=$indice_m_u->getValue();
+                $property->valeur_indexation_normale=$property->valeur_indice_reference_object->getValue();
 
             }else{
                 $property->valeur_indexation_normale=0;
@@ -693,9 +700,9 @@ class PropertyController extends AbstractController
         if($query4->getResult()){
             $indice_m_u = $query4->getResult()[0]; 
         }else{
-            $indice_m_u = (object) array('value' => 0);
+            $indice_m_u = (object) array('value' => 0,'id'=>0);
         }
-        return new JsonResponse(['data' => $rhs,'options'=> $options,"valeur_indice_de_référence"=> $indice_m_u->getValue(),]);
+        return new JsonResponse(['data' => $rhs,'options'=> $options,"valeur_indice_de_référence"=> $indice_m_u->getValue(),"valeur_indice_de_référence_id"=> $indice_m_u->getId(),]);
     }
     /**
      *@Route(name="get_currents_ipcs",path="/get_currents_ipcs/{type}")
@@ -839,9 +846,9 @@ class PropertyController extends AbstractController
             if($query->getResult()){
                 $indice_og2i = $query->getResult()[0];
             }else{
-                $indice_og2i = (object) array('value' => 0);
+                $indice_og2i = (object) array('value' => 0,'id'=>0);
             }
-        return new JsonResponse(['data' => $rhs,'options'=> $options,"valeur_indice_de_référence"=> $indice_og2i->getValue(),]);
+        return new JsonResponse(['data' => $rhs,'options'=> $options,"valeur_indice_de_référence"=> $indice_og2i->getValue(),"valeur_indice_de_référence_id"=> $indice_og2i->getId(),]);
     }
 
 /**

@@ -87,6 +87,37 @@ class PropertyPaymentFormType extends AbstractType
                 },
                 'choice_value' => 'id',
             ])
+            ->add('valeur_indice_reference_object', EntityType::class, [
+                'required' => false,
+                'class' => RevaluationHistory::class,
+                'query_builder' => function (EntityRepository $er)  use($options){
+                    
+                        return $er->createQueryBuilder('rh')
+                        ->where('rh.type LIKE :key1 or rh.type LIKE :key2 or rh.type LIKE :key3')
+                        ->setParameter('key1', "Urbains")
+                        ->setParameter('key2', "Ménages")
+                        ->setParameter('key3', "OGI")
+                            ->orderBy('rh.id', 'DESC');
+                    
+                    
+                },
+                'choice_attr' => function($package) use ($options) {
+                    if($options['data']->valeur_indice_reference_object){
+                        $selected = false;
+                        if($package == $options['data']->valeur_indice_reference_object) {
+                            $selected = true;
+                        }
+                        return ['selected' => $selected];
+                    }else{
+                        return ['selected' => false];
+                    }
+                    
+                },
+                'choice_label' => function (RevaluationHistory $rh): string {
+                    return $rh->getValue().' '.$rh->getType().' mois de '.strftime('%B %Y',$rh->getDate()->getTimestamp());
+                },
+                'choice_value' => 'id',
+            ])
             ->add('abandonmentIndex', TextType::class, ['required' => false])
             ->add('revaluationDate', DayType::class)
             ->add('mois_indice_initial', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy','years' => range(date("Y")-12, date("Y")) ])
