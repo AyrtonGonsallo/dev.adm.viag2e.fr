@@ -97,7 +97,8 @@ class PropertyPaymentFormType extends AbstractType
                         ->setParameter('key1', "Urbains")
                         ->setParameter('key2', "Ménages")
                         ->setParameter('key3', "OGI")
-                            ->orderBy('rh.id', 'DESC');
+                        ->orderBy('rh.type', 'ASC')
+                        ->addOrderBy('rh.date', 'DESC');
                     
                     
                 },
