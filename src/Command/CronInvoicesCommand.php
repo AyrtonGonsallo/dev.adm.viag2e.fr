@@ -255,7 +255,7 @@ class CronInvoicesCommand extends Command
             $io->note("OTP invoice ({$data['type']}) generated for id {$pendingInvoice->getProperty()->getId()}");
         }
 
-        if (date('d') >= 20) {
+        if (date('d') >= 18) {
             // Quarterly invoices ce sont les charges de copro
             if(in_array(date('m'), [12, 3, 6, 9])) { //$d->format('m')
                 $date=new DateTime('last day of last month');
@@ -453,8 +453,19 @@ class CronInvoicesCommand extends Command
                             ];
                     
                             $data['property']['annuity'] = $annuity;
-                        
-
+                            $data["debirentier"]= null;
+                            $data["debirentier_different"]= null;
+                            if( $property->getDebirentierDifferent()){
+                                $debirentier    = [
+                                    'nom_debirentier'         =>  $property->getNomDebirentier(),
+                                    'prenom_debirentier'       =>  $property->getPrenomDebirentier(),
+                                    'addresse_debirentier'  =>  $property->getAddresseDebirentier(),
+                                    'code_postal_debirentier'   =>  $property->getCodePostalDebirentier(),
+                                    'ville_debirentier'    =>  $property->getVilleDebirentier(),
+                                ];
+                                $data["debirentier"]=$debirentier;
+                                $data["debirentier_different"]= $property->getDebirentierDifferent();
+                            }
                         if (!$this->isDryRun()) {
                             $last_number->setValue($number);
                         }
@@ -462,7 +473,7 @@ class CronInvoicesCommand extends Command
                         if (($data['property']['honoraryRates'] > 0) || ( $data['property']['annuity'] > 0)) {
                             $this->generateInvoice($io, $data, $parameters, $property);
 
-                            $io->note("Invoice ({$data['type']} ) generated for id {$property->getId()}");
+                            $io->note("Invoice ({$data['type']} ) generated for id {$property->getId()} with annuity {$data['property']['annuity']} and honorary {$data['property']['honoraryRates']}");
                         }
                         else {
                             $io->note("Invoice skipped ({$data['type']} ) for id {$property->getId()}, amount was 0");

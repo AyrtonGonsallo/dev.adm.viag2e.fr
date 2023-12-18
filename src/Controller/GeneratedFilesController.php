@@ -690,22 +690,26 @@ class GeneratedFilesController extends AbstractController
                 $fileName = "/Courrier d’indexation OG2I Année 1 -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 $now_date=new DateTime();
 
-                $startDate = \DateTime::createFromFormat('d-n-Y', "01-".date('m')."-".date('Y'));
-                $startDate->setTime(0, 0 ,0);
-
-                $endDate = \DateTime::createFromFormat('d-n-Y', "01-".(date('m')+1)."-".date('Y'));
-                $endDate->setTime(0, 0, 0);
+                $month_og2i=$property->valeur_indice_ref_og2_i_object->getDate()->format('m');
+                $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month_og2i."-".date('Y'));
+                $endDate_og2i->setTime(0, 0, 0);
+                //recuperer 
                 $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
                 ->select("rh")
                 ->from('App\Entity\RevaluationHistory', 'rh')
-                ->where('rh.type LIKE :key and rh.date BETWEEN :start AND :end')
+                ->where('rh.type LIKE :key and rh.date <= :end')
+                ->andWhere('rh.date like  :endmonth')
                 ->setParameter('key', 'OGI')
-                ->setParameter('start', $startDate)
-                ->setParameter('end', $endDate)
-                    ->orderBy('rh.id', 'DESC');
+                ->setParameter('end', $endDate_og2i)
+                ->setParameter('endmonth',  "%-%".$month_og2i."-%")
+                    ->orderBy('rh.date', 'DESC');
                 $query = $qb->getQuery();
                 // Execute Query
-                $indice_og2i = $query->getResult()[0]; 
+                if($query->getResult()){
+                    $indice_og2i = $query->getResult()[0];
+                }else{
+                    $indice_og2i = (object) array('value' => 0,'id'=>0);
+                }
                 $mi = $property->getInitialAmount();
                 $rdb=round(($property->valeur_indice_ref_og2_i_object->getValue()*$mi)/$property->initial_index_object->getValue(),2);
 
@@ -715,6 +719,7 @@ class GeneratedFilesController extends AbstractController
                 $plaff_v=(1+($plaff/100))*$rdb;
                 if($res<$plaff_v){
                     $rente=round($res,2);
+                    $is_plaff=false;
                 }else{
                     $rente=round($plaff_v,2);
                     $is_plaff=true;
@@ -902,27 +907,33 @@ class GeneratedFilesController extends AbstractController
                 $fileName = "/Courrier d’indexation -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 $now_date=new DateTime();
 
-                $startDate = \DateTime::createFromFormat('d-n-Y', "01-".date('m')."-".date('Y'));
-                $startDate->setTime(0, 0 ,0);
-
-                $endDate = \DateTime::createFromFormat('d-n-Y', "01-".(date('m')+1)."-".date('Y'));
-                $endDate->setTime(0, 0, 0);
+                $month_m_u=$property->initial_index_object->getDate()->format('m');
+                $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
+                $endDate_m_u->setTime(0, 0, 0);
+                // recuperer Valeur Indice de référence* (indexation)
+                
                 $qb4=$this->getDoctrine()->getManager()->createQueryBuilder()
                 ->select("rh")
                 ->from('App\Entity\RevaluationHistory', 'rh')
                 ->where('rh.type LIKE :key')
-                ->andWhere('rh.date BETWEEN :start AND :end')
+                ->andWhere('rh.date <= :end')
+                ->andWhere('rh.date like  :endmonth')
                 ->setParameter('key', get_label($property->getIntitulesIndicesInitial()))
-                ->setParameter('start', $startDate)
-                ->setParameter('end', $endDate)
-                    ->orderBy('rh.id', 'DESC');
+                ->setParameter('endmonth',  "%-%".$month_m_u."-%")
+                ->setParameter('end', $endDate_m_u)
+                    ->orderBy('rh.date', 'DESC');
                 $query4 = $qb4->getQuery();
                 // Execute Query
-                $indice_m_u = $query4->getResult()[0]; 
+                if($query4->getResult()){
+                    $indice_m_u = $query4->getResult()[0]; 
+                    $property->valeur_indice_reference_object=$query4->getResult()[0];
+                }else{
+                    $indice_m_u = (object) array('value' => 0,'id'=>0);
+                }
 
                 $data = [
                     'date'       => $now_date,
-                    'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
+                    'current_day'       => strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') )),
                     'annee'       => $now_date->format('Y'),
                     'date_a_f'       => $now_date->format('d/m/Y'),
                     'property'   => $property,

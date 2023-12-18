@@ -23,9 +23,25 @@
                 <small>{{ parameters.city|title }}, le {{ data.date.current_day }}</small>
                 <br /><br /><br />
                 <b>A l'attention de:</b><br />
-                {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
-                {{ data.warrant.address }}<br />
-                {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                {#
+                {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
+                    {% if data.debirentier_different %}
+                        {{ data.debirentier.prenom_debirentier }} {{ data.debirentier.nom_debirentier }}<br />
+                        {{ data.debirentier.addresse_debirentier }}<br />
+                        {{ data.debirentier.code_postal_debirentier }} {{ data.debirentier.ville_debirentier }}
+                    {% else %}
+                        {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                        {{ data.warrant.address }}<br />
+                        {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                    {% endif %}
+                {% else %}
+                    {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                    {{ data.warrant.address }}<br />
+                    {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                {% endif %}#}
+                    {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                    {{ data.warrant.address }}<br />
+                    {{ data.warrant.postalcode }} {{ data.warrant.city }}
             </td>
         </tr>
     </table>
@@ -68,7 +84,6 @@
             </td>
             <td style="width: 40%;">
                 <br /><br />
-                {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_BUYERS') or (data.separation_type is defined and data.separation_type == constant('App\\Entity\\Property::BUYERS_ANNUITY')) %}
                 <table style="width: 100%;">
                     <colgroup>
                         <col style="width: 60%; text-align: left">
@@ -87,7 +102,6 @@
                     </tbody>
                 </table>
                 <br /><br /><br /><br /><br />
-                {% endif %}
             </td>
         </tr>
     </table>
