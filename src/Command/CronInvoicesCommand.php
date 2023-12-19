@@ -600,7 +600,12 @@ class CronInvoicesCommand extends Command
 
             }  
             $filePath = $this->generator->generateFile($data, $parameters);
-            $filePath2= $this->generator->generateFile2($data, $parameters);
+            if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                $filePath2= -1;
+            }else{
+                $filePath2= $this->generator->generateFile2($data, $parameters);
+
+            }
             if ($this->isDryRun()) {
                 return;
             }
@@ -620,18 +625,22 @@ class CronInvoicesCommand extends Command
             $file->setDriveId($this->drive->addFile($file->getName(), $filePath, File::TYPE_INVOICE, $property->getWarrant()->getId()));
             $this->manager->persist($file);
 			//second fichier
-			$file2 = new File();
-			$file2->setType(File::TYPE_INVOICE);
-			$file2->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$invoice->getId()} - R file2");
-			$file2->setWarrant($property->getWarrant());
-			/** @noinspection PhpUnhandledExceptionInspection */
-			$file2->setDriveId($this->drive->addFile($file2->getName(), $filePath2, File::TYPE_INVOICE, $property->getWarrant()->getId()));
-			$this->manager->persist($file2);
+            if(! $data['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                $file2 = new File();
+                $file2->setType(File::TYPE_INVOICE);
+                $file2->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$invoice->getId()} - R file2");
+                $file2->setWarrant($property->getWarrant());
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $file2->setDriveId($this->drive->addFile($file2->getName(), $filePath2, File::TYPE_INVOICE, $property->getWarrant()->getId()));
+                $this->manager->persist($file2);
+            }
 			//$invoice->setFile($file);
             $invoice->setNumber($data['number_int']);
             $invoice->setData($data);
             $invoice->setFile($file);
-            $invoice->setFile2($file2);
+            if(! $data['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                $invoice->setFile2($file2);
+            }
         $invoice->setDate(new DateTime());
             $invoice->setProperty($property);
             $this->manager->persist($invoice);
@@ -658,14 +667,23 @@ class CronInvoicesCommand extends Command
             }
             if ((!empty($data['separation_type']) && ($data['separation_type'] == Property::BUYERS_ANNUITY) && !empty($property->getBuyerMail1())) || !empty($property->getWarrant()->getMail1())) {
                 
-                $message = (new Swift_Message($invoice->getMailSubject()))
+                
+                    if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                        $message = (new Swift_Message($invoice->getMailSubject()))
                     ->setFrom($this->mail_from)
                     ->setBcc($this->mail_from)
                     ->setTo($invoice->getMailTarget())
                     ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
-                    ->attach(Swift_Attachment::fromPath($filePath))
-                    ->attach(Swift_Attachment::fromPath($filePath2));
-
+                    ->attach(Swift_Attachment::fromPath($filePath));
+                      }else{
+                        $message = (new Swift_Message($invoice->getMailSubject()))
+                        ->setFrom($this->mail_from)
+                        ->setBcc($this->mail_from)
+                        ->setTo($invoice->getMailTarget())
+                        ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                        ->attach(Swift_Attachment::fromPath($filePath))
+                        ->attach(Swift_Attachment::fromPath($filePath2));
+                      }
                 if(!empty($invoice->getMailCc())) {
                     $message->setCc($invoice->getMailCc());
                 }
