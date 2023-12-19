@@ -255,7 +255,7 @@ class CronInvoicesCommand extends Command
             $io->note("OTP invoice ({$data['type']}) generated for id {$pendingInvoice->getProperty()->getId()}");
         }
 
-        if (date('d') >= 19) {
+        if (date('d') >= 20) {
             // Quarterly invoices ce sont les charges de copro
             if(in_array(date('m'), [12, 3, 6, 9])) { //$d->format('m')
                 $date=new DateTime('last day of last month');
