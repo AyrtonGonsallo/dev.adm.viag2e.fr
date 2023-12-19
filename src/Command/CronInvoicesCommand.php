@@ -510,6 +510,8 @@ class CronInvoicesCommand extends Command
                             'annuity'          => $annuity,
                             'honoraryRates'    => $honoraryRates,
                             'honoraryRatesTax' => $honoraryRatesTax,
+                            'nom_debirentier'          => null,
+                            'debirentier_different'          => null,
                         ],
                         'warrant'    => [
                             'id'         => $property->getWarrant()->getId(),
@@ -521,7 +523,18 @@ class CronInvoicesCommand extends Command
                             'city'       => ($property->getWarrant()->hasFactAddress()) ? $property->getWarrant()->getFactCity() : $property->getWarrant()->getCity(),
                         ]
                     ];
-
+                    
+                    if( $property->getDebirentierDifferent()){
+                        $debirentier    = [
+                            'nom_debirentier'         =>  $property->getNomDebirentier(),
+                            'prenom_debirentier'       =>  $property->getPrenomDebirentier(),
+                            'addresse_debirentier'  =>  $property->getAddresseDebirentier(),
+                            'code_postal_debirentier'   =>  $property->getCodePostalDebirentier(),
+                            'ville_debirentier'    =>  $property->getVilleDebirentier(),
+                        ];
+                        $data["debirentier"]=$debirentier;
+                        $data["debirentier_different"]= $property->getDebirentierDifferent();
+                    }
                     if (!$this->isDryRun()) {
                         $last_number->setValue($number);
                     }

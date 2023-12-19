@@ -21,7 +21,7 @@ class PropertyRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Property::class);
     }
-/*
+/**/
     public function findInvoicesToDo(int $max)
     {
         return $this->createQueryBuilder('p')
@@ -36,7 +36,7 @@ class PropertyRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-*/
+
     public function findQuarterlyInvoicesToDo(int $max)
     {
         return $this->createQueryBuilder('p')
@@ -47,7 +47,7 @@ class PropertyRepository extends ServiceEntityRepository
             ->andWhere('p.active = true')
             ->setParameter('date', new DateTime('last day of last month'))
             ->setParameter('last_month', new DateTime('last day of next month'))
-            ->setMaxResults(0)
+            ->setMaxResults($max)
             ->getQuery()
             ->getResult();
     }
@@ -68,7 +68,7 @@ pour faire les tests sur les charges de copro
     }
 
     pour faire les tests sur les rentes et honoraires
-*/
+
     public function findInvoicesToDo(int $max)
     {
         return $this->createQueryBuilder('p')
@@ -77,7 +77,7 @@ pour faire les tests sur les charges de copro
             ->setMaxResults($max)
             ->getQuery()
             ->getResult();
-    }
+    }*/
     public function findLast()
     {
         return $this->createQueryBuilder('p')
