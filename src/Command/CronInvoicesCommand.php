@@ -255,7 +255,7 @@ class CronInvoicesCommand extends Command
             $io->note("OTP invoice ({$data['type']}) generated for id {$pendingInvoice->getProperty()->getId()}");
         }
 
-        if (date('d') >= 20) {
+        if (date('d') >= 19) {
             // Quarterly invoices ce sont les charges de copro
             if(in_array(date('m'), [12, 3, 6, 9])) { //$d->format('m')
                 $date=new DateTime('last day of last month');
@@ -657,6 +657,7 @@ class CronInvoicesCommand extends Command
                    
             }
             if ((!empty($data['separation_type']) && ($data['separation_type'] == Property::BUYERS_ANNUITY) && !empty($property->getBuyerMail1())) || !empty($property->getWarrant()->getMail1())) {
+                
                 $message = (new Swift_Message($invoice->getMailSubject()))
                     ->setFrom($this->mail_from)
                     ->setBcc($this->mail_from)
@@ -671,6 +672,7 @@ class CronInvoicesCommand extends Command
 
                 if (!$this->areMailsDisabled() && $this->mailer->send($message)) {
                     $invoice->setStatus(Invoice::STATUS_SENT);
+                    $io->note("mail envoyé ");
                 } else {
                     $invoice->setStatus(Invoice::STATUS_UNSENT);
                 }
