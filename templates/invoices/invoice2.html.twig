@@ -39,9 +39,10 @@
                     {{ data.warrant.address }}<br />
                     {{ data.warrant.postalcode }} {{ data.warrant.city }}
                 {% endif %}#}
-                    {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
-                    {{ data.warrant.address }}<br />
-                    {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                    {{ data.property.lastname }} {{ data.property.firstname }}<br />
+                    {{ data.property.lastname2 }} {{ data.property.firstname2 }}<br />
+                    {{ data.property.address }}<br />
+                    {{ data.property.postalcode }} {{ data.property.city }}
             </td>
         </tr>
     </table>
@@ -61,11 +62,9 @@
                             Madame, Monsieur,<br /><br />
                             Nous vous prions de trouver ci-joint votre
                             {% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}
-                                {% if data.separation_type is defined and data.separation_type == constant('App\\Entity\\Property::BUYERS_HONORARIES') %}
+                                
                                     <br />appel d'honoraires relatifs à la gestion de votre Rente Viagère
-                                {% else %}
-                                    appel de Rente Viagère
-                                {% endif %}
+                               
                             {% else %}
                                 quittance
                             {% endif %}<br />
@@ -73,7 +72,7 @@
                             {{ data.property.firstname }} {{ data.property.lastname }}{% if not data.property.firstname2 is empty %} - {{ data.property.firstname2 }} {% if not data.property.lastname2 is empty %}{{ data.property.lastname2 }}{% else %}{{ data.property.lastname }}{% endif %}{% endif %}<br />
                             {{ data.property.address }}<br />
                             {{ data.property.postalcode }} {{ data.property.city }}<br /><br />
-                            {% if data.separation_type is defined and data.separation_type == constant('App\\Entity\\Property::BUYERS_ANNUITY') %}Vendeur: {{ data.seller.firstname }} {{ data.seller.lastname }}<br /><br />{% endif %}
+                            Vendeur: {{ data.seller.firstname }} {{ data.seller.lastname }}<br /><br />
                             {% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}Dans l'attente de votre prochain règlement,<br />{% endif %}
                             Nous restons à votre disposition.<br /><br />
                             Bien cordialement.<br /><br />
