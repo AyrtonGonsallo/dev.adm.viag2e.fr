@@ -11,7 +11,7 @@ Mais si le switch "débirentier different du mandant" est coché on prends le de
 
 quand on fait le cron:invoices les erreurs concernant les fichiers sont dues au mail(lignes 662 a 668) de croninvoicescommand.php
 c'est a cause du chemin de la ligne 25 de config/services.yaml
-
+sur le prod a chaque execution du cron, on vide le tmp/pdf
 
 pour voir les concernes
 SELECT id,last_quarterly_invoice FROM `property` WHERE last_quarterly_invoice="2023-12-20" and start_date_management<"2024-01-31" and condominium_fees>0 and active=1;
