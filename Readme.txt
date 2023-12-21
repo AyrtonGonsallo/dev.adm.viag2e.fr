@@ -22,3 +22,13 @@ SELECT id,last_quarterly_invoice FROM `property` WHERE last_quarterly_invoice<"2
 second probleme 
 SELECT id,last_invoice,start_date_management,active,billing_disabled FROM `property` WHERE last_invoice<"2023-11-30" and start_date_management<"2024-01-30" and billing_disabled=0 and active=1
 SELECT id,last_invoice,start_date_management,active,billing_disabled,annuities_disabled,honoraries_disabled,valeur_indice_reference_object_id,valeur_indexation_normale FROM `property` WHERE last_invoice<"2023-11-30" and start_date_management<"2024-01-30" and billing_disabled=0 and active=1;
+
+en cas de bug sur le prod activer le end=dev
+avent d'uploader generated files remplacer
+/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf
+/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/
+les boss recoivent un copie des emails remplacer
+->setFrom($this->mail_from)
+->setBcc($this->mail_from)
+->setTo($invoice->getMailTarget())
+$message1->setCc($invoice->getMailCc());

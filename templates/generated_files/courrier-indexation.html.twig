@@ -16,6 +16,14 @@
                 </div>
             </div>
         {% endif %}
+        {% if error %}
+            <div class="-alert m-alert--icon m-alert--outline m-alert--square alert alert-danger" role="alert">
+                <div class="m-alert__icon"><i class="la la-exclamation-circle"></i></div>
+                <div class="m-alert__text">
+                    <strong>{{ error }} </strong> 
+                </div>
+            </div>
+        {% endif %}
     <div class="m-subheader">
         <div class="d-flex align-items-center">
             <div class="mr-auto">

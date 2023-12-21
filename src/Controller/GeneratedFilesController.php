@@ -906,7 +906,14 @@ class GeneratedFilesController extends AbstractController
                 $date_fdnm = new DateTime('First day of next month');
                 $fileName = "/Courrier d’indexation -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 $now_date=new DateTime();
-
+                if(!$property->initial_index_object){
+                    return $this->render('generated_files/courrier-indexation.html.twig', [
+                        'property' => $property,
+                        'form' => $form->createView(),
+                        'message' => null,
+                        'error' => "Pour générer ce courrier d'indexation, merci de renseigner le champ 'Valeur de l'indice initial' sur le bien ".$property->getId()." : ".$property->getTitle(),
+                    ]);
+                }
                 $month_m_u=$property->initial_index_object->getDate()->format('m');
                 $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
                 $endDate_m_u->setTime(0, 0, 0);
@@ -1009,6 +1016,7 @@ class GeneratedFilesController extends AbstractController
                         'property' => $property,
                         'form' => $form->createView(),
                         'message' => 'fichier Courrier d’indexation créé avec succès',
+                        'error' => null,
                     ]);
 
                 } catch (Html2PdfException $e) {
@@ -1021,6 +1029,7 @@ class GeneratedFilesController extends AbstractController
             'property' => $property,
             'form' => $form->createView(),
             'message' => null,
+            'error' =>null,
         ]);
     }
 
