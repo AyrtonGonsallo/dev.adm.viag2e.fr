@@ -467,7 +467,7 @@ class PropertyController extends AbstractController
                     $data["target"]="Crédirentier";
                 }
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
-                $fileName = "/".$now_date->format('d-m-Y h:i:s')." Régul ".$property->getId()." ".explode("/", $property->getTitle())[0].".pdf";
+                $fileName = $now_date->format('d-m-Y h:i:s')." Régul ".$property->getId()." ".explode("/", $property->getTitle())[0].".pdf";
                 try {
                     $pdf->pdf->SetDisplayMode('fullpage');
                    
@@ -482,14 +482,14 @@ class PropertyController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('regul_annuelle/credit.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
                     $file->setName($fileName);
                     $file->setDate($now_date);
                     $file->setWarrant($property->getWarrant());
-                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path ."/". $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
                     $property->regul = Null;
@@ -618,6 +618,15 @@ class PropertyController extends AbstractController
         $query2 = $qb2->getQuery();
         // Execute Query
         $invoices_files = $query2->getResult();
+        $qb22=$this->getDoctrine()->getManager()->createQueryBuilder()
+        ->select("f")
+        ->from('App\Entity\File', 'f')
+        ->where('f.property = :key')
+        ->setParameter('key', $property)
+            ->orderBy('f.id', 'DESC');
+        $query22 = $qb22->getQuery();
+        // Execute Query
+        $generated_files = $query22->getResult();
         $tva = $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'tva']);
         $messages = $this->getDoctrine()
         ->getRepository(Mail::class)
@@ -632,7 +641,7 @@ class PropertyController extends AbstractController
             'form_payment'  => $form_payment->createView(),
             'form_mail'  => $form_mail->createView(),
             'property'  => $property,
-            //'form_mail'  => $form_mail,
+            'generated_files'  => $generated_files,
             'indice_og2i'  => $indice_og2i,
             'indice_m_u'  => $indice_m_u,
             'recaps'  => $recaps,

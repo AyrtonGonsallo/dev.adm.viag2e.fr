@@ -397,7 +397,7 @@ class CronInvoicesCommand extends Command
                     continue;
                 }
 
-                if($property->getType() === Warrant::TYPE_SELLERS) {
+                if($property->getWarrant()->getType() === Warrant::TYPE_SELLERS) {
                     $data_full = [
                         'date'       => $this->date,
                         'type'       => Invoice::TYPE_NOTICE_EXPIRY,
@@ -474,7 +474,7 @@ class CronInvoicesCommand extends Command
                         if (($data['property']['honoraryRates'] > 0) || ( $data['property']['annuity'] > 0)) {
                             $this->generateInvoice($io, $data, $parameters, $property);
 
-                            $io->note("Invoice ({$data['type']} ) generated for id {$property->getId()} with annuity {$data['property']['annuity']} and honorary {$data['property']['honoraryRates']}");
+                            $io->note("Invoice ({$data['type']}) generated for id {$property->getId()} with annuity {$data['property']['annuity']} and honorary {$data['property']['honoraryRates']}");
                         }
                         else {
                             $io->note("Invoice skipped ({$data['type']} ) for id {$property->getId()}, amount was 0");
@@ -510,9 +510,9 @@ class CronInvoicesCommand extends Command
                             'annuity'          => $annuity,
                             'honoraryRates'    => $honoraryRates,
                             'honoraryRatesTax' => $honoraryRatesTax,
-                            'nom_debirentier'          => null,
-                            'debirentier_different'          => null,
                         ],
+                        'debirentier'          => null,
+                        'debirentier_different'          => null,
                         'warrant'    => [
                             'id'         => $property->getWarrant()->getId(),
                             'type'       => $property->getWarrant()->getType(),
@@ -641,7 +641,7 @@ class CronInvoicesCommand extends Command
             if(! $data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                 $invoice->setFile2($file2);
             }
-        $invoice->setDate(new DateTime());
+            $invoice->setDate(new DateTime());
             $invoice->setProperty($property);
             $this->manager->persist($invoice);
             if($filePath ==-1 && $filePath2 ==-1){
@@ -676,10 +676,10 @@ class CronInvoicesCommand extends Command
                             ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                             ->attach(Swift_Attachment::fromPath($filePath));
                       }else{
-                            if($invoice->getProperty()->getType() === Warrant::TYPE_SELLERS){
+                            if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                                 //si mandat vendeur
                                 //envoyer les honoraires aux mandant
-                                
+                                $io->note($invoice->getProperty()->getId()." mandat vendeur");
                                 $message1 = (new Swift_Message($invoice->getMailSubject()))
                                     ->setFrom($this->mail_from)
                                     ->setBcc($this->mail_from)
@@ -696,6 +696,7 @@ class CronInvoicesCommand extends Command
                                     ->attach(Swift_Attachment::fromPath($filePath));
                             }else{
                                 //si mandat acquereur
+                                $io->note($invoice->getProperty()->getId()." mandat acquereur");
                                 $message = (new Swift_Message($invoice->getMailSubject()))
                                     ->setFrom($this->mail_from)
                                     ->setBcc($this->mail_from)
@@ -705,7 +706,7 @@ class CronInvoicesCommand extends Command
                                     ->attach(Swift_Attachment::fromPath($filePath2));
                             }
                       }
-                      if($invoice->getProperty()->getType() === Warrant::TYPE_SELLERS){
+                      if($data['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                             if(!empty($invoice->getMailCc())) {
                                 $message1->setCc($invoice->getMailCc());
                             }

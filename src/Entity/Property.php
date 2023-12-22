@@ -319,6 +319,10 @@ class Property
      * @ORM\Column(type="string", length=10)
      */
     private $revaluation_date;
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\File", mappedBy="property")
+     */
+    private $documents;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)

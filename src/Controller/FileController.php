@@ -228,7 +228,7 @@ class FileController extends AbstractController
             return $this->redirectToRoute('dashboard', [], 302);
         }
         if($file->getType()==File::TYPE_DOCUMENT){
-            $path = '/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $file->getName();
+            $path = '/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $file->getName();
             if (!empty($path)) {
                 return  $this->file( $path);
             }

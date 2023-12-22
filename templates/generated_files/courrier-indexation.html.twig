@@ -36,7 +36,7 @@
                     <li class="m-nav__separator">-</li>
                     <li class="m-nav__item">
                         <a href="#" class="m-nav__link">
-                            <span class="m-nav__link-text">Courrier d’indexation pour le bien #{{ property.id }} ({{ property.title }})</span>
+                         <span class="m-nav__link-text"><a href="{{ path('property_view', {'propertyId': property.id }) }}" class="">Bien #{{ property.id }} ({{ property.title }})</a> / Courrier d’indexation </span>
                         </a>
                     </li>
                 </ul>

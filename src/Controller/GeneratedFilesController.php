@@ -75,7 +75,6 @@ class GeneratedFilesController extends AbstractController
             $file->setDriveId($driveManager->addFile($file->getName(), $filePath, File::TYPE_DOCUMENT, $warrant->getId()));
             $file->setType(File::TYPE_DOCUMENT);
             $file->setWarrant($warrant);
-
             $manager = $this->getDoctrine()->getManager();
             $manager->persist($file);
             $manager->flush();
@@ -218,7 +217,7 @@ class GeneratedFilesController extends AbstractController
                 $data = $form->getData();
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                 $now_date=new DateTime();
-                $fileName = "/MandatSEPA-".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                $fileName = "MandatSEPA-".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 try {
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $data = [
@@ -230,12 +229,13 @@ class GeneratedFilesController extends AbstractController
                         'property'           => $property,
                     ];
                     $pdf->writeHTML($this->twig->render('generated_files/mandat-sepa-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
                     $file->setName($fileName);
                     $file->setWarrant($property->getWarrant());
+                    $file->setProperty($property);
                     $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
@@ -319,20 +319,20 @@ class GeneratedFilesController extends AbstractController
                 $data = $form->getData();
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                 $now_date=new DateTime();
-                $fileName = "/Courrier envoi de mandat de prélèvement SEPA -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                $fileName = "Courrier envoi de mandat de prélèvement SEPA -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 try {
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $data = [
                         'date'       => $now_date,
                         'form'       => $form->getData(),
-                        'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
+                        'current_day'       => strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') )),
                         'day'  => $now_date->format('d'),
                         'month'     => $now_date->format('m'),
                         'year' => $now_date->format('Y'),
                         'property'           => $property,
                     ];
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-mandat-sepa-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -451,7 +451,7 @@ class GeneratedFilesController extends AbstractController
                 $pieces_jointes = $data["pieces_jointes"];
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                 $now_date=new DateTime();
-                $fileName = "/Courrier de régularisation des charges de copropriété -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                $fileName = "Courrier de régularisation des charges de copropriété -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
 
                 $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
                 ->select("inv")
@@ -508,7 +508,7 @@ class GeneratedFilesController extends AbstractController
                 $now_date=new DateTime();
                 $data = [
                     'date'       => $now_date,
-                    'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
+                    'current_day'       => strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') )),
                     'annee'       => $now_date->format('Y'),
                     'date_a_f'       => $now_date->format('d/m/Y'),
                     'date_d_f'       => $date_reg_debut->format('d/m/Y'),
@@ -574,13 +574,14 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-regularisation-copro-06-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
                     $file->setName($fileName);
                     $file->setDate($now_date);
                     $file->setWarrant($property->getWarrant());
+                    $file->setProperty($property);
                     $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
@@ -687,9 +688,15 @@ class GeneratedFilesController extends AbstractController
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                 $now_date=new DateTime();
                 $date_fdnm = new DateTime('First day of next month');
-                $fileName = "/Courrier d’indexation OG2I Année 1 -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                $fileName = "Courrier d’indexation OG2I Année 1 -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 $now_date=new DateTime();
-
+                if(!$property->valeur_indice_ref_og2_i_object){
+                    return $this->render('generated_files/courrier-indexation-og2i-annee1.html.twig', [
+                        'property' => $property,
+                        'form' => $form->createView(),
+                        'message' => null,
+                        'error' => "Pour générer ce courrier d'indexation og2i, merci de verifier que le bien ".$property->getId()." : ".$property->getTitle()." est de type og2i et que le champ 'Valeur Indice de référence og2i' a été renseigné."]);
+                }
                 $month_og2i=$property->valeur_indice_ref_og2_i_object->getDate()->format('m');
                 $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month_og2i."-".date('Y'));
                 $endDate_og2i->setTime(0, 0, 0);
@@ -728,7 +735,7 @@ class GeneratedFilesController extends AbstractController
 
                 $data = [
                     'date'       => $now_date,
-                    'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
+                    'current_day'       => strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') )),
                     'annee'       => $now_date->format('Y'),
                     'date_a_f'       => $now_date->format('d/m/Y'),
                     'property'   => $property,
@@ -792,12 +799,13 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-og2i-annee1-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
                     $file->setName($fileName);
                     $file->setWarrant($property->getWarrant());
+                    $file->setProperty($property);
                     $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
@@ -808,6 +816,7 @@ class GeneratedFilesController extends AbstractController
                     return $this->render('generated_files/courrier-indexation-og2i-annee1.html.twig', [
                         'property' => $property,
                         'form' => $form->createView(),
+                        'error' => null,
                         'message' => 'fichier Courrier d’indexation créé avec succès',
                     ]);
 
@@ -821,6 +830,7 @@ class GeneratedFilesController extends AbstractController
             'property' => $property,
             'form' => $form->createView(),
             'message' => null,
+            'error' => null,
         ]);
     }
 
@@ -904,7 +914,7 @@ class GeneratedFilesController extends AbstractController
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                 $now_date=new DateTime();
                 $date_fdnm = new DateTime('First day of next month');
-                $fileName = "/Courrier d’indexation -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                $fileName = "Courrier d’indexation -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 $now_date=new DateTime();
                 if(!$property->initial_index_object){
                     return $this->render('generated_files/courrier-indexation.html.twig', [
@@ -999,12 +1009,13 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
                     $file->setName($fileName);
                     $file->setWarrant($property->getWarrant());
+                    $file->setProperty($property);
                     $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
@@ -1098,11 +1109,11 @@ class GeneratedFilesController extends AbstractController
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                 $now_date=new DateTime();
                 $date_fdnm = new DateTime('First day of next month');
-                $fileName = "/Courrier d’abandon du DUH -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                $fileName = "Courrier d’abandon du DUH -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 $now_date=new DateTime();
                 $data = [
                     'date'       => $now_date,
-                    'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
+                    'current_day'       => strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') )),
                     'annee'       => $now_date->format('Y'),
                     'date_a_f'       => $now_date->format('d/m/Y'),
                     'property'   => $property,
@@ -1151,12 +1162,13 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-abandon-duh-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
                     $file->setName($fileName);
                     $file->setWarrant($property->getWarrant());
+                    $file->setProperty($property);
                     $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);

@@ -55,6 +55,11 @@ class File implements JsonSerializable
      * @ORM\JoinColumn(nullable=false)
      */
     private $warrant;
+     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Property", inversedBy="documents")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $property;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Invoice", mappedBy="file", cascade={"persist", "remove"})
@@ -146,6 +151,18 @@ class File implements JsonSerializable
     public function setWarrant(?Warrant $warrant): self
     {
         $this->warrant = $warrant;
+
+        return $this;
+    }
+
+    public function getProperty(): ?Property
+    {
+        return $this->property;
+    }
+
+    public function setProperty(?Property $property): self
+    {
+        $this->property = $property;
 
         return $this;
     }

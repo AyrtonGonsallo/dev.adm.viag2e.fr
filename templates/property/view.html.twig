@@ -1220,38 +1220,49 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for invoice_file in invoices_files %}
-                                {% if invoice_file.file %}
-                                    <tr>
-                                        <td>{{ invoice_file.file.date |date('d-M-Y H:m:s')}}</td>
-                                        <td>{{ invoice_file.file.name }}</td>
-                                        <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_INVOICE') and invoice_file.file.invoice is not empty %}{{ invoice_file.file.invoice.formattednumber }}{% endif %}</td>
-                                        <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif invoice_file.file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
-                                        <td><a href="{{ path('file_download', {'fileId': invoice_file.file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
-                                        <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': invoice_file.file.driveId}) }}" data-name="{{ invoice_file.file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
-                                    </tr>
-                                 {% endif %}
-                            {% else %}
+                            {% if generated_files or invoices_files %}
+                                {% for invoice_file in invoices_files %}
+                                    {% if invoice_file.file %}
+                                        <tr>
+                                            <td>{{ invoice_file.file.date |date('d-M-Y H:m:s')}}</td>
+                                            <td>{{ invoice_file.file.name }}</td>
+                                            <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_INVOICE') and invoice_file.file.invoice is not empty %}{{ invoice_file.file.invoice.formattednumber }}{% endif %}</td>
+                                            <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif invoice_file.file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
+                                            <td><a href="{{ path('file_download', {'fileId': invoice_file.file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
+                                            <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': invoice_file.file.driveId}) }}" data-name="{{ invoice_file.file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}   
+                                {% for invoice_file in invoices_files %}
+                                    {% if invoice_file.file2 %}
+                                        <tr>
+                                            <td>{{ invoice_file.file2.date |date('d-M-Y H:m:s')}}</td>
+                                            <td>{{ invoice_file.file2.name }}</td>
+                                            <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_INVOICE') and invoice_file.file2.invoice is not empty %}{{ invoice_file.file2.invoice.formattednumber }}{% endif %}</td>
+                                            <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif invoice_file.file2.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
+                                            <td><a href="{{ path('file_download', {'fileId': invoice_file.file2.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
+                                            <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': invoice_file.file2.driveId}) }}" data-name="{{ invoice_file.file2.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for generated_file in generated_files %}
+                                    {% if generated_file %}
+                                        <tr>
+                                            <td>{{ generated_file.date |date('d-M-Y H:m:s')}}</td>
+                                            <td>{{ generated_file.name }}</td>
+                                            <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') and generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}</td>
+                                            <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
+                                            <td><a href="{{ path('file_download2', {'fileId': generated_file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
+                                            <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': generated_file.driveId}) }}" data-name="{{ generated_file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}     
+                            {% elseif not generated_files and not invoices_files %}
                                 <tr>
                                     <td align="center" colspan="4">Aucun Fichier</td>
                                 </tr>
-                            {% endfor %}
-                            {% for invoice_file in invoices_files %}
-                                {% if invoice_file.file2 %}
-                                    <tr>
-                                        <td>{{ invoice_file.file2.date |date('d-M-Y H:m:s')}}</td>
-                                        <td>{{ invoice_file.file2.name }}</td>
-                                        <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_INVOICE') and invoice_file.file2.invoice is not empty %}{{ invoice_file.file2.invoice.formattednumber }}{% endif %}</td>
-                                        <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif invoice_file.file2.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
-                                        <td><a href="{{ path('file_download', {'fileId': invoice_file.file2.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
-                                        <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': invoice_file.file2.driveId}) }}" data-name="{{ invoice_file.file2.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
-                                    </tr>
-                                {% endif %}
-                            {% else %}
-                                <tr>
-                                    <td align="center" colspan="4">Aucun Fichier</td>
-                                </tr>
-                            {% endfor %}
+                            {% endif %}
+                            
                             
                             </tbody>
                         </table>

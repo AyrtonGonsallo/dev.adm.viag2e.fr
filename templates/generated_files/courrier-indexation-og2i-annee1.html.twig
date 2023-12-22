@@ -6,13 +6,21 @@
 
 
 {% block body %}
-    {% if message %}
+        {% if message %}
             <div class="m-alert m-alert--icon alert alert-success" role="alert">
                 <div class="m-alert__icon">
                     <i class="la la-check"></i>
                 </div>
                 <div class="m-alert__text">
                     <strong>{{ message }} </strong> 
+                </div>
+            </div>
+        {% endif %}
+        {% if error %}
+            <div class="-alert m-alert--icon m-alert--outline m-alert--square alert alert-danger" role="alert">
+                <div class="m-alert__icon"><i class="la la-exclamation-circle"></i></div>
+                <div class="m-alert__text">
+                    <strong>{{ error }} </strong> 
                 </div>
             </div>
         {% endif %}
@@ -28,7 +36,7 @@
                     <li class="m-nav__separator">-</li>
                     <li class="m-nav__item">
                         <a href="#" class="m-nav__link">
-                            <span class="m-nav__link-text">Courrier d’indexation OG2I Année 1 pour le bien #{{ property.id }} ({{ property.title }})</span>
+                            <span class="m-nav__link-text"><a href="{{ path('property_view', {'propertyId': property.id }) }}" class="">Bien #{{ property.id }} ({{ property.title }})</a> / Courrier d’indexation OG2I Année 1 </span>
                         </a>
                     </li>
                 </ul>
