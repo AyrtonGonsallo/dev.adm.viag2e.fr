@@ -596,11 +596,11 @@ class InvoiceController extends AbstractController
 			}
             elseif($file2){
                 $file2_drive_id=$invoice->getFile2()->getDriveId();
-                $lien_telechargements='<a href="'.$this->generateUrl('file_download', ['fileId' => $file2_drive_id]).'" target="_blank"><i class="la la-cloud-download" title="Télécharger"></i> Rente</a>';
+                $lien_telechargements='<a href="'.$this->generateUrl('file_download', ['fileId' => $file2_drive_id]).'" target="_blank"><i class="la la-cloud-download" title="Télécharger"></i> Honoraires</a>';
             }
             elseif($file1){
                 $file1=$invoice->getFile()->getDriveId();
-                $lien_telechargements='<a href="'.$this->generateUrl('file_download', ['fileId' => $file1]).'" target="_blank"><i class="la la-cloud-download" title="Télécharger"></i> Honoraires</a>';
+                $lien_telechargements='<a href="'.$this->generateUrl('file_download', ['fileId' => $file1]).'" target="_blank"><i class="la la-cloud-download" title="Télécharger"></i> Rente</a>';
             }
 			if($this->getTableAmount($invoice)<=-1){
                 $amount='-';
