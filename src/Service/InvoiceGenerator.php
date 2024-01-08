@@ -59,12 +59,13 @@ class InvoiceGenerator
                     break;
                 case Invoice::RECURSION_MONTHLY:
                 default:
+                    $fileName = "/invoice_{$data['number']}R-file1.pdf";
                     $pdf->writeHTML($this->twig->render('invoices/invoice.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
 					
                     break;
             }
 
-            $pdf->output('/var/www/vhosts/alternativeviager.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+            $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {
             $pdf->clean();
@@ -97,13 +98,14 @@ class InvoiceGenerator
                     break;
                 case Invoice::RECURSION_MONTHLY:
                 default:
+                        $fileName = "/invoice_{$data['number']}H-file2.pdf";
 						$pdf2->writeHTML($this->twig->render('invoices/invoice2.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
 					
                     
                     break;
             }
 
-            $pdf2->output('/var/www/vhosts/alternativeviager.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+            $pdf2->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {
             $pdf2->clean();

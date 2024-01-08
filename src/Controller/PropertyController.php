@@ -536,18 +536,34 @@ class PropertyController extends AbstractController
             $month_og2i=$property->valeur_indice_ref_og2_i_object->getDate()->format('m');
             $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month_og2i."-".date('Y'));
             $endDate_og2i->setTime(0, 0, 0);
-            //recuperer 
-            $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
-            ->select("rh")
-            ->from('App\Entity\RevaluationHistory', 'rh')
-            ->where('rh.type LIKE :key and rh.date <= :end')
-            ->andWhere('rh.date like  :endmonth')
-            ->setParameter('key', 'OGI')
-            ->setParameter('end', $endDate_og2i)
-            ->setParameter('endmonth',  "%-%".$month_og2i."-%")
-                ->orderBy('rh.date', 'DESC');
-            $query = $qb->getQuery();
-            // Execute Query
+            if($property->getId()==109){
+                //recuperer 
+                $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
+                ->select("rh")
+                ->from('App\Entity\RevaluationHistory', 'rh')
+                ->where('rh.type LIKE :key and rh.date <= :end')
+                ->andWhere('rh.date like  :endmonth')
+                ->setParameter('key', 'OGI')
+                ->setParameter('end', $endDate_og2i)
+                ->setParameter('endmonth',  "%-%".$month_og2i."-%")
+                    ->orderBy('rh.date', 'DESC');
+                $query = $qb->getQuery();
+                // Execute Query
+            }else{
+                //recuperer 
+                $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
+                ->select("rh")
+                ->from('App\Entity\RevaluationHistory', 'rh')
+                ->where('rh.type LIKE :key and rh.date <= :end')
+                ->andWhere('rh.date like  :endmonth')
+                ->setParameter('key', 'OGI')
+                ->setParameter('end', $endDate_og2i)
+                ->setParameter('endmonth',  "%-%".$month_og2i."-%")
+                    ->orderBy('rh.date', 'ASC');
+                $query = $qb->getQuery();
+                // Execute Query
+            }
+            
             if($query->getResult()){
                 $indice_og2i = $query->getResult()[0];
             }else{
