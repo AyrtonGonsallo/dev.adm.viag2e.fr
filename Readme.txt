@@ -38,3 +38,12 @@ les boss recoivent un copie des emails remplacer
 ->setBcc($this->mail_from)
 ->setTo($invoice->getMailTarget())
 $message1->setCc($invoice->getMailCc());
+
+
+correction bug quittances
+
+SELECT p.id as property_id,p.last_receipt,i.id as invoice_id, i.status,i.data FROM `invoice` i,property p WHERE i.status=5 and p.id=i.property_id order by p.last_receipt desc;
+
+
+8216,7934,8328,8462,8405
+update invoice set status=4 where id in (8216,7934,8328,8462,8405)

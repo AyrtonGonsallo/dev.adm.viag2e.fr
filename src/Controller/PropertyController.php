@@ -1003,4 +1003,64 @@ class PropertyController extends AbstractController
         return new JsonResponse(['formule'=> '(ri/ii)*ia','res' => $res,'ri'=>$ri,'ii'=>$ii->getValue(),'ia'=>$ia ]);
         
     }
+
+    /**
+     * @Route("/property/activate/{propertyId}", name="property_activate")
+     *
+     * @param Request $request
+     * @param DriveManager $driveManager
+     * @return Response
+     */
+    public function activate_property(Request $request)
+    {
+        $p = $this->getDoctrine()
+        ->getRepository(Property::class)
+        ->find($request->get('propertyId'));
+
+        $route = $this->generateUrl('property_view', [ 'propertyId' =>$request->get('propertyId'),'onglet' => 'm_tabs_profil']);
+        
+
+        if (!empty($p )) {
+            $p->setActive(1);
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($p);
+            $manager->flush();
+
+            $this->addFlash('success', 'Bien n°'.$p->getId().' activé');
+            return $this->redirect($route);
+        }
+
+        $this->addFlash('danger', 'Une erreur a eu lieu pendant lactivation');
+        return $this->redirect($route);
+    }
+
+    /**
+     * @Route("/property/deactivate/{propertyId}", name="property_deactivate")
+     *
+     * @param Request $request
+     * @param DriveManager $driveManager
+     * @return Response
+     */
+    public function deactivate_property(Request $request)
+    {
+        $p = $this->getDoctrine()
+        ->getRepository(Property::class)
+        ->find($request->get('propertyId'));
+
+        $route = $this->generateUrl('property_view', [ 'propertyId' =>$request->get('propertyId'),'onglet' => 'm_tabs_profil']);
+        
+
+        if (!empty($p )) {
+            $p->setActive(0);
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($p);
+            $manager->flush();
+
+            $this->addFlash('success', 'Bien n°'.$p->getId().' desactivé');
+            return $this->redirect($route);
+        }
+
+        $this->addFlash('danger', 'Une erreur a eu lieu pendant la desactivation');
+        return $this->redirect($route);
+    }
 }

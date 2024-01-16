@@ -330,6 +330,11 @@ class Property
     private $last_revaluation;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public $date_maj_indice_ref;
+
+    /**
      * @ORM\Column(type="float")
      */
     private $initial_amount;

@@ -51,10 +51,9 @@
                 {% endif %}#}
 
                 {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
-                    {{ data.property.lastname }} {{ data.property.firstname }}<br />
-                    {{ data.property.lastname2 }} {{ data.property.firstname2 }}<br />
-                    {{ data.property.address }}<br />
-                    {{ data.property.postalcode }} {{ data.property.city }}
+                    {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                        {{ data.warrant.address }}<br />
+                        {{ data.warrant.postalcode }} {{ data.warrant.city }}
                 {% else %}
                     {% if data.property.is_og2i %}
                         {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />

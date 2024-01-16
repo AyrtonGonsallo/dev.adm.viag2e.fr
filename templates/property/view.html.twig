@@ -37,6 +37,7 @@
     </div>
 
     <div class="m-content">
+    
         {% if not property.warrant.active %}
             <div class="m-alert m-alert--icon alert alert-danger" role="alert">
                 <div class="m-alert__icon">
@@ -182,6 +183,20 @@
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane{% if not buyer_tab or property.warrant.type != constant('App\\Entity\\Warrant::TYPE_SELLERS') %} active{% endif %}" id="m_tabs_profil" role="tabpanel">
+                       
+                        <div>
+                            
+                            <div id="active-box">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        <input type="checkbox" id="active_property" {% if property.active == 1 %} checked{% endif %} name="activer" class=" form-control m-input" value="{{property.active}}">
+                                        <span></span>
+                                    </label>
+                                </span>
+                                <label  class="">{% if property.active == 1 %}Bien actif {% else %}Bien désactivé{% endif %}</label>
+                            </div>
+                            
+                        </div>
                         {{ form_start(form, {'attr': {'class': 'm-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed'}}) }}
 
                             <div class="">
@@ -571,6 +586,33 @@
                        
                        
                         <input id="bouton_envoyer" class="btn btn-outline-success btn-block" type="submit" value="Enregistrer" />
+                        {% if property.active %}
+                            <a class="btn btn-outline-danger btn-block" href="#" data-toggle="modal" data-target="#m_modal_activate">Désactiver</a>
+                            <div class="modal fade" id="m_modal_activate" tabindex="-1" role="dialog" aria-labelledby="property_activate" aria-hidden="true">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="buyer_add">Désactiver le bien</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="m-alert m-alert--icon m-alert--outline m-alert--square alert alert-danger" role="alert">
+                                                <div class="m-alert__icon"><i class="la la-exclamation-circle"></i></div>
+                                                <div class="m-alert__text">
+                                                    Êtes-vous sûr de vouloir désactiver le bien ?
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                                            <a class="btn btn-primary" href="{{ path('property_activate', {'propertyId': property.id}) }}">Continuer</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                         {{ form_end(form) }}
                     </div>
                     
@@ -1382,33 +1424,7 @@
                 
             </div>
         </div>
-        {% if property.active %}
-            <a class="btn btn-outline-danger btn-block" href="#" data-toggle="modal" data-target="#m_modal_activate">Désactiver</a>
-            <div class="modal fade" id="m_modal_activate" tabindex="-1" role="dialog" aria-labelledby="property_activate" aria-hidden="true">
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="buyer_add">Désactiver le bien</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="m-alert m-alert--icon m-alert--outline m-alert--square alert alert-danger" role="alert">
-                                <div class="m-alert__icon"><i class="la la-exclamation-circle"></i></div>
-                                <div class="m-alert__text">
-                                    Êtes-vous sûr de vouloir désactiver le bien ?
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                            <a class="btn btn-primary" href="{{ path('property_activate', {'propertyId': property.id}) }}">Continuer</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
+        
     </div>
 {% endblock %}
 
@@ -1857,7 +1873,15 @@ function load_payment_datas(){
             {% endfor %}
         });
 
-        
+        $('#active_property').click(function () {
+                    if ($(this).is(':checked')) {
+                        console.log("activation du bien n°{{property.id}}")
+                        window.location ="{{ path('property_activate', {'propertyId': property.id }) }}";
+                    }else{
+                        console.log("desactivation du bien n°{{property.id}}")
+                        window.location ="{{ path('property_deactivate', {'propertyId': property.id }) }}";
+                    }
+                });
 
        $('#property_payment_form_mois_indice_initial_day').val("1").change();
         $('#adresse_crédirentier').hide();
