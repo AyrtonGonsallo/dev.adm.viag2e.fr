@@ -23,7 +23,11 @@ second probleme
 SELECT id,last_invoice,start_date_management,active,billing_disabled FROM `property` WHERE last_invoice<"2023-11-30" and start_date_management<"2024-01-30" and billing_disabled=0 and active=1
 SELECT id,last_invoice,start_date_management,active,billing_disabled,annuities_disabled,honoraries_disabled,valeur_indice_reference_object_id,valeur_indexation_normale FROM `property` WHERE last_invoice<"2023-11-30" and start_date_management<"2024-01-30" and billing_disabled=0 and active=1;
 update property set annuities_disabled=1 where id=98;
-update `property` set last_invoice="2023-11-29" where last_invoice="2023-12-20"
+update `property` set last_invoice="2023-11-29" where last_invoice="2024-01-04"
+
+tester les factures
+update `property` set last_invoice="2023-11-29" where id=103 or id=84 or id=99 or id=93 or id=24 or id=98;
+
 
 en cas de bug sur le prod activer le end=dev
 avent d'uploader generated files remplacer
@@ -34,3 +38,12 @@ les boss recoivent un copie des emails remplacer
 ->setBcc($this->mail_from)
 ->setTo($invoice->getMailTarget())
 $message1->setCc($invoice->getMailCc());
+
+
+correction bug quittances
+
+SELECT p.id as property_id,p.last_receipt,i.id as invoice_id, i.status,i.data FROM `invoice` i,property p WHERE i.status=5 and p.id=i.property_id order by p.last_receipt desc;
+
+
+8216,7934,8328,8462,8405
+update invoice set status=4 where id in (8216,7934,8328,8462,8405)

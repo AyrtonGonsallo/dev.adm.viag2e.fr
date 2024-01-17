@@ -18,7 +18,7 @@
                 {{ parameters.site }}
             </td>
             <td style="width: 50%; padding-top: 25px;">
-                <span style="font-size: 15pt"><b>{% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}AVIS D'ECHEANCE{% else %}QUITTANCE{% endif %} {{ data.number }}</b></span><br />
+                <span style="font-size: 15pt"><b>{% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}AVIS D'ECHEANCE{% else %}QUITTANCE{% endif %} {{ data.number }} H</b></span><br />
                 Période de <b>{{ data.date.month }} {{ data.date.year }}</b><br />
                 <small>{{ parameters.city|title }}, le {{ data.date.current_day }}</small>
                 <br /><br /><br />
@@ -38,7 +38,7 @@
                     {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
                     {{ data.warrant.address }}<br />
                     {{ data.warrant.postalcode }} {{ data.warrant.city }}
-                {% endif %}#}
+                {% endif %}#}{#
                 {% if data.property.is_og2i %}
                     {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
                     {{ data.warrant.address }}<br />
@@ -48,6 +48,29 @@
                     {{ data.property.lastname2 }} {{ data.property.firstname2 }}<br />
                     {{ data.property.address }}<br />
                     {{ data.property.postalcode }} {{ data.property.city }}
+                {% endif %}#}
+
+                {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
+                    {{ data.property.lastname }} {{ data.property.firstname }}<br />
+                    {{ data.property.lastname2 }} {{ data.property.firstname2 }}<br />
+                    {{ data.property.address }}<br />
+                    {{ data.property.postalcode }} {{ data.property.city }}
+                {% else %}
+                    {% if data.property.is_og2i %}
+                        {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                        {{ data.warrant.address }}<br />
+                        {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                    {% else %}
+                       {% if data.debirentier_different %}
+                            {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                            {{ data.warrant.address }}<br />
+                            {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                        {% else %}
+                            {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                            {{ data.warrant.address }}<br />
+                            {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                        {% endif %}
+                    {% endif %}
                 {% endif %}
                     
             </td>

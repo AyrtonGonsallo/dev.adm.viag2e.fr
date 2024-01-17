@@ -40,7 +40,7 @@ class CronInvoicesCommand extends Command
 {
     use LockableTrait;
 
-    private const PROCESS_MAX = 5;
+    private const PROCESS_MAX = 25;
     protected static $defaultName = 'cron:invoices';
 
     private $container;
@@ -131,7 +131,7 @@ class CronInvoicesCommand extends Command
             'site'       => $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_site'])->getValue(),
         ];
 
-        $d = new DateTime('First day of next month');
+        $d = new DateTime('First day of this month');
 
         $this->date = [
             'current_day'   => strftime('%A %e %B %Y'),
@@ -255,7 +255,7 @@ class CronInvoicesCommand extends Command
             $io->note("OTP invoice ({$data['type']}) generated for id {$pendingInvoice->getProperty()->getId()}");
         }
 
-        if (date('d') >= 20) {
+        if (date('d') <= 10) {
             // Quarterly invoices ce sont les charges de copro
             if(in_array(date('m'), [12, 3, 6, 9])) { //$d->format('m')
                 $date=new DateTime('last day of last month');
@@ -356,19 +356,39 @@ class CronInvoicesCommand extends Command
                     $startDate->setTime(0, 0 ,0);
                     $endDate = \DateTime::createFromFormat('d-n-Y', "01-".(date('m')+1)."-".date('Y'));
                     $endDate->setTime(0, 0, 0);
-                    $qb4=$this->manager->createQueryBuilder()
-                    ->select("rh")
-                    ->from('App\Entity\RevaluationHistory', 'rh')
-                    ->where('rh.type LIKE :key')
-                    ->andWhere('rh.date <= :end')
-                    ->setParameter('key', 'OGI')
-                    ->setParameter('end', $endDate)
-                        ->orderBy('rh.date', 'DESC');
-                    $query4 = $qb4->getQuery();
-                    // Execute Query
+                    $month_og2i=$property->valeur_indice_ref_og2_i_object->getDate()->format('m');
+                    $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month_og2i."-".date('Y'));
+                    $endDate_og2i->setTime(0, 0, 0);
+                    if($property->getId()==109){
+                        //recuperer 
+                        $qb4=$this->manager->createQueryBuilder()
+                        ->select("rh")
+                        ->from('App\Entity\RevaluationHistory', 'rh')
+                        ->where('rh.type LIKE :key and rh.date <= :end')
+                        ->andWhere('rh.date like  :endmonth')
+                        ->setParameter('key', 'OGI')
+                        ->setParameter('end', $endDate_og2i)
+                        ->setParameter('endmonth',  "%-%".$month_og2i."-%")
+                            ->orderBy('rh.date', 'DESC');
+                        $query4 = $qb4->getQuery();
+                        // Execute Query
+                    }else{
+                        //recuperer 
+                        $qb4=$this->manager->createQueryBuilder()
+                        ->select("rh")
+                        ->from('App\Entity\RevaluationHistory', 'rh')
+                        ->where('rh.type LIKE :key and rh.date <= :end')
+                        ->andWhere('rh.date like  :endmonth')
+                        ->setParameter('key', 'OGI')
+                        ->setParameter('end', $endDate_og2i)
+                        ->setParameter('endmonth',  "%-%".$month_og2i."-%")
+                            ->orderBy('rh.date', 'ASC');
+                        $query4 = $qb4->getQuery();
+                        // Execute Query
+                    }
                     $indice_og2i_ma = $query4->getResult()[0]; 
 
-                    $annuity_base=( $indice_og2i_ma->getValue()/$property->valeur_indice_ref_og2_i_object->getValue())* $property->getInitialAmount() ;
+                    $annuity_base=( $indice_og2i_ma->getValue()/$property->initial_index_object->getValue())* $property->getInitialAmount() ;
                     $annuity=$annuity_base*$property->valeur_indexation_normale/$property->valeur_indice_ref_og2_i_object->getValue();
                     $plaf=(1+($property->plafonnement_index_og2_i/100))*$annuity_base;
                     if($annuity<$plaf){
@@ -378,17 +398,17 @@ class CronInvoicesCommand extends Command
                     }
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity_base * $property->honorary_rates_object->getValeur()/100;
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
-                    $honoraryRates    +=$honoraryRatesTax;
+                    //$honoraryRates    +=$honoraryRatesTax;
                 }else if(!$property->getClauseOG2I()){
                     $annuity=$property->valeur_indexation_normale / $property->initial_index_object->getValue() * $property->getInitialAmount() ;
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
-                    $honoraryRates    +=$honoraryRatesTax;
+                    //$honoraryRates    +=$honoraryRatesTax;
                 }else{
                     $annuity          = ($property->getRevaluationIndex() > 0) ? $property->getRevaluationIndex() / $property->getInitialIndex() * $property->getInitialAmount() : $property->getInitialAmount();
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
-                    $honoraryRates    +=$honoraryRatesTax;
+                    //$honoraryRates    +=$honoraryRatesTax;
                 }
                 
 
@@ -417,7 +437,7 @@ class CronInvoicesCommand extends Command
                             'honoraryRates'    => $honoraryRates,
                             'honoraryRatesTax' => $honoraryRatesTax,
                         ],
-                        
+                        'buyer'    =>null,
                         'warrant'    => [
                             'id'         => $property->getWarrant()->getId(),
                             'type'       => $property->getWarrant()->getType(),
@@ -443,9 +463,7 @@ class CronInvoicesCommand extends Command
                                 'firstname'  => $property->getWarrant()->getFirstname(),
                                 'lastname'   => $property->getWarrant()->getLastname(),
                             ];
-                            $data['warrant'] = [
-                                'id'         => $property->getWarrant()->getId(),
-                                'type'       => $property->getWarrant()->getType(),
+                            $data['buyer'] = [
                                 'firstname'  => $property->getBuyerFirstname(),
                                 'lastname'   => $property->getBuyerLastname(),
                                 'address'    => $property->getBuyerAddress(),
@@ -570,7 +588,36 @@ class CronInvoicesCommand extends Command
             $data['type'] = Invoice::TYPE_RECEIPT;
             $data['number'] = Invoice::formatNumber($data['number_int'], Invoice::TYPE_RECEIPT);
 
-            $this->generateInvoice($io, $data, $parameters, $invoice->getProperty(), $invoice->getCategory());
+            $property = $invoice->getProperty();
+            if($property->getWarrant()->getType() === Warrant::TYPE_SELLERS) {
+                $data['seller'] = [
+                    'firstname'  => $property->getWarrant()->getFirstname(),
+                    'lastname'   => $property->getWarrant()->getLastname(),
+                ];
+                $data['buyer'] = [
+                    'firstname'  => $property->getBuyerFirstname(),
+                    'lastname'   => $property->getBuyerLastname(),
+                    'address'    => $property->getBuyerAddress(),
+                    'postalcode' => $property->getBuyerPostalCode(),
+                    'city'       => $property->getBuyerCity(),
+                ];
+            }
+            if( $property->getDebirentierDifferent() || $data['target'] == PendingInvoice::TARGET_WARRANT){
+                $debirentier    = [
+                    'nom_debirentier'         =>  $property->getNomDebirentier(),
+                    'prenom_debirentier'       =>  $property->getPrenomDebirentier(),
+                    'addresse_debirentier'  =>  $property->getAddresseDebirentier(),
+                    'code_postal_debirentier'   =>  $property->getCodePostalDebirentier(),
+                    'ville_debirentier'    =>  $property->getVilleDebirentier(),
+                ];
+                $data["debirentier"]=$debirentier;
+                $data["debirentier_different"]= $property->getDebirentierDifferent();
+            }
+            if($invoice->getCategory() == Invoice::CATEGORY_MANUAL){
+                $this->generateInvoiceManual($io, $data, $parameters, $invoice->getProperty(), $invoice->getCategory());
+            }else{
+                $this->generateInvoice($io, $data, $parameters, $invoice->getProperty(), $invoice->getCategory());
+            }
             if (!$this->isDryRun()) {
                 $invoice->getProperty()->setLastReceipt(new DateTime());
                 $invoice->setStatus(Invoice::STATUS_TREATED);
@@ -621,7 +668,11 @@ class CronInvoicesCommand extends Command
 
             $file = new File();
             $file->setType(File::TYPE_INVOICE);
-            $file->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$property->getId()}");
+            if($data['recursion'] ==Invoice::RECURSION_MONTHLY){
+                $file->setName("{$data['number']} - R");
+            }else{
+                $file->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$property->getId()}");
+            }
             $file->setWarrant($property->getWarrant());
             $file->setDriveId($this->drive->addFile($file->getName(), $filePath, File::TYPE_INVOICE, $property->getWarrant()->getId()));
             $this->manager->persist($file);
@@ -629,7 +680,11 @@ class CronInvoicesCommand extends Command
             if($data['recursion'] !=Invoice::RECURSION_QUARTERLY){
                 $file2 = new File();
                 $file2->setType(File::TYPE_INVOICE);
-                $file2->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$invoice->getId()} - R file2");
+                if($data['recursion'] ==Invoice::RECURSION_MONTHLY){
+                    $file2->setName("{$data['number']} - H");
+                }else{
+                    $file2->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$invoice->getId()} - R file2");
+                }
                 $file2->setWarrant($property->getWarrant());
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $file2->setDriveId($this->drive->addFile($file2->getName(), $filePath2, File::TYPE_INVOICE, $property->getWarrant()->getId()));
@@ -666,6 +721,7 @@ class CronInvoicesCommand extends Command
                 }
                    
             }
+            
             if ((!empty($data['separation_type']) && ($data['separation_type'] == Property::BUYERS_ANNUITY) && !empty($property->getBuyerMail1())) || !empty($property->getWarrant()->getMail1())) {
                 
                 
@@ -673,7 +729,7 @@ class CronInvoicesCommand extends Command
                     $message = (new Swift_Message($invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
-                        ->setTo($invoice->getMailTarget())
+                        ->setTo("roquetigrinho@gmail.com")
                         ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
                   }else{
@@ -684,7 +740,7 @@ class CronInvoicesCommand extends Command
                             $message1 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo($invoice->getMailTarget())
+                                ->setTo("roquetigrinho@gmail.com")
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath2));
                             
@@ -692,7 +748,7 @@ class CronInvoicesCommand extends Command
                             $message2 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo($invoice->getProperty()->getBuyerMail1())
+                                ->setTo("roquetigrinho@gmail.com")
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath));
                         }else{
@@ -701,7 +757,7 @@ class CronInvoicesCommand extends Command
                             $message = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo($invoice->getMailTarget())
+                                ->setTo("roquetigrinho@gmail.com")
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath))
                                 ->attach(Swift_Attachment::fromPath($filePath2));
@@ -723,6 +779,186 @@ class CronInvoicesCommand extends Command
                             $io->note("mail mandat vendeur envoyé avec la rente au buyer /acquereur/acheteur ".$invoice->getProperty()->getBuyerMail1());
                         } else {
                             $invoice->setStatus(Invoice::STATUS_UNSENT);
+                        }
+                  }else{
+                        if(!empty($invoice->getMailCc())) {
+                            $message->setCc($invoice->getMailCc());
+                        }
+        
+                        if (!$this->areMailsDisabled() && $this->mailer->send($message)) {
+                            $invoice->setStatus(Invoice::STATUS_SENT);
+                            $io->note("mail envoyé ");
+                        } else {
+                            $invoice->setStatus(Invoice::STATUS_UNSENT);
+                        }
+                  }
+            
+        } else {
+            $invoice->setStatus(Invoice::STATUS_UNSENT);
+        }
+
+            //@unlink($this->pdf_dir . $fileName);
+        } catch (Exception $e) {
+            $io->error($e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine());
+        }
+    }
+
+
+    public function generateInvoiceManual(SymfonyStyle &$io, array $data, array $parameters, Property $property, int $category = Invoice::CATEGORY_ANNUITY)
+    {
+        try {   
+            if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                $io->note("manual quittance trying to be created ");
+
+            }  
+            $fichier_de_rente=( $data["amount"]>0);
+            $fichier_d_honoraire=( $data["montantht"]>0);
+            $type = "";
+            if($fichier_d_honoraire){
+                $type = "honoraire";
+            }else if($fichier_de_rente){
+                $type = "rente";
+            }
+            $io->note("invoice manuel, fichier de type ".$type);
+            if(($fichier_de_rente)){
+                $filePath = $this->generator->generateFile2($data, $parameters);
+            }else{
+                $filePath = -1;
+            }
+            if($fichier_d_honoraire){
+                $filePath2 = $this->generator->generateFile($data, $parameters);
+            }else{
+                $filePath2 = -1;
+            }
+            $io->note("file1 ".$filePath);
+            $io->note("file2 ".$filePath2);
+            if ($this->isDryRun()) {
+                return;
+            }
+            
+            if ($this->isDryRun()) {
+                return;
+            }
+
+            $invoice = new Invoice();
+            $invoice->setCategory($category);
+            $invoice->setType($data['type']);
+            if(($fichier_de_rente)){
+                $file = new File();
+                $file->setType(File::TYPE_INVOICE);
+                if($data['recursion'] ==Invoice::RECURSION_MONTHLY){
+                    $file->setName("{$data['number']} - R");
+                }else{
+                    $file->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$property->getId()}");
+                }
+                $file->setWarrant($property->getWarrant());
+                $file->setDriveId($this->drive->addFile($file->getName(), $filePath, File::TYPE_INVOICE, $property->getWarrant()->getId()));
+                $this->manager->persist($file);
+            }
+			//second fichier
+            if($fichier_d_honoraire){
+                $file2 = new File();
+                $file2->setType(File::TYPE_INVOICE);
+                if($data['recursion'] ==Invoice::RECURSION_MONTHLY){
+                    $file2->setName("{$data['number']} - H");
+                }else{
+                    $file2->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$invoice->getId()} - R file2");
+                }
+                $file2->setWarrant($property->getWarrant());
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $file2->setDriveId($this->drive->addFile($file2->getName(), $filePath2, File::TYPE_INVOICE, $property->getWarrant()->getId()));
+                $this->manager->persist($file2);
+            }
+			//$invoice->setFile($file);
+            $invoice->setNumber($data['number_int']);
+            $invoice->setData($data);
+            if(($fichier_de_rente)){
+            $invoice->setFile($file);
+            }
+            if($fichier_d_honoraire){
+                $invoice->setFile2($file2);
+            }
+            $invoice->setDate(new DateTime());
+            $invoice->setProperty($property);
+            $this->manager->persist($invoice);
+           $message=null;
+           $message1=null;
+           $message2=null;
+            
+            if ((!empty($data['separation_type']) && ($data['separation_type'] == Property::BUYERS_ANNUITY) && !empty($property->getBuyerMail1())) || !empty($property->getWarrant()->getMail1())) {
+                
+                
+                if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                    $message = (new Swift_Message($invoice->getMailSubject()))
+                        ->setFrom($this->mail_from)
+                        ->setBcc($this->mail_from)
+                        ->setTo("roquetigrinho@gmail.com")
+                        ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                        ->attach(Swift_Attachment::fromPath($filePath));
+                  }else{
+                        if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+                            //si mandat vendeur
+                            //envoyer les honoraires aux mandant
+                            if($fichier_d_honoraire){
+                            $io->note($invoice->getProperty()->getId()." mandat vendeur");
+                            $message1 = (new Swift_Message($invoice->getMailSubject()))
+                                ->setFrom($this->mail_from)
+                                ->setBcc($this->mail_from)
+                                ->setTo("roquetigrinho@gmail.com")
+                                ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                                ->attach(Swift_Attachment::fromPath($filePath2));
+                            }
+                            if(($fichier_de_rente)){
+                                //envoyer la rente au buyer /acquereur/acheteur
+                                $message2 = (new Swift_Message($invoice->getMailSubject()))
+                                    ->setFrom($this->mail_from)
+                                    ->setBcc($this->mail_from)
+                                    ->setTo("roquetigrinho@gmail.com")
+                                    ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                                    ->attach(Swift_Attachment::fromPath($filePath));
+                            }
+                        }else{
+                            //si mandat acquereur
+                            if(($fichier_de_rente)){
+                                $io->note($invoice->getProperty()->getId()." mandat acquereur");
+                                $message = (new Swift_Message($invoice->getMailSubject()))
+                                    ->setFrom($this->mail_from)
+                                    ->setBcc($this->mail_from)
+                                    ->setTo("roquetigrinho@gmail.com")
+                                    ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                                    ->attach(Swift_Attachment::fromPath($filePath));
+                            }
+                            if($fichier_d_honoraire){
+                                $io->note($invoice->getProperty()->getId()." mandat acquereur");
+                                $message = (new Swift_Message($invoice->getMailSubject()))
+                                    ->setFrom($this->mail_from)
+                                    ->setBcc($this->mail_from)
+                                    ->setTo("roquetigrinho@gmail.com")
+                                    ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                                    ->attach(Swift_Attachment::fromPath($filePath2));
+                            }
+                        }
+                  }
+                  if($data['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+                        if($fichier_d_honoraire){
+                            if(!empty($invoice->getMailCc())) {
+                                $message1->setCc($invoice->getMailCc());
+                            }
+                        
+                            if (!$this->areMailsDisabled() && $this->mailer->send($message1)) {
+                                $invoice->setStatus(Invoice::STATUS_SENT);
+                                $io->note("mail mandat vendeur envoyé avec les honoraires aux mandants ".$invoice->getMailTarget()." et ".$invoice->getMailCc());
+                            } else {
+                                $invoice->setStatus(Invoice::STATUS_UNSENT);
+                            }
+                        }
+                        if(($fichier_de_rente)){
+                            if (!$this->areMailsDisabled() && $this->mailer->send($message2)) {
+                                $invoice->setStatus(Invoice::STATUS_SENT);
+                                $io->note("mail mandat vendeur envoyé avec la rente au buyer /acquereur/acheteur ".$invoice->getProperty()->getBuyerMail1());
+                            } else {
+                                $invoice->setStatus(Invoice::STATUS_UNSENT);
+                            }
                         }
                   }else{
                         if(!empty($invoice->getMailCc())) {
@@ -794,7 +1030,7 @@ class CronInvoicesCommand extends Command
             $invoice->setData($data);
             if($filePath !=-1){$invoice->setFile($file);}
             if($filePath2 !=-1){$invoice->setFile2($file2);}
-        $invoice->setDate(new DateTime());
+            $invoice->setDate(new DateTime());
             $invoice->setProperty($property);
             $this->manager->persist($invoice);
 

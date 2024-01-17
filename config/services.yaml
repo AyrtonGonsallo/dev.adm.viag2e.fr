@@ -22,7 +22,7 @@ parameters:
     mail_from: 'gestion@univers-viager.fr'
 
     pdf_logo_path: '%kernel.project_dir%/public/img/logo_invoices.jpg'
-    pdf_tmp_dir: '%kernel.project_dir%/var/tmp/pdf'
+    pdf_tmp_dir: '%kernel.project_dir%/pdf'
 
     tmp_files_dir: '%kernel.project_dir%/var/tmp'
 
