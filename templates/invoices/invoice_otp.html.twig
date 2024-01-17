@@ -23,26 +23,20 @@
                 <small>{{ parameters.city|title }}, le {{ data.date.current_day }}</small>
                 <br /><br /><br />
                 <b>A l'attention de:</b><br />
-                {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
-                    {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
-                        {{ data.warrant.address }}<br />
-                        {{ data.warrant.postalcode }} {{ data.warrant.city }}
-                {% else %}
-                    {% if data.property.is_og2i %}
+                {% if data.target == constant('App\\Entity\\PendingInvoice::TARGET_WARRANT') %}
+                   
                         {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
                         {{ data.warrant.address }}<br />
                         {{ data.warrant.postalcode }} {{ data.warrant.city }}
-                    {% else %}
-                       {% if data.debirentier_different %}
-                            {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
-                            {{ data.warrant.address }}<br />
-                            {{ data.warrant.postalcode }} {{ data.warrant.city }}
-                        {% else %}
-                            {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
-                            {{ data.warrant.address }}<br />
-                            {{ data.warrant.postalcode }} {{ data.warrant.city }}
-                        {% endif %}
-                    {% endif %}
+                    
+                {% elseif data.target == constant('App\\Entity\\PendingInvoice::TARGET_PROPERTY') %}
+                    {{ data.property.lastname }} {{ data.property.firstname }}<br />
+                    {{ data.property.address }}<br />
+                    {{ data.property.postalcode }} {{ data.property.city }}
+                {% else %}
+                    {{ data.property.buyerlastname }} {{ data.property.buyerfirstname }}<br />
+                    {{ data.property.buyeraddress }}<br />
+                    {{ data.property.buyerpostalcode }} {{ data.property.buyercity }}
                 {% endif %}
             </td>
         </tr>

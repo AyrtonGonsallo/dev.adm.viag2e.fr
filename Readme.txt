@@ -47,3 +47,10 @@ SELECT p.id as property_id,p.last_receipt,i.id as invoice_id, i.status,i.data FR
 
 8216,7934,8328,8462,8405
 update invoice set status=4 where id in (8216,7934,8328,8462,8405)
+
+pour les quittances
+generate file 1 honoraires
+generate file 2 rente
+pour les avis 
+generate file 1 rente
+generate file 2 honoraires

@@ -140,6 +140,8 @@ pour faire les tests sur les charges de copro
         return $this->createQueryBuilder('p')
             ->where('p.date_maj_indice_ref <= :date')
             ->andWhere('p.billing_disabled = false')
+            ->andWhere('p.honoraries_disabled = false')
+            ->andWhere('p.annuities_disabled = false')
             ->andWhere('p.active = true')
             ->setParameter('date', new DateTime("-15 days"))
             ->setMaxResults($max)

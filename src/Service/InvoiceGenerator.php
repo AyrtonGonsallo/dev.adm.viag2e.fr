@@ -44,24 +44,29 @@ class InvoiceGenerator
 
             switch ($data['recursion']) {
                 case Invoice::RECURSION_OTP:
-					if($data['montantht']==-1){
+					if($data['amount']==-1){
 						return -1;
 					}
-                        $pdf->writeHTML($this->twig->render('invoices/invoice_otp.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
-                    
-
+                    $fileName = "/invoice_{$data['number']}R-file1.pdf";
+                    $pdf->writeHTML($this->twig->render('invoices/invoice_otp_1.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
                     break;
+
                 case Invoice::RECURSION_QUARTERLY:
                     $fileName = "/invoice_quarterly{$data['number']}-file1.pdf";
                     $pdf->writeHTML($this->twig->render('invoices/invoice_quarterly.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
-					
-
                     break;
+
                 case Invoice::RECURSION_MONTHLY:
+                    if($data['property']['annuity']<=0){
+						return -1;
+					}
+                    $fileName = "/invoice_{$data['number']}R-file1.pdf";
+                    $pdf->writeHTML($this->twig->render('invoices/invoice.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
+                    break;
+
                 default:
                     $fileName = "/invoice_{$data['number']}R-file1.pdf";
                     $pdf->writeHTML($this->twig->render('invoices/invoice.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
-					
                     break;
             }
 
@@ -83,25 +88,30 @@ class InvoiceGenerator
 
             switch ($data['recursion']) {
                 case Invoice::RECURSION_OTP:
-					if($data['amount']==-1){
+					if($data['montantht']==-1){
 						return -1;
 					}
-                        $pdf2->writeHTML($this->twig->render('invoices/invoice_otp_1.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
-                    
-
+                    $fileName = "/invoice_{$data['number']}H-file2.pdf";
+                    $pdf2->writeHTML($this->twig->render('invoices/invoice_otp.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
                     break;
+
                 case Invoice::RECURSION_QUARTERLY:
+                    return -1;
                     $fileName = "/invoice_quarterly{$data['number']}-file2.pdf";
-                    	$pdf2->writeHTML($this->twig->render('invoices/invoice_quarterly2.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
-					
-
+                    $pdf2->writeHTML($this->twig->render('invoices/invoice_quarterly2.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
                     break;
+
                 case Invoice::RECURSION_MONTHLY:
+                    if($data['property']['honoraryRates']<=0){
+						return -1;
+					}
+                    $fileName = "/invoice_{$data['number']}H-file2.pdf";
+					$pdf2->writeHTML($this->twig->render('invoices/invoice2.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
+					break;
+
                 default:
-                        $fileName = "/invoice_{$data['number']}H-file2.pdf";
-						$pdf2->writeHTML($this->twig->render('invoices/invoice2.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
-					
-                    
+                    $fileName = "/invoice_{$data['number']}H-file2.pdf";
+					$pdf2->writeHTML($this->twig->render('invoices/invoice2.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
                     break;
             }
 
