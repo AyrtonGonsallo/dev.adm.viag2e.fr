@@ -135,6 +135,18 @@ pour faire les tests sur les charges de copro
             ->getResult();
     }
 
+    public function findIndicestoUpdate($max)
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.date_maj_indice_ref <= :date')
+            ->andWhere('p.billing_disabled = false')
+            ->andWhere('p.active = true')
+            ->setParameter('date', new DateTime("-15 days"))
+            ->setMaxResults($max)
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return BuyerGood[] Returns an array of BuyerGood objects
     //  */

@@ -40,7 +40,8 @@ class CronInvoicesCommand extends Command
 {
     use LockableTrait;
 
-    private const PROCESS_MAX = 25;
+
+    private const PROCESS_MAX = 12;
     protected static $defaultName = 'cron:invoices';
 
     private $container;
@@ -87,7 +88,7 @@ class CronInvoicesCommand extends Command
             ->addOption('dry-run', 'd', InputOption::VALUE_NONE, 'Disable mails and save for testing purposes')
         ;
     }
-
+    
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
@@ -254,7 +255,59 @@ class CronInvoicesCommand extends Command
 
             $io->note("OTP invoice ({$data['type']}) generated for id {$pendingInvoice->getProperty()->getId()}");
         }
+        if (date('d') >= 16) {
+            function get_label($i){
+                if($i==1){
+                    return 'Urbains';
+                }else if($i==2){
+                    return 'Ménages';
+                }else{
+                    return 'Ménages';
+                }
+        
+            }
+            $io->note("mise a jour des indices sur les biens");
+            $properties = $this->manager
+            ->getRepository(Property::class)
+            ->findIndicestoUpdate(self::PROCESS_MAX);
+            foreach ($properties as $property) {
+                
+                    $io->note("property ".$property->getId()." active");
+                    $indice = $property->valeur_indice_reference_object;
+                    $month_m_u=$property->initial_index_object->getDate()->format('m');
+                    $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
+                    $endDate_m_u->setTime(0, 0, 0);
+                    // recuperer Valeur Indice de référence* (indexation)
+                    
+                    $qb4=$this->manager->createQueryBuilder()
+                    ->select("rh")
+                    ->from('App\Entity\RevaluationHistory', 'rh')
+                    ->where('rh.type LIKE :key')
+                    ->andWhere('rh.date <= :end')
+                    ->andWhere('rh.date like  :endmonth')
+                    ->setParameter('key', get_label($property->getIntitulesIndicesInitial()))
+                    ->setParameter('endmonth',  "%-%".$month_m_u."-%")
+                    ->setParameter('end', $endDate_m_u)
+                        ->orderBy('rh.date', 'DESC');
+                    $query4 = $qb4->getQuery();
+                    // Execute Query
+                    if($query4->getResult()){
+                        $indice_m_u = $query4->getResult()[0]; 
+                        if($indice_m_u->getId()!=$property->valeur_indice_reference_object->getId()){
+                            $io->note("mise a jour de l'indice de la valeur initiale du n°".$property->valeur_indice_reference_object->getId()." de valeur ".$property->valeur_indice_reference_object->getValue()." vers le n°".$indice_m_u->getId()." de valeur ".$indice_m_u->getValue());
+                        }else{
+                            $io->note("pas de mise a jour de l'indice de la valeur initiale du n°".$property->valeur_indice_reference_object->getId()." de valeur ".$property->valeur_indice_reference_object->getValue()." vers le n°".$indice_m_u->getId()." de valeur ".$indice_m_u->getValue());
+                        }
+                        $property->valeur_indice_reference_object=$indice_m_u;
+                        $property->date_maj_indice_ref=new DateTime();
+                    }
 
+                
+                $this->manager->persist($property);
+                $this->manager->flush();
+            }
+
+        }
         if (date('d') <= 10) {
             // Quarterly invoices ce sont les charges de copro
             if(in_array(date('m'), [12, 3, 6, 9])) { //$d->format('m')
