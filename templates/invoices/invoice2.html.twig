@@ -19,7 +19,7 @@
             </td>
             <td style="width: 50%; padding-top: 25px;">
                 <span style="font-size: 15pt"><b>{% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}AVIS D'ECHEANCE{% else %}QUITTANCE{% endif %} {{ data.number }} H</b></span><br />
-                Période de <b>{{ data.date.month }} {{ data.date.year }}</b><br />
+                Période de <b>{{ data.date.month  }} {{ data.date.year }}</b><br />
                 <small>{{ parameters.city|title }}, le {{ data.date.current_day }}</small>
                 <br /><br /><br />
                 <b>A l'attention de:</b><br />

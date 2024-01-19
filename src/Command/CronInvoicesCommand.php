@@ -696,6 +696,8 @@ class CronInvoicesCommand extends Command
     public function generateInvoice(SymfonyStyle &$io, array $data, array $parameters, Property $property, int $category = Invoice::CATEGORY_ANNUITY)
     {
         try {   
+            
+            $data['date']["month"]=utf8_decode($data['date']["month"]);
             if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                 $io->note("quaterly files trying to be created ");
 
@@ -896,6 +898,7 @@ class CronInvoicesCommand extends Command
                 $io->note("manual quittance trying to be created ");
 
             }  
+            $data['date']["month"]=utf8_decode($data['date']["month"]);
             $fichier_de_rente=( $data["amount"]>0);
             $fichier_d_honoraire=( $data["montantht"]>0);
             $type = "";

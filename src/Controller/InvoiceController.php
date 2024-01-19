@@ -616,18 +616,18 @@ class InvoiceController extends AbstractController
                 $honoraire=$this->getTableHonoraryRates($invoice);
             }
             if($invoice->getCategoryString()=='Rente'){
-                $date=$invoice->getDate()->format('m/Y');
+                $date=$invoice->getData()['date']["month_n"]."/".$invoice->getData()['date']["year"];
             }else if($invoice->getCategoryString()=='Frais de co-pro'){
-                $date=$invoice->getDate()->format('Y');
-                if($invoice->getDate()->format('m')>9){
+                $date=$invoice->getData()['date']["year"];
+                if($invoice->getData()['date']["month_n"]>9){
                     $date.='T4';
-                }else if($invoice->getDate()->format('m')>6){
+                }else if($invoice->getData()['date']["month_n"]>6){
                     $date.='T3';
                 }
-                else if($invoice->getDate()->format('m')>3){
+                else if($invoice->getData()['date']["month_n"]>3){
                     $date.='T2';
                 }
-                else if($invoice->getDate()->format('m')>0){
+                else if($invoice->getData()['date']["month_n"]>0){
                     $date.='T1';
                 }
             }else{

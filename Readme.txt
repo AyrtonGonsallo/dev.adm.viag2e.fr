@@ -54,3 +54,10 @@ generate file 2 rente
 pour les avis 
 generate file 1 rente
 generate file 2 honoraires
+
+tests 
+SELECT p.id,p.revaluation_date,r.date,r.id as rev_index FROM `property` p,revaluation_history r WHERE p.valeur_indice_reference_object_id=r.id and r.date<"2023-01-01"
+ORDER BY p.`revaluation_date` DESC;
+
+bien 
+SELECT * FROM `invoice` WHERE date >="2023-12-20 00:00:01" and date <="2024-01-08 23:59:01" and category in (0,1) ORDER BY `date` DESC;

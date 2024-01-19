@@ -306,6 +306,8 @@ $('#select_all').click(function() {
                     });
 
                     $('#m_form_category').selectpicker().on('change', function() {
+                        val=$(this).val().toLowerCase()
+                        console.log(""+$(this).val().toLowerCase())
                         datatable.search($(this).val().toLowerCase(), 'Category');
                     });
 
