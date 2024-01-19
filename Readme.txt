@@ -61,3 +61,11 @@ ORDER BY p.`revaluation_date` DESC;
 
 bien 
 SELECT * FROM `invoice` WHERE date >="2023-12-20 00:00:01" and date <="2024-01-08 23:59:01" and category in (0,1) ORDER BY `date` DESC;
+update property set bank_ics="FR12ZZZ886B32" where 1;
+
+regarder le pb ics si elle rajoute un bien
+
+SELECT * FROM `invoice` WHERE date >="2024-01-08 00:00:01" and date <="2024-01-31 23:59:01" and category in (0) ORDER BY `date` DESC;
+
+comment fonctionne l'export bank ?
+dans invoice repository listByDateNE

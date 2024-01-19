@@ -13,6 +13,7 @@ use App\Entity\RevaluationHistory;
 use App\Entity\Honoraire;
 use App\Entity\Warrant;
 use App\Form\PropertyFormType;
+use App\Form\PropertycreateFormType;
 use App\Form\PropertyCoproFormType;
 use App\Form\PropertyFormBuyerType;
 use App\Form\PropertyPaymentFormType;
@@ -122,7 +123,7 @@ class PropertyController extends AbstractController
 
         $property = new Property();
         $property->setType($warrant->getType());
-        $form = $this->createForm(PropertyFormType::class, $property);
+        $form = $this->createForm(PropertycreateFormType::class, $property);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -132,7 +133,21 @@ class PropertyController extends AbstractController
             if (empty($property->getRevaluationIndex())) {
                 $property->setRevaluationIndex(0.0);
             }
-
+            $property->date_duh=new DateTime();
+            $property->setMoisIndiceInitial(new DateTime());
+            $property->setCoordonneesSyndic("");
+            $property->setIntitulesIndicesInitial(2);
+            $property->climatisation_pompe_chaleur=0;
+            $property->chaudiere=0;
+            $property->valeur_indice_ref_og2_i=0;
+            $property->valeur_indexation_normale=0;
+            $property->num_mandat_gestion=0;
+            $property->hide_honorary_export=0;
+            $property->setDebirentierDifferent(0);
+            $property->setBankRum("");
+            $property->setAnnuitiesDisabled(0);
+            $property->setShowDuh(0);
+            $property->setClauseOG2I(0);
             $property->setWarrant($warrant);
             $property->setCreationUser($this->getUser());
             $property->setEditionUser($this->getUser());

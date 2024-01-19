@@ -393,11 +393,35 @@ $('#select_all').click(function() {
                 }
             });
     });
+
+    function forceDownload(url, fileName){
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "blob";
+    xhr.onload = function(){
+        var urlCreator = window.URL || window.webkitURL;
+        var imageUrl = urlCreator.createObjectURL(this.response);
+        var tag = document.createElement('a');
+        tag.href = imageUrl;
+        tag.download = fileName;
+        document.body.appendChild(tag);
+        tag.click();
+        document.body.removeChild(tag);
+    }
+    xhr.send();
+}
+
     $('#télécharger-tous').click(function() {
             let route = "{{ path('get_selected_invoices',{'type':'télécharger-tous'}) }}";
             selected_ids=[];
-            elements=$('input[type="checkbox"]').filter(':checked')
-            //console.log( 'elements: ',elements );
+            elements=$('input[type="checkbox"]').filter(function() {  
+                return $(this).is(':checked') && $(this).not('#select_all');
+            })
+            if($('#select_all').is(':checked')){
+                console.log("retirer le premier")
+                elements=elements.slice(1, elements.length)
+            }
+            console.log( 'elements: ',elements );
              $.each(elements, function(key, value) {
                 name=$(value).attr("name");
                 fullname=name;
@@ -409,7 +433,7 @@ $('#select_all').click(function() {
                     }
                 )
             });
-            //console.log( 'sent: ',selected_ids );
+            console.log( 'sent: ',selected_ids );
             $.ajax({
                 type: 'POST',
                 dataType: "json",
@@ -420,9 +444,10 @@ $('#select_all').click(function() {
                     results=data["results"]
                     console.log('received: ',results)
                     $.each(results, function(key, value) {
+                        
                         lien=value[0]
-                        console.log(lien)
-                        window.open(lien, '_blank');
+                        nom=value[1]["name"]
+                        forceDownload(lien, nom)
                         
                     });
                     $('#partie-reponse').html('<div class="m-content"><div class="alert alert-pad alert-success">Fichiers téléchargés</div></div>');

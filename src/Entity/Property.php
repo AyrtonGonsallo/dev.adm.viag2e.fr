@@ -656,7 +656,7 @@ class Property
     {
         $this->setActive(true);
         
-        $this->setGoodType(self::LIFETIME_TYPE_FREE);
+        $this->setGoodType(self::LIFETIME_TYPE_VL);
         $this->setHeatingType(self::HEATING_TYPE_ELECTRIC);
         $this->setGarage(0);
         $this->setParking(0);

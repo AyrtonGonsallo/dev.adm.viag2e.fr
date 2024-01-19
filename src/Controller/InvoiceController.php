@@ -821,7 +821,8 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
 
         if($type=="valider-tous"){
             foreach ($ids as $id) {
-                $invoice = $this->getDoctrine()
+                if($id["id"]>0){
+                    $invoice = $this->getDoctrine()
                     ->getRepository(Invoice::class)
                     ->find($id["id"]);
                     if($invoice->getStatus()<4){
@@ -829,11 +830,14 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                         $invoice->setStatus(Invoice::STATUS_PAYED);
                         $manager->persist($invoice);
                     }
+                }
+                
             }
             $rep="validés";
         }else if($type=="télécharger-tous"){
             foreach ($ids as $id) {
-                $invoice = $this->getDoctrine()
+                if($id["id"]>0){
+                    $invoice = $this->getDoctrine()
                     ->getRepository(Invoice::class)
                     ->find($id["id"]);
                     if($invoice->getFile()){
@@ -844,6 +848,8 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                         $file2=$invoice->getFile2();
                         array_push($results,array('/file/download/'.$file2->getDriveId(),$file2));
                     }
+                }
+                
             }
             $rep="télécharger";
 
