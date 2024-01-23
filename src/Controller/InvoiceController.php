@@ -633,6 +633,84 @@ class InvoiceController extends AbstractController
             }else{
                 $date=$invoice->getDate()->format('m/Y');
             }
+
+            $filePath = -1;
+            $filePath2 = -1;
+            $data2 = $invoice->getData();
+            if($invoice->getFile()){
+                $filePath = $invoice->getFile()->getDriveId();
+            }
+            if($invoice->getFile2()){
+                $filePath2 = $invoice->getFile2()->getDriveId();
+            }
+            $cond_h_n=($filePath2 != -1)?true:false; //honoraires nuls ?
+            $cond_r_n=($filePath != -1)?true:false; //rente nulle ?
+            
+            if($data2['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                $mailTarget=$invoice->getMailTarget();
+                
+            }
+            if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+                if($cond_h_n){
+                    $mailTarget2=$invoice->getMailTarget();
+                   
+                }
+                if($cond_r_n){
+                    $mailTarget1=$invoice->getProperty()->getBuyerMail1();
+                   
+                }
+            }else{
+                if($cond_h_n){
+                    $mailTarget2=$invoice->getMailTarget();
+                   
+                }
+                if($cond_r_n){
+                    if($invoice->getProperty()->getDebirentierDifferent()){
+                        $mailTarget1=$invoice->getProperty()->getEmailDebirentier();
+
+                    }else{
+                        $mailTarget1=$invoice->getMailTarget();
+
+                    }
+                   
+                }
+            }
+            if($data2['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+                if($cond_h_n){
+                    if(!empty($invoice->getMailCc())) {
+                        $mailTarget3=$invoice->getMailCc();
+                    }
+    
+                    
+                }
+                
+          }else if($data2['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() != Warrant::TYPE_SELLERS){
+            if($cond_h_n && $cond_r_n){
+                if(!empty($invoice->getMailCc())) {
+                    $mailTarget3=$invoice->getMailCc();
+                }
+            }    
+            
+          }else if($data2['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                if(!empty($invoice->getMailCc())) {
+                    $mailTarget3=$invoice->getMailCc();
+                }
+          }
+            if($data2['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                $recap_mails="la rente sera envoyée à ".$mailTarget." et ".$mailTarget3;
+            }else{
+                if($cond_r_n){
+                    $recap_mails="la rente sera envoyée à ".$mailTarget1;
+                }
+                if($cond_h_n){
+                    $recap_mails.=" et les honoraires à ".$mailTarget2;
+                }
+                if(!empty($invoice->getMailCc())) {
+                    $recap_mails.=" et ".$mailTarget3;
+                }
+            }
+
+
             $data[] = [
                 'Selected' =>"<input type='checkbox' name='invoice_".$invoice->getId()."' value='invoice_".$invoice->getId()."'>",
                 'Date' => $date,
@@ -645,7 +723,9 @@ class InvoiceController extends AbstractController
                 'Amount' => $amount,
                 'HonoraryRates' => $honoraire,
                 'Status' => ($invoice->getStatus() >= Invoice::STATUS_PAYED) ? '<span class="'.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</span>' : '<a id="invoice_'.$invoice->getId().'" href="#" data-id="'.$invoice->getId().'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_status" class="invoice-status m--font-bold '.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</a>',
-                'Resend' => '<a href="'.$this->generateUrl('invoice_resend', ['invoiceId' => $invoice->getId()]).'"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>',
+                //'Resend' => '<a href="'.$this->generateUrl('invoice_resend', ['invoiceId' => $invoice->getId()]).'"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>',
+                'Resend' => '<a href="#" class="invoice-mail" data-id="'.$invoice->getId().'" data-message="'.$recap_mails.'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_mail"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>',
+                
                 'Download' => $lien_telechargements,
             ];
         }
@@ -752,6 +832,133 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
     }
 
     /**
+     * @Route("/invoice/check_and_resend_mails", name="invoice_check_and_resend_mails")
+     * 
+     * @param Request $request
+     * @param DriveManager $driveManager
+     * @param Swift_Mailer $mailer
+     * @return Response
+     */
+    public function check_and_resend_mails(Request $request,DriveManager $driveManager, Swift_Mailer $mailer)
+    {
+        if (!is_numeric($request->get('id'))) {
+            return $this->redirectToRoute('invoices');
+        }
+
+        $invoice = $this->getDoctrine()
+            ->getRepository(Invoice::class)
+            ->find($request->get('id'));
+
+       
+            if (!empty($invoice)) {
+                if($invoice->getFile()){
+                    $filePath = $driveManager->getFile($invoice->getFile());
+                }
+                if($invoice->getFile2()){
+                    $filePath2 = $driveManager->getFile($invoice->getFile2());
+                }
+                $data = $invoice->getData();
+                $cond_h_n=($filePath2)?true:false; //honoraires non nuls ?
+                $cond_r_n=($filePath)?true:false; //rente non nulle ?
+                
+                if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                    $message = (new Swift_Message($invoice->getMailSubject()))
+                        ->setFrom($this->getParameter('mail_from'))
+                        ->setBcc($this->getParameter('mail_from'))
+                        ->setTo($invoice->getMailTarget())
+                        ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                        ->attach(Swift_Attachment::fromPath($filePath));
+                }
+                else{
+                    if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+                        //si mandat vendeur
+                        //envoyer les honoraires aux mandant
+                        if($cond_h_n){
+                            $message1 = (new Swift_Message($invoice->getMailSubject()))
+                                ->setFrom($this->getParameter('mail_from'))
+                                ->setBcc($this->getParameter('mail_from'))
+                                ->setTo("roquetigrinho@gmail.com")
+                                ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                                ->attach(Swift_Attachment::fromPath($filePath2));
+                        }
+                        //envoyer la rente au buyer /acquereur/acheteur
+                        if($cond_r_n){
+                            $message2 = (new Swift_Message($invoice->getMailSubject()))
+                                ->setFrom($this->getParameter('mail_from'))
+                                ->setBcc($this->getParameter('mail_from'))
+                                ->setTo("roquetigrinho@gmail.com")
+                                ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                                ->attach(Swift_Attachment::fromPath($filePath));
+                        }
+                    }else{
+                        //si mandat acquereur                                
+                        if($cond_h_n && $cond_r_n){
+                            $message = (new Swift_Message($invoice->getMailSubject()))
+                                ->setFrom($this->getParameter('mail_from'))
+                                ->setBcc($this->getParameter('mail_from'))
+                                ->setTo($invoice->getMailTarget())
+                                ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                                ->attach(Swift_Attachment::fromPath($filePath))
+                                ->attach(Swift_Attachment::fromPath($filePath2));
+                        }
+                    }
+                }
+                if($data['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+                    if($cond_h_n){
+                        if(!empty($invoice->getMailCc())) {
+                            $message1->setCc($invoice->getMailCc());
+                        }
+        
+                        if ($mailer->send($message1)) {
+                            $invoice->setStatus(Invoice::STATUS_SENT);
+                        } else {
+                            $invoice->setStatus(Invoice::STATUS_UNSENT);
+                        }
+                    }
+                    if($cond_r_n){
+                        if ($mailer->send($message2)) {
+                            $invoice->setStatus(Invoice::STATUS_SENT);
+                        } else {
+                            $invoice->setStatus(Invoice::STATUS_UNSENT);
+                        }
+                    }
+                }else if($data['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() != Warrant::TYPE_SELLERS){
+                    if($cond_h_n && $cond_r_n){
+                        if(!empty($invoice->getMailCc())) {
+                            $message->setCc($invoice->getMailCc());
+                        }
+        
+                        if ($mailer->send($message)) {
+                            $invoice->setStatus(Invoice::STATUS_SENT);
+                        } else {
+                            $invoice->setStatus(Invoice::STATUS_UNSENT);
+                        }
+                    }    
+                    
+                }else if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                    if(!empty($invoice->getMailCc())) {
+                        $message->setCc($invoice->getMailCc());
+                    }
+    
+                    if ($mailer->send($message)) {
+                        $invoice->setStatus(Invoice::STATUS_SENT);
+                    } else {
+                        $invoice->setStatus(Invoice::STATUS_UNSENT);
+                    }
+                }
+            
+            } else {
+                $this->addFlash('danger', 'Facture introuvable');
+            }
+
+
+
+
+    
+            return new JsonResponse(['rente non nulle' => $cond_r_n,"honoraire non nuls"=> $cond_h_n,"results"=>true,"fp"=>$filePath,"fp2"=>$filePath2],);
+    }
+
+    /**
      * @Route("/invoice/resend/{invoiceId}", name="invoice_resend", requirements={"invoiceId"="\d+"})
      *
      * @param Request $request
@@ -768,17 +975,49 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
 
         if (!empty($invoice)) {
             if($invoice->getFile()){
-                $filePath = $driveManager->getFile($invoice->getFile());
+                $filePath = $invoice->getFile()->getDriveId();
+            }
+            if($invoice->getFile2()){
+                $filePath2 = $invoice->getFile2()->getDriveId();
             }
             $data = $invoice->getData();
+            $mailTarget="";
+            $cond_h_n=($filePath2 != -1)?true:false; //honoraires nuls ?
+            $cond_r_n=($filePath != -1)?true:false; //rente nulle ?
             $message = (new Swift_Message($invoice->getMailSubject()))
                 ->setFrom($this->getParameter('mail_from'))
-                ->setBcc($this->getParameter('mail_from'))
-                ->setTo($invoice->getMailTarget())
-                ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+                ->setBcc($this->getParameter('mail_from'));
+            if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                $mailTarget=$invoice->getMailTarget();
                 if($invoice->getFile()){
                     $message ->attach(Swift_Attachment::fromPath($filePath));
                 }
+            }
+            if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+                if($cond_h_n){
+                    $mailTarget=$invoice->getMailTarget();
+                    if($invoice->getFile()){
+                        $message ->attach(Swift_Attachment::fromPath($filePath2));
+                    }
+                }
+                if($cond_r_n){
+                    $mailTarget=$invoice->getProperty()->getBuyerMail1();
+                    if($invoice->getFile()){
+                        $message ->attach(Swift_Attachment::fromPath($filePath));
+                    }
+                }
+            }else{
+                if($cond_h_n && $cond_r_n){
+                    $mailTarget=$invoice->getMailTarget();
+                    if($invoice->getFile()){
+                        $message ->attach(Swift_Attachment::fromPath($filePath))
+                        ->attach(Swift_Attachment::fromPath($filePath2));
+                    }
+                }
+            }
+            $message->setTo($mailTarget)
+                ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+                
 
             if (!empty($invoice->getMailCc())) {
                 $message->setCc($invoice->getMailCc());
@@ -844,7 +1083,8 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                         $file=$invoice->getFile();
                         array_push($results,array('/file/download/'.$file->getDriveId(),$file));
 
-                    }else if($invoice->getFile2()){
+                    }
+                    if($invoice->getFile2()){
                         $file2=$invoice->getFile2();
                         array_push($results,array('/file/download/'.$file2->getDriveId(),$file2));
                     }

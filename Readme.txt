@@ -69,3 +69,13 @@ SELECT * FROM `invoice` WHERE date >="2024-01-08 00:00:01" and date <="2024-01-3
 
 comment fonctionne l'export bank ?
 dans invoice repository listByDateNE
+
+update `property` set last_invoice="2023-12-20" WHERE last_invoice="2024-01-08" or last_invoice="2024-01-09";
+
+
+4645
+4644
+4643
+4642
+
+SELECT id,valeur_indexation_normale,valeur_indice_reference_object_id FROM `property` where id in (39,57,59,60);

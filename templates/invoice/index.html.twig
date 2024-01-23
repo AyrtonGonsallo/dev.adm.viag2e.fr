@@ -110,7 +110,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <button type="button" class="btn btn-primary" id="valider-tous">Valider sélection</button>
+                                    <button type="button" class="btn btn-primary" id="valider-tous">Générer</button>
                                 </div>
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-primary" id="télécharger-tous">Télécharger sélection</button>
@@ -146,6 +146,28 @@
             </div>
         </div>
     </div>
+
+     <div class="modal fade" id="m_modal_invoice_mail" tabindex="-1" role="dialog" aria-labelledby="invoice_mail" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="invoice_mail_h">Envoi du mail <span id="modal-title-mails">-</span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <b>ATTENTION:</b> 
+                    <span id="modal-message">-</span>
+                    <form action="{{ path('invoice_check_and_resend_mails') }}" method="post" id="payed-form"><input type="hidden" name="id" value="0" id="mail-form-id"><input type="hidden" name="sort" value="0" id="payment-form-sort"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="validate-email">Valider l'envoi</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
 
 {% endblock %}
@@ -163,6 +185,12 @@
             $('#html_table').on('click', '.invoice-status', function () {
                 $('#payment-form-id').attr('value', $(this).attr('data-id'));
                 $('#modal-title').html($(this).attr('data-number'));
+            });
+            $('#html_table').on('click', '.invoice-mail', function () {
+                $('#mail-form-id').attr('value', $(this).attr('data-id'));
+               
+                $('#modal-title-mails').html($(this).attr('data-number'));
+                $('#modal-message').html($(this).attr('data-message'));
             });
 
             $('#validate-payment').click(function () {
@@ -186,6 +214,29 @@
                         console.log('received: ',data)
                         $(status).parent().parent().html('<span class="m--font-success" style="width: 110px;">Payée</span>')
                         $('#partie-reponse').html('<div class="m-content"><div class="alert alert-pad alert-success">Facture marquée comme payée</div></div>');
+                        
+                    }
+                });
+                 
+            });
+
+
+            $('#validate-email').click(function () {
+                let route = "{{ path('invoice_check_and_resend_mails') }}";
+                
+                id=$('#mail-form-id').attr('value');
+                status='#invoice_'+id
+                
+                $('#m_modal_invoice_mail').modal('hide');
+                 $.ajax({
+                    type: 'POST',
+                    dataType: "json",
+                    url:route,
+                    data: {"id":id},
+                    success: function(data) {
+                        console.log('received: ',data)
+                        
+                        $('#partie-reponse').html('<div class="m-content"><div class="alert alert-pad alert-success">Facture renvoyée</div></div>');
                         
                     }
                 });

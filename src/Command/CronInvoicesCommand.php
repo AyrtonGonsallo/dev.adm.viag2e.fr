@@ -132,7 +132,7 @@ class CronInvoicesCommand extends Command
             'site'       => $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_site'])->getValue(),
         ];
 
-        $d = new DateTime('First day of this month');
+        $d = new DateTime('First day of next month');
 
         $this->date = [
             'current_day'   => strftime('%A %e %B %Y'),
@@ -299,6 +299,7 @@ class CronInvoicesCommand extends Command
                             $io->note("pas de mise a jour de l'indice de la valeur initiale du n°".$property->valeur_indice_reference_object->getId()." de valeur ".$property->valeur_indice_reference_object->getValue()." vers le n°".$indice_m_u->getId()." de valeur ".$indice_m_u->getValue());
                         }
                         $property->valeur_indice_reference_object=$indice_m_u;
+                        $property->valeur_indexation_normale=$indice_m_u->getValue();
                         $property->date_maj_indice_ref=new DateTime();
                     }
 
@@ -697,7 +698,7 @@ class CronInvoicesCommand extends Command
     {
         try {   
             
-            $data['date']["month"]=utf8_decode($data['date']["month"]);
+            //$data['date']["month"]=utf8_decode($data['date']["month"]);
             if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                 $io->note("quaterly files trying to be created ");
 
@@ -898,7 +899,7 @@ class CronInvoicesCommand extends Command
                 $io->note("manual quittance trying to be created ");
 
             }  
-            $data['date']["month"]=utf8_decode($data['date']["month"]);
+            //$data['date']["month"]=utf8_decode($data['date']["month"]);
             $fichier_de_rente=( $data["amount"]>0);
             $fichier_d_honoraire=( $data["montantht"]>0);
             $type = "";
