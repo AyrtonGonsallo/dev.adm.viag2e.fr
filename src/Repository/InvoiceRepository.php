@@ -22,7 +22,20 @@ class InvoiceRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Invoice::class);
     }
-
+    function get_category($val){
+        if($val=="Tous"){
+            return 4;
+        }
+        else if($val=="Rente"){
+            return 0;
+        }else if($val=="Frais de co-pro"){
+            return 1;
+        }else if($val=="Ordures ménagères"){
+            return 2;
+        }else if($val=="Manuelle"){
+            return 3;
+        }
+    }
     public function findAllOrdered(int $page, int $max, array $data)
     {
         $query = $this->createQueryBuilder('i')
@@ -36,8 +49,8 @@ class InvoiceRepository extends ServiceEntityRepository
                 ->setParameter('end', $data['end']);
         }
 
-        if(!empty($data['Category'])) {
-            $query->andWhere('i.category = :category')->setParameter('category', $data['Category']);
+        if(!empty($data['Category']) && $this->get_category($data['Category'])!=4) {
+            $query->andWhere('i.category = :category')->setParameter('category', $this->get_category($data['Category']));
         }
 
         if(!empty($data['Status'])) {

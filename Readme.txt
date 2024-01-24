@@ -79,3 +79,6 @@ update `property` set last_invoice="2023-12-20" WHERE last_invoice="2024-01-08" 
 4642
 
 SELECT id,valeur_indexation_normale,valeur_indice_reference_object_id FROM `property` where id in (39,57,59,60);
+
+UPDATE `property` SET `last_invoice` = '2023-12-20' WHERE `property`.`id` = 20;
+UPDATE `invoice` SET `status` = '4' WHERE `invoice`.`id` = 8242;
