@@ -657,7 +657,7 @@ class CronInvoicesCommand extends Command
                 ];
             }
             $data['property']['is_og2i']=$property->getClauseOG2I();
-            if( $property->getDebirentierDifferent() || $data['target'] == PendingInvoice::TARGET_WARRANT){
+            if( $property->getDebirentierDifferent() ){
                 $debirentier    = [
                     'nom_debirentier'         =>  $property->getNomDebirentier(),
                     'prenom_debirentier'       =>  $property->getPrenomDebirentier(),

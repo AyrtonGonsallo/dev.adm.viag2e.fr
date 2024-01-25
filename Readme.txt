@@ -82,3 +82,15 @@ SELECT id,valeur_indexation_normale,valeur_indice_reference_object_id FROM `prop
 
 UPDATE `property` SET `last_invoice` = '2023-12-20' WHERE `property`.`id` = 20;
 UPDATE `invoice` SET `status` = '4' WHERE `invoice`.`id` = 8242;
+accents aout
+SELECT * FROM `invoice` where number=3938 and data like "%ao%";
+
+	aout
+7650
+9181
+fevrier
+9170
+decemnbre
+9156
+UPDATE `invoice` SET `status` = '4' WHERE `invoice`.`id` in (7650,9181,9170,9156);
+celui ci 9181 est problematique pour aout avec son \u00c3\u0083\u00c2\u00bb, mais on verra ca plus tard 
