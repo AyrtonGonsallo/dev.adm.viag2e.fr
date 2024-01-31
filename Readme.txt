@@ -94,3 +94,9 @@ decemnbre
 9156
 UPDATE `invoice` SET `status` = '4' WHERE `invoice`.`id` in (7650,9181,9170,9156);
 celui ci 9181 est problematique pour aout avec son \u00c3\u0083\u00c2\u00bb, mais on verra ca plus tard 
+
+
+generée: L'avis d'echéance est payé et le cron a tourné et généré la quittance, l'avis lui est marqué traité
+payée: la quittance est validée dans le back office au niveau de la liste des factures
+traitée: le cron a tourné et a envoyé la quittance payée, la quittance est marquée envoyée
+Donc la question c'est "une quittance n'a que 2 status ? généré et envoyé ?"

@@ -742,8 +742,10 @@ class InvoiceController extends AbstractController
                     $recap_mails.=" et ".$mailTarget3;
                 }
             }
-
-
+            $status_choice=($invoice->getStatus() >= Invoice::STATUS_PAYED) ? '<span class="'.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</span>' : '<a id="invoice_'.$invoice->getId().'" href="#" data-id="'.$invoice->getId().'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_status" class="invoice-status m--font-bold '.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</a>';
+            if($invoice->getType()===2){
+                $status_choice='<span class="'.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</span>';
+            }
             $data[] = [
                 'Selected' =>"<input type='checkbox' name='invoice_".$invoice->getId()."' value='invoice_".$invoice->getId()."'>",
                 'Date' => $date,
@@ -755,7 +757,7 @@ class InvoiceController extends AbstractController
                 'Title' => '<a href="'.$this->generateUrl('property_view', ['propertyId' => $invoice->getProperty()->getId()]).'">'.$invoice->getProperty()->getTitle().'</a>',
                 'Amount' => $amount,
                 'HonoraryRates' => $honoraire,
-                'Status' => ($invoice->getStatus() >= Invoice::STATUS_PAYED) ? '<span class="'.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</span>' : '<a id="invoice_'.$invoice->getId().'" href="#" data-id="'.$invoice->getId().'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_status" class="invoice-status m--font-bold '.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</a>',
+                'Status' => $status_choice,
                 //'Resend' => '<a href="'.$this->generateUrl('invoice_resend', ['invoiceId' => $invoice->getId()]).'"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>',
                 'Resend' => '<a href="#" class="invoice-mail" data-id="'.$invoice->getId().'" data-message="'.$recap_mails.'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_mail"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>',
                 
