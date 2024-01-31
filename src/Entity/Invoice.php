@@ -398,7 +398,7 @@ class Invoice implements JsonSerializable
     public function getMailSubject()
     {
         if($this->getCategory() === self::CATEGORY_MANUAL) {
-            return $this->getTypeString() . " {$this->getData()['period']} {$this->getData()['period']} " . $this->getProperty()->getTitle();
+            return $this->getTypeString() . " {$this->getData()['period']} " . $this->getProperty()->getTitle();
         }
         return $this->getTypeString() . " {$this->getData()['date']['month']} {$this->getData()['date']['year']} " . $this->getProperty()->getTitle();
     }

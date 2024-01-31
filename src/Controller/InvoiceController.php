@@ -661,6 +661,14 @@ class InvoiceController extends AbstractController
             }else{
                 if($data2['recursion'] ==Invoice::RECURSION_QUARTERLY){
                     $mailTarget=$invoice->getProperty()->getWarrant()->getMail1();
+                    if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+                        $mailTarget=$invoice->getProperty()->getWarrant()->getMail1();
+                    }else{
+                        $mailTarget=$invoice->getProperty()->getMail1();
+                        if(!empty($invoice->getProperty()->getMail2())) {
+                           $mailTarget3=$invoice->getProperty()->getMail2();
+                        }
+                    }
                   
                     
                 }
@@ -705,10 +713,6 @@ class InvoiceController extends AbstractController
                     }
                 }    
                 
-              }else if($data2['recursion'] ==Invoice::RECURSION_QUARTERLY){
-                    if(!empty($invoice->getMailCc())) {
-                        $mailTarget3=$invoice->getMailCc();
-                    }
               }
             }
             if($invoice->getCategory() == Invoice::CATEGORY_MANUAL){
@@ -724,7 +728,7 @@ class InvoiceController extends AbstractController
             }
             else if($data2['recursion'] ==Invoice::RECURSION_QUARTERLY){
                 $recap_mails="la rente sera envoyée à ".$mailTarget;
-                if(!empty($invoice->getMailCc())) {
+                if(!empty($invoice->getProperty()->getMail2())) {
                     $recap_mails.=" et ".$mailTarget3;
                 }
             }else{
@@ -924,12 +928,25 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                     
                 }else{
                     if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
-                        $message = (new Swift_Message($invoice->getMailSubject()))
-                            ->setFrom($this->getParameter('mail_from'))
-                            ->setBcc($this->getParameter('mail_from'))
-                            ->setTo("roquetigrinho@gmail.com")
-                            ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
-                            //->attach(Swift_Attachment::fromPath($filePath));
+                        if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+                            $message = (new Swift_Message($invoice->getMailSubject()))
+                                ->setFrom($this->getParameter('mail_from'))
+                                ->setBcc($this->getParameter('mail_from'))
+                                ->setTo("roquetigrinho@gmail.com")
+                                ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+                                //->attach(Swift_Attachment::fromPath($filePath));
+                        }else{
+                            $message = (new Swift_Message($invoice->getMailSubject()))
+                                ->setFrom($this->getParameter('mail_from'))
+                                ->setBcc($this->getParameter('mail_from'))
+                                ->setTo("roquetigrinho@gmail.com")
+                                ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+                                //->attach(Swift_Attachment::fromPath($filePath));
+                                
+                                if(!empty($invoice->getProperty()->getMail2())) {
+                                    $message->setCc("roquetigrinho@gmail.com");
+                                }
+                        }
                     }
                     else{
                         if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){

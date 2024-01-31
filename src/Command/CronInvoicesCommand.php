@@ -208,7 +208,7 @@ class CronInvoicesCommand extends Command
                     'address'    => $pendingInvoice->getProperty()->getAddress(),
                     'postalcode' => $pendingInvoice->getProperty()->getPostalCode(),
                     'city'       => $pendingInvoice->getProperty()->getCity(),
-                    'is_og2i'       => $property->getClauseOG2I(),
+                    'is_og2i'       => $pendingInvoice->getProperty()->getClauseOG2I(),
                     'buyerfirstname'  => $pendingInvoice->getProperty()->getBuyerFirstname(),
                     'buyerlastname'   => $pendingInvoice->getProperty()->getBuyerLastname(),
                     'buyeraddress'    => $pendingInvoice->getProperty()->getBuyerAddress(),
@@ -789,12 +789,26 @@ class CronInvoicesCommand extends Command
                 
                 
                 if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
-                    $message = (new Swift_Message($invoice->getMailSubject()))
-                        ->setFrom($this->mail_from)
-                        ->setBcc($this->mail_from)
-                        ->setTo("roquetigrinho@gmail.com")
-                        ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
-                        ->attach(Swift_Attachment::fromPath($filePath));
+                    if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+                        $message = (new Swift_Message($invoice->getMailSubject()))
+                            ->setFrom($this->mail_from)
+                            ->setBcc($this->mail_from)
+                            ->setTo("roquetigrinho@gmail.com")
+                            ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                            ->attach(Swift_Attachment::fromPath($filePath));
+                    }else{
+                        $message = (new Swift_Message($invoice->getMailSubject()))
+                            ->setFrom($this->mail_from)
+                            ->setBcc($this->mail_from)
+                            ->setTo("roquetigrinho@gmail.com")
+                            ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                            ->attach(Swift_Attachment::fromPath($filePath));
+                            
+                            if(!empty($invoice->getProperty()->getMail2())) {
+                                $message->setCc("roquetigrinho@gmail.com");
+                            }
+                    }
+                    
                   }else{
                         if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                             //si mandat vendeur
@@ -1014,13 +1028,13 @@ class CronInvoicesCommand extends Command
 	 public function generatePendingInvoice(SymfonyStyle &$io, array $data, array $parameters, Property $property, int $category = Invoice::CATEGORY_ANNUITY)
     {
         try {
-            if($data['amount']>0){
+            if($data['montantht']> 0){
                 $filePath2= $this->generator->generateFile2($data, $parameters);
             }
             else{
                 $filePath2= -1;
             }
-            if($data['montantht']> 0){
+            if($data['amount']>0){
                 $filePath = $this->generator->generateFile($data, $parameters);
             }
             else{
