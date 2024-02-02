@@ -49,7 +49,7 @@ class Bank
         foreach ($this->data as $property_id => $types) {
             
             foreach ($types as $property) {
-                if(empty($property['payer']['ics'])) {
+                if(empty($property['payer']['ics'])) {//si C'Est acquereur et que le warrant n'a pas d'ics il va sauter, si c'est vendeur et que le buyer n'a pas d'ics il va sauter
                     continue;
                 }
                 
@@ -127,11 +127,15 @@ class Bank
             if(empty($data['recursion'])) {
                 $data['recursion'] = Invoice::RECURSION_MONTHLY;
             }
-
-            if($data['recursion'] == Invoice::RECURSION_MONTHLY && $invoice->getProperty()->getHideExportMonthly()) {
+/*
+            if($data['recursion'] == Invoice::RECURSION_MONTHLY && $invoice->getProperty()->getHideExportMonthly() && $invoice->getFile()) {//si cacher rente et facture de rente
                 continue;
             }
 
+            if($data['recursion'] == Invoice::RECURSION_MONTHLY && $invoice->getProperty()->hide_honorary_export && $invoice->getFile2()) {//si cacher honoraire et facture de honoraire
+                continue;
+            }
+*/
             if($data['recursion'] == Invoice::RECURSION_OTP && $invoice->getProperty()->getHideExportOtp()) {
                 continue;
             }
@@ -140,7 +144,7 @@ class Bank
                 continue;
             }
 
-            $amount = $this->getAmount($data,$invoice->getProperty()->hide_honorary_export);
+            $amount = $this->getAmount($data,$invoice->getProperty()->hide_honorary_export,$invoice->getProperty()->getHideExportMonthly());
 
             if($amount <= 0) {
                 continue;
@@ -161,7 +165,7 @@ class Bank
             }
 
             if(empty($this->data[$invoice->getProperty()->getId()][$data['recursion']]['payer']['ics'])) {
-                continue;
+                continue; //si C'Est acquereur et que le warrant n'a pas d'ics il va sauter, si c'est vendeur et que le buyer n'a pas d'ics il va sauter exemple sur le bien 26
             }
 
             $this->total->addTransaction($amount);
@@ -179,7 +183,7 @@ class Bank
         return $this->buildXML();
     }
 
-    private function getAmount(?array $data,$invoice_honn)
+    private function getAmount(?array $data,$invoice_honn,$invoice_rente)
     {
         switch ($data['recursion']) {
             case Invoice::RECURSION_OTP:
@@ -190,9 +194,15 @@ class Bank
                 break;
             case Invoice::RECURSION_MONTHLY:
                 $return=0;
-                if( $invoice_honn){
+                if( $invoice_honn && $invoice_rente){
+                    $return=0;
+                }
+                else if( $invoice_honn){
                     $return=number_format($data['property']['annuity'], 2, '.', '');
-                }else{
+                }else if($invoice_rente){
+                    $return=number_format($data['property']['honoraryRates'], 2, '.', '');
+                }
+                else if( !$invoice_honn && !$invoice_rente){
                     $return=number_format($data['property']['annuity'] + $data['property']['honoraryRates'], 2, '.', '');
                 }
                 return $return;

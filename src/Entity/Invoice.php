@@ -6,7 +6,7 @@ use DateTime;
 use DateTimeInterface;
 use JsonSerializable;
 use Doctrine\ORM\Mapping as ORM;
-
+setlocale(LC_TIME, "fr_FR","French");
 /**
  * @ORM\Entity(repositoryClass="App\Repository\InvoiceRepository")
  */
@@ -171,6 +171,8 @@ class Invoice implements JsonSerializable
 
         return $this;
     }
+    
+   
     public  function convert_from_latin1_to_utf8_recursively($dat)
     {
       
@@ -209,9 +211,17 @@ class Invoice implements JsonSerializable
          
        
     }
+
+    public function getMonthfromNumber($number): ?string{
+        
+        $date="2024-{$number}-22 12:25:26";
+        return utf8_encode(strftime("%B",strtotime($date)));
+    
+    }
     public function getData(): ?array
     {
-        return $this->convert_from_latin1_to_utf8_recursively2($this->data);
+        $this->data['date']['month']=$this->getMonthfromNumber( $this->data['date']['month_n']);
+        return $this->data;
     }
 
 

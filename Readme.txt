@@ -83,20 +83,16 @@ SELECT id,valeur_indexation_normale,valeur_indice_reference_object_id FROM `prop
 UPDATE `property` SET `last_invoice` = '2023-12-20' WHERE `property`.`id` = 20;
 UPDATE `invoice` SET `status` = '4' WHERE `invoice`.`id` = 8242;
 accents aout
-SELECT * FROM `invoice` where number=3938 and data like "%ao%";
+SELECT * FROM `invoice` where data like "%\"month\":\"f%" and type=1 and category=0 ORDER BY `invoice`.`date` DESC
+aout  7650
+fevrier 9128
+decemnbre 8332
 
-	aout
-7650
-9181
-fevrier
-9170
-decemnbre
-9156
-UPDATE `invoice` SET `status` = '4' WHERE `invoice`.`id` in (7650,9181,9170,9156);
+UPDATE `invoice` SET `status` = '4' WHERE `invoice`.`id` in (7650,9128,8332);
 celui ci 9181 est problematique pour aout avec son \u00c3\u0083\u00c2\u00bb, mais on verra ca plus tard 
 
 
 generée: L'avis d'echéance est payé et le cron a tourné et généré la quittance, l'avis lui est marqué traité
-payée: la quittance est validée dans le back office au niveau de la liste des factures
-traitée: le cron a tourné et a envoyé la quittance payée, la quittance est marquée envoyée
+ la quittance est validée dans le back office au niveau de la liste des factures
+ le cron a tourné et a envoyé la quittance payée, la quittance est marquée envoyée
 Donc la question c'est "une quittance n'a que 2 status ? généré et envoyé ?"
