@@ -10,35 +10,27 @@
     <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px">
         <tr>
             <td style="text-align: left; width: 50%;">
-                <img style="width: 150px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+                <img style="width: 150px;top:20px;position:absolute" src="{{ pdf_logo_path }}" alt="Logo"><br />
                 {{ parameters.address|raw }}<br />
                 {{ parameters.postalcode }} {{ parameters.city|upper }}<br /><br />
                 Téléphone: {{ parameters.phone }}<br />
                 Mail: {{ parameters.mail }}<br />
                 {{ parameters.site }}
             </td>
-            <td style="width: 50%; padding-top: 25px;">
+            <td style="width: 50%; padding-top: 25px;text-align: center;position:relative;">
                 {{ parameters.city|title }}, le {{ data.date.current_day }}
-            </td>
-        </tr>
-    </table>
-    <br>
-    <br>
-    <table cellspacing="0" style="width: 100%; text-align: left; font-size: 11pt;">
-        <tr>
-            <td style="width:70%;"></td>
-            <td style="width:30%;">
-                {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                {% for i in 0..9 %}
+                    <br />
+                {% endfor %}
+                <div style="position:absolute;left:300px;top:-40px;width:300px;text-align: left;">
+                 {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
                 {{ data.warrant.address }}<br />
                 {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                </div>
             </td>
         </tr>
     </table>
-
-    <br />
-    <br />
-    <br />
-    <br />
+    <br>
 
     <table cellspacing="0" style="width: 100%; text-align: left; font-size: 11pt;">
         <colgroup>
@@ -172,7 +164,7 @@
                 UNIVERS VIAGER - Siège social : 58 Rue Fondaudège 33000 BORDEAUX, SARL au capital de 5 000 €<br />
                 TVA FR27523654408 - Immatriculée au RCS Bordeaux N°523 654 408<br />
                 Garantie financière GALIAN 89 rue de la Boétie 75008 PARIS Montant : 120 000 €<br />
-                Carte Professionnelle Transaction n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br />
+                Carte Professionnelle Transaction et Gestion n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br />
                 « Notre agence ne détient aucun fonds pour le compte de ses clients »
             </td>
         </tr>

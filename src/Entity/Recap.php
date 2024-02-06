@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\RecapRepository;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-
+setlocale(LC_TIME, "fr_FR","French");
 /**
  * @ORM\Entity(repositoryClass=RecapRepository::class)
  */
@@ -114,14 +114,62 @@ class Recap
         return $this;
     }
 
+    public  function convert_from_latin1_to_utf8_recursively($dat)
+    {
+      
+        if (is_string($dat)) {
+            return utf8_encode($dat);
+         } elseif (is_array($dat)) {
+            $ret = [];
+            foreach ($dat as $i => $d) $ret[ $i ] = self::convert_from_latin1_to_utf8_recursively($d);
+            return $ret;
+         } elseif (is_object($dat)) {
+            foreach ($dat as $i => $d) $dat->$i = self::convert_from_latin1_to_utf8_recursively($d);
+            return $dat;
+         } else {
+            return $dat;
+         }
+         
+       
+    }
+    
+    
+    public  function convert_from_latin1_to_utf8_recursively2($dat)
+    {
+      
+        if (is_string($dat)) {
+            return utf8_decode($dat);
+         } elseif (is_array($dat)) {
+            $ret = [];
+            foreach ($dat as $i => $d) $ret[ $i ] = self::convert_from_latin1_to_utf8_recursively2($d);
+            return $ret;
+         } elseif (is_object($dat)) {
+            foreach ($dat as $i => $d) $dat->$i = self::convert_from_latin1_to_utf8_recursively2($d);
+            return $dat;
+         } else {
+            return $dat;
+         }
+         
+       
+    }
+
+    public function getMonthfromNumber($number): ?string{
+        
+        $date="2024-{$number}-22 12:25:26";
+        return utf8_encode(strftime("%B",strtotime($date)));
+    
+    }
+
     public function getData(): ?array
     {
+        $this->data['date']['month']=$this->getMonthfromNumber( $this->data['date']['month_n']);
         return $this->data;
     }
 
+
     public function setData(?array $data): self
     {
-        $this->data = $data;
+        $this->data = $this->convert_from_latin1_to_utf8_recursively($data);
 
         return $this;
     }

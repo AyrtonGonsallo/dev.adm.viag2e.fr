@@ -173,7 +173,7 @@ class RecapCommand extends Command
         $d = new DateTime('First day of this month');
 
         $date = [
-            'current_day'   => strftime('%A %e %B %Y'),
+            'current_day'   => utf8_encode(strftime('%A %e %B %Y')),
             'current_month' => date('m'),
             'max_days'      => cal_days_in_month(CAL_GREGORIAN, $d->format('m'), $d->format('Y')),
             'month'         => strftime('%B', $d->getTimestamp()),
@@ -358,7 +358,7 @@ class RecapCommand extends Command
                 $message = (new Swift_Message($recap->getMailSubject()))
                     ->setFrom($this->mail_from)
                     ->setBcc($this->mail_from)
-                    ->setTo($recap->getMailRecipient())
+                    ->setTo("roquetigrinho@gmail.com")
                     ->setBody($this->twig->render('invoices/emails/recap.twig', ['type' => $recap->getTypeString(), 'year' => $data['year']]), 'text/html')
                     ->attach(Swift_Attachment::fromPath($filePath));
 
