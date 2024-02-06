@@ -14,6 +14,9 @@
                 {{ parameters.address|raw }}<br />
                 {{ parameters.postalcode }} {{ parameters.city|upper }}<br /><br />
                 Téléphone: {{ parameters.phone }}<br />
+                {% for i in 0..9 %}
+                    &nbsp;
+                {% endfor %}06 67 11 61 83<br />
                 Mail: {{ parameters.mail }}<br />
                 {{ parameters.site }}
             </td>

@@ -715,6 +715,7 @@ class InvoiceController extends AbstractController
                 
               }
             }
+            $recap_mails="";
             if($invoice->getCategory() == Invoice::CATEGORY_MANUAL){
                 if($cond_r_n){
                     $recap_mails="la rente sera envoyée à ".$mailTarget;
@@ -738,9 +739,7 @@ class InvoiceController extends AbstractController
                 if($cond_h_n){
                     $recap_mails.=" et les honoraires à ".$mailTarget2;
                 }
-                if(!empty($invoice->getMailCc())) {
-                    $recap_mails.=" et ".$mailTarget3;
-                }
+                
             }
             $status_choice=($invoice->getStatus() >= Invoice::STATUS_PAYED) ? '<span class="'.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</span>' : '<a id="invoice_'.$invoice->getId().'" href="#" data-id="'.$invoice->getId().'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_status" class="invoice-status m--font-bold '.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</a>';
             if($invoice->getType()===2){
