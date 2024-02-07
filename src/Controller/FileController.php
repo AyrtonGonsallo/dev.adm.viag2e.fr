@@ -280,7 +280,7 @@ class FileController extends AbstractController
         return $this->redirectToRoute('dashboard', [], 302);
     }
 	/**
-     * @Route("/file/list", name="fichier_list")
+     * @Route("/file/list", name="files_list")
      *
      * @param Request $request
      * @return Response

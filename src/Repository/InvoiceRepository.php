@@ -49,7 +49,7 @@ class InvoiceRepository extends ServiceEntityRepository
                 ->setParameter('end', $data['end']);
         }
 
-        if(!empty($data['month_concerned']) ) {
+        if(!empty($data['month_concerned']) && $data['month_concerned']!="all" ) {
             $query
                 ->andWhere('i.data like :month')
                 ->setParameter('month', '%"month_n":"'.$data['month_concerned'].'%');
