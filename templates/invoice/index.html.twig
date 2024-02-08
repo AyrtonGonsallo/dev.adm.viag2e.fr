@@ -29,7 +29,7 @@
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
                         <h3 class="m-portlet__head-text">
-                            Liste des factures | <a id="pending-only" href="#"><small><i id="pending-label">Voir les factures en attente de paiement</i></small></a>
+                            Liste des factures | <button class="btn btn-custom nmr-5 nml-10" id="all-invoices" type="button">Toutes</button><button class="btn btn-custom2" id="pending-invoices" type="button">En attente de paiement</button>
                         </h3>
                     </div>
                 </div>
@@ -376,7 +376,23 @@ $('#select_all').click(function() {
             
     });
                     $('#m_form_status').selectpicker().on('change', function() {
-                        datatable.search($(this).val().toLowerCase(), 'Status');
+                        val=$(this).val().toLowerCase()
+                        console.log("valeur "+val)
+                        month_concerned= $('#month_concerned').val()
+                        cat=get_category($("#m_form_category").val())
+                        stat=$("#m_form_status").val()
+                        type=$("#m_form_type").val()
+                        query = { 
+                            'month_concerned': month_concerned,
+                            'Category': cat , 
+                            'Status': val , 
+                            'generalSearch':$('#generalSearch').val(),
+                            'Type': type,
+                            'range': $('input[name="range"]').val(),
+                            'pending_only': pending_only ? 1 : 0
+                         };
+                        datatable.setDataSourceParam('query', query);
+                        datatable.reload();
                     });
                     function get_category(val){
                         if(val==4){
@@ -395,11 +411,41 @@ $('#select_all').click(function() {
                     $('#m_form_category').selectpicker().on('change', function() {
                         val=get_category($(this).val())
                         console.log("valeur "+val)
-                        datatable.search(val, 'Category');
+                        month_concerned= $('#month_concerned').val()
+                        //cat=$("#m_form_category").val()
+                        stat=$("#m_form_status").val()
+                        type=$("#m_form_type").val()
+                        query = { 
+                            'month_concerned': month_concerned,
+                            'Category': val , 
+                            'Status': stat , 
+                            'generalSearch':$('#generalSearch').val(),
+                            'Type': type,
+                            'range': $('input[name="range"]').val(),
+                            'pending_only': pending_only ? 1 : 0
+                         };
+                        datatable.setDataSourceParam('query', query);
+                        datatable.reload();
                     });
 
                     $('#m_form_type').selectpicker().on('change', function() {
-                        datatable.search($(this).val().toLowerCase(), 'Type');
+                        val=$(this).val().toLowerCase()
+                        console.log("valeur "+val)
+                        month_concerned= $('#month_concerned').val()
+                        cat=get_category($("#m_form_category").val())
+                        stat=$("#m_form_status").val()
+                        //type=$("#m_form_type").val()
+                        query = { 
+                            'month_concerned': month_concerned,
+                            'Category': val , 
+                            'Status': stat , 
+                            'generalSearch':$('#generalSearch').val(),
+                            'Type': val,
+                            'range': $('input[name="range"]').val(),
+                            'pending_only': pending_only ? 1 : 0
+                         };
+                        datatable.setDataSourceParam('query', query);
+                        datatable.reload();
                     });
 
                     $('#reload_data').on('click', function () {
@@ -426,16 +472,37 @@ $('#select_all').click(function() {
                             'month_concerned': val,
                             'Category': get_category(cat) , 
                             'Status': stat , 
-                            'Type': type 
+                            'Type': type,
+                            'generalSearch':$('#generalSearch').val(),
+                            'range': $('input[name="range"]').val(),
+                            'pending_only': pending_only ? 1 : 0
                          };
                         datatable.setDataSourceParam('query', query);
                         datatable.reload();
                         //datatable.search(val, 'Category');
                     });
 
-                    $('#pending-only').on('click', function () {
-                        pending_only = !pending_only;
-                        $('#pending-label').html(pending_only ? 'Voir toutes les factures' : 'Voir les factures en attente de paiement');
+                    $('#pending-invoices').on('click', function () {
+                        pending_only = true;
+                        $(this).css("background-color", "#5867dd");
+                        $('#all-invoices').css("background-color", "#878787");
+
+                        let query = datatable.getDataSourceParam('query');
+                        if(typeof query === 'object' && query !== null) {
+                            query = Object.assign(query, { 'pending_only': pending_only ? 1 : 0 });
+                        }
+                        else {
+                            query = { 'pending_only': pending_only ? 1 : 0 };
+                        }
+
+                        datatable.setDataSourceParam('pagination.page', 1);
+                        datatable.setDataSourceParam('query', query);
+                        datatable.reload();
+                    });
+                    $('#all-invoices').on('click', function () {
+                        pending_only = false;
+                        $(this).css("background-color", "#5867dd");
+                        $('#pending-invoices').css("background-color", "#878787");
 
                         let query = datatable.getDataSourceParam('query');
                         if(typeof query === 'object' && query !== null) {
