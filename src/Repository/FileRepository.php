@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\File;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -20,6 +22,50 @@ class FileRepository extends ServiceEntityRepository
         parent::__construct($registry, File::class);
     }
 
+    public function findAllOrdered(int $page, int $max, array $data)
+    {
+        $query = $this->createQueryBuilder('f')
+            ->orderBy('f.date', 'DESC');
+
+        if(!empty($data['start']) && !empty($data['end'])) {
+            $query
+                ->andWhere('f.date >= :start')
+                ->andWhere('f.date <= :end')
+                ->setParameter('start', $data['start'])
+                ->setParameter('end', $data['end']);
+        }
+
+        
+
+       
+
+        if(!empty($data['Type'])) {
+            $query->andWhere('f.type = :type')->setParameter('type', $data['Type']);
+        }
+
+        if(!empty($data['generalSearch'])) {
+            $query
+                
+                ->andWhere('f.name LIKE :search ')
+                ->setParameter('search', '%'.$data['generalSearch'].'%');
+        }
+
+        
+
+        $query = $query->getQuery();
+
+        $paginator = new Paginator($query);
+
+        $total = count($paginator);
+        $pagesCount = ceil($total / $max);
+
+        $paginator
+            ->getQuery()
+            ->setFirstResult($max * ($page - 1))
+            ->setMaxResults($max);
+
+        return ['total' => $total, 'pagesCount' => $pagesCount, 'data' => $paginator];
+    }
     // /**
     //  * @return File[] Returns an array of File objects
     //  */

@@ -1,10 +1,8 @@
 {% extends 'layout.html.twig' %}
 
-{% import "macros/forms.html.twig" as mforms %}
 {% block title %}Viag2e | Liste des documents{% endblock %}
 
 {% block body %}
-
     <div class="m-subheader">
         <div class="d-flex align-items-center">
             <div class="mr-auto">
@@ -17,100 +15,290 @@
                     <li class="m-nav__separator">-</li>
                     <li class="m-nav__item">
                         <a href="#" class="m-nav__link">
-                            <span class="m-nav__link-text">LISTE DES DOCUMENTS</span>
+                            <span class="m-nav__link-text">Facturation</span>
                         </a>
                     </li>
                 </ul>
             </div>
         </div>
     </div>
-    
+<div id="partie-reponse" class="m-content"></div>
     <div class="m-content">
         <div class="m-portlet m-portlet--mobile">
             <div class="m-portlet__head">
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
                         <h3 class="m-portlet__head-text">
-                            LISTE DES DOCUMENTS
+                            Liste des documents
                         </h3>
                     </div>
                 </div>
+                <div class="m-portlet__head-tools">
+                    <form action="{{ path('invoices') }}" method="post">
+                        <div class="form-group m-form__group m--margin-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control m-input m--margin-top-5" id="form-dates" name="range" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" id="reload_data" type="button">Valider</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="m-portlet__body" id="" role="">
+            <div class="m-portlet__body">
                 <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
                     <div class="row align-items-center">
-                        <div class="col-xl-8 order-2 order-xl-1">
+                        <div class="col-xl-12 order-2 order-xl-1">
                             <div class="form-group m-form__group row align-items-center">
-                                <div class="col-md-4">
+                                
+                                <div class="col-md-2">
                                     <div class="m-form__group m-form__group--inline">
                                         <div class="m-form__label">
-                                            <label class="m-label m-label--single" for="m_form_active">Type:</label>
+                                            <label class="m-label m-label--single" for="m_form_type">Type:</label>
                                         </div>
                                         <div class="m-form__control">
                                             <select class="form-control m-bootstrap-select" id="m_form_type">
                                                 <option value="">Tous</option>
-                                                <option value="Document">Documents</option>
-                                                <option value="Facture">Factures</option>
-                                                <option value="Recap">Recap</option>
+                                                <option value="{{ constant('App\\Entity\\File::TYPE_DOCUMENT') }}">Document</option>
+                                                <option value="{{ constant('App\\Entity\\File::TYPE_INVOICE') }}">Facture</option>
+                                                <option value="{{ constant('App\\Entity\\File::TYPE_RECAP') }}">Décompte annuel</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="d-md-none m--margin-bottom-10"></div>
                                 </div>
-                                <div class="col-md-4">
+                                
+                                <div class="col-md-2">
                                     <div class="m-input-icon m-input-icon--left">
-                                        <input type="text" class="form-control m-input" placeholder="Recherche..." id="fileSearch">
+                                        <input type="text" class="form-control m-input" placeholder="Recherche..." id="generalSearch">
                                         <span class="m-input-icon__icon m-input-icon__icon--left">
-                                    <span><i class="la la-search"></i></span>
-                                </span>
+                                            <span><i class="la la-search"></i></span>
+                                        </span>
                                     </div>
                                 </div>
+                               
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-primary" id="télécharger-tous">Télécharger sélection</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-xl-4 order-1 order-xl-2 m--align-right">
-                        
                         </div>
                     </div>
                 </div>
 
-                <table class="m-datatable-files" id="html_table" width="100%">
-                    <thead>
-                    <tr>
-                        <th title="Nom" data-field="Name">Nom</th>
-                        <th title="Number" data-field="Number">N° Fact</th>
-                        <th title="Type" data-field="Type">Type</th>
-                        <th data-field="Download"></th>
-                        <th data-field="Delete"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for file in fichiers %}
-                        <tr>
-                            <td>{{ file.name }}</td>
-                            <td>{% if file.type is constant('App\\Entity\\File::TYPE_INVOICE') and file.invoice is not empty %}{{ file.invoice.formattednumber }}{% endif %}</td>
-                            <td>{% if file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
-                            <td><a href="{{ path('file_download2', {'fileId': file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
-                            <td>{% if file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': file.driveId}) }}" data-name="{{ file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td align="center" colspan="4">Aucun Fichier</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <table class="m-datatable-invoices" id="html_table" width="100%"></table>
             </div>
-
         </div>
+        
     </div>
-{% endblock %}
-{% block scripts %}
- {{ encore_entry_script_tags('property') }}
-    {{ encore_entry_script_tags('property-billing') }}
-    {{ encore_entry_script_tags('html-table.warrants') }}
-    {{ encore_entry_script_tags('warrant') }}
+
+    
+
+
 {% endblock %}
 
-{% block styles %}
-    {{ encore_entry_link_tags('warrant') }}
+{% block scripts %}
+    {# encore_entry_script_tags('html-table.invoices') #}
+    <script type="text/javascript">
+        $(function() {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const parameter = urlParams.get('sorts')
+            if(parameter){
+                console.log(parameter.split("-"))
+            }
+           
+           
+
+            $('input[name="range"]').daterangepicker({
+                autoApply: true,
+                startDate: "{{ range_start }}",
+                endDate: "{{ range_end }}",
+            });
+
+            let DatatableHtmlInvoices = function() {
+                let datatable = false;
+                let pending_only = false;
+
+                let table = function() {
+                    datatable = $('.m-datatable-invoices').mDatatable({
+                        data: {
+                            saveState: {cookie: false},
+                            pageSize: 50,
+                            type: 'remote',
+                            source: {
+                                read: {
+                                    url: '{{ path('fileslist_data') }}',
+                                    method: 'POST',
+                                    map: function(raw) {
+                                        let dataSet = raw;
+                                        if (typeof raw.data !== 'undefined') {
+                                            dataSet = raw.data;
+                                        }
+                                        return dataSet;
+                                    },
+                                }
+                            },
+                            serverPaging: true,
+                            serverFiltering: true,
+                        },
+                        search: {
+                            input: $('#generalSearch'),
+                        },
+                        columns: [
+                             {
+                                field: 'Selected',
+                            },
+                            {
+                                field: 'Name',
+                                title: 'Nom',
+                            },
+                            {
+                                field: 'Date',
+                                title: 'Date',
+                            },
+                            {
+                                field: 'Number',
+                                title: 'N°',
+                            },
+                           
+                            {
+                                field: 'Type',
+                                title: 'Type',
+                                type: 'string',
+                            },
+                            {
+                                field: 'Download',
+                            },
+                        ],
+                        toolbar: {
+                            items: {
+                                pagination: {
+                                    pageSizeSelect: [50, 100, 150, 200, 250, 500]
+                                }
+                            }
+                        }
+                    });
+
+                    $('#html_table > thead > tr > th:nth-child(1) > span').html("<input type='checkbox' id='select_all'>")
+                    $('#select_all').click(function() {
+
+                            elements=$('input[type="checkbox"]')
+                            if( $('#select_all').is(':checked') ){
+                                $.each(elements, function(key, value) {
+                                    $(value).prop( "checked", true );
+                                });
+                            }else{
+                                $.each(elements, function(key, value) {
+                                    $(value).prop( "checked", false );
+                                });
+                            }
+                            
+                    });
+                                    
+                                
+                   
+
+                    $('#m_form_type').selectpicker().on('change', function() {
+                        datatable.search($(this).val().toLowerCase(), 'Type');
+                    });
+
+                    $('#reload_data').on('click', function () {
+                        let query = datatable.getDataSourceParam('query');
+                        if(typeof query === 'object' && query !== null) {
+                            query = Object.assign(query, { 'range': $('input[name="range"]').val() });
+                        }
+                        else {
+                            query = { 'range': $('input[name="range"]').val() };
+                        }
+
+                        datatable.setDataSourceParam('pagination.page', 1);
+                        datatable.setDataSourceParam('query', query);
+                        datatable.reload();
+                    });
+
+                    
+                    
+                };
+
+                return {
+                    //== Public functions
+                    init: function() {
+                        // init table
+                        table();
+                    },
+                };
+            }();
+
+            jQuery(document).ready(function() {
+                DatatableHtmlInvoices.init();
+            });
+        });
+
+        
+
+    function forceDownload(url, fileName){
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "blob";
+    xhr.onload = function(){
+        var urlCreator = window.URL || window.webkitURL;
+        var imageUrl = urlCreator.createObjectURL(this.response);
+        var tag = document.createElement('a');
+        tag.href = imageUrl;
+        tag.download = fileName;
+        document.body.appendChild(tag);
+        tag.click();
+        document.body.removeChild(tag);
+    }
+    xhr.send();
+}
+
+    $('#télécharger-tous').click(function() {
+            let route = "{{ path('get_selected_files',{'type':'télécharger-tous'}) }}";
+            selected_ids=[];
+            elements=$('input[type="checkbox"]').filter(function() {  
+                return $(this).is(':checked') && $(this).not('#select_all');
+            })
+            if($('#select_all').is(':checked')){
+                console.log("retirer le premier")
+                elements=elements.slice(1, elements.length)
+            }
+            console.log( 'elements: ',elements );
+             $.each(elements, function(key, value) {
+                name=$(value).attr("name");
+                fullname=name;
+                id=name.split("_")[1];
+                selected_ids.push(
+                    {
+                        "fullname":fullname,
+                        "id":id,
+                    }
+                )
+            });
+            console.log( 'sent: ',selected_ids );
+            $.ajax({
+                type: 'POST',
+                dataType: "json",
+                url:route,
+                data: {"ids":selected_ids},
+                success: function(data) {
+                    
+                    results=data["results"]
+                    console.log('received: ',results)
+                    $.each(results, function(key, value) {
+                        
+                        lien=value[0]
+                        nom=value[1]["name"]
+                        forceDownload(lien, nom)
+                        
+                    });
+                    $('#partie-reponse').html('<div class="m-content"><div class="alert alert-pad alert-success">Fichiers téléchargés</div></div>');
+
+                    
+                }
+            });
+    });
+    
+    </script>
 {% endblock %}

@@ -279,26 +279,5 @@ class FileController extends AbstractController
         $this->addFlash('danger', 'Fichier introuvable');
         return $this->redirectToRoute('dashboard', [], 302);
     }
-	/**
-     * @Route("/file/list", name="files_list")
-     *
-     * @param Request $request
-     * @return Response
-     * @throws Exception
-     */
-    public function view(Request $request){
-        $fichiers = $this->getDoctrine()
-        ->getRepository(File::class)
-        ->findBy(array(), ['id' => 'DESC'], 100, 0);
-
-        if (empty($fichiers)) {
-            $this->addFlash('danger', 'Aucun honoraire n\'est enregistré');
-        }
-        return $this->render('file/list-files.html.twig', [
-            
-            'fichiers'  => $fichiers,
-            
-            
-        ]);
-    }
+	
 }
