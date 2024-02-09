@@ -26,7 +26,7 @@ class FileRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('f')
             ->orderBy('f.date', 'DESC');
-
+        $query->andWhere('not f.type = 2');
         if(!empty($data['start']) && !empty($data['end'])) {
             $query
                 ->andWhere('f.date >= :start')

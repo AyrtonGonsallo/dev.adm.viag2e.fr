@@ -58,7 +58,7 @@ class DashboardController extends AbstractController
         ->select("p")
         ->from('App\Entity\Property', 'p')
         ->where('p.revaluation_date like :date')
-        ->setParameter('date', '%-'.date("m").'%')
+        ->setParameter('date', '%-'.intval(date("m",strtotime('first day of +1 month'))).'%')
             ->orderBy('p.revaluation_date', 'ASC');
         $query2 = $qb2->getQuery();
         // Execute Query

@@ -345,6 +345,7 @@ class RecapCommand extends Command
             $file->setType(File::TYPE_RECAP);
             $file->setName("[RECAP] {$recap->getFileTypeString()} {$data['year']} #{$property->getId()}");
             $file->setRecap($recap);
+            $file->setProperty($property);
             $file->setWarrant($property->getWarrant());
             $file->setDriveId($this->drive->addFile($file->getName(), $filePath, File::TYPE_RECAP, $property->getWarrant()->getId()));
             $this->manager->persist($file);
