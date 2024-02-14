@@ -678,7 +678,12 @@ class InvoiceController extends AbstractController
                        
                     }
                     if($cond_r_n){
-                        $mailTarget1=$invoice->getProperty()->getBuyerMail1();
+                        if($invoice->getProperty()->getDebirentierDifferent()){
+                            $mailTarget1=$invoice->getProperty()->getEmailDebirentier();
+                        }else{
+                            $mailTarget1=$invoice->getProperty()->getWarrant()->getMail1();
+                        }
+                       
                        
                     }
                 }else{

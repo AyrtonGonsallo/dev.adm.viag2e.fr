@@ -90,14 +90,6 @@
                         <td>{{ data.label }}</td>
                         <td>{{ data.amount|number_format(2, '.', ' ') }} €</td>
                     </tr>
-					<tr>
-                        <td>TVA 20% :</td>
-                        <td>{{ data.amount|number_format(2, '.', ' ')*0.2 }} €</td>
-                    </tr>
-					<tr>
-                        <td>Total TTC :</td>
-                        <td>{{ data.amount|number_format(2, '.', ' ') + (data.amount|number_format(2, '.', ' ')*0.2) }} €</td>
-                    </tr>
                     </tbody>
                 </table>
                
