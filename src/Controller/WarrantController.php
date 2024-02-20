@@ -110,6 +110,7 @@ class WarrantController extends AbstractController
             ->findBy(['type' => Warrant::getTypeId($request->get('type'))]);
 
         $warrant = new Warrant();
+        $warrant->setBankIcs('FR12ZZZ886B32');
         $form = $this->createForm(WarrantFormType::class, $warrant);
         $form->handleRequest($request);
         $form_mail = $this->createForm(MailFormType::class, new Mail(), ['action' => $this->generateUrl('mail_add2', ['type' => $request->get('type')])]);

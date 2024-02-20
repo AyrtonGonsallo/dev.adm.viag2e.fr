@@ -36,6 +36,20 @@ class InvoiceRepository extends ServiceEntityRepository
             return 3;
         }
     }
+
+
+
+    public function findToSeparate(int $max){
+        return $this->createQueryBuilder('i')
+        ->where('i.file IS NOT NULL')
+        ->andWhere('i.file2 IS NOT NULL')
+        ->orderBy('i.id', 'DESC')
+        ->setMaxResults($max)
+        ->getQuery()
+        ->getResult();
+    }
+
+
     public function findAllOrdered(int $page, int $max, array $data)
     {
         $query = $this->createQueryBuilder('i')

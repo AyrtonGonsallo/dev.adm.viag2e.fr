@@ -135,6 +135,16 @@ class Invoice implements JsonSerializable
 
         return $this;
     }
+
+    public function removeFile(int $id)
+    {
+        if($id==1){
+            $this->file = null;
+        }else if($id==2){
+            $this->file2 = null;
+        }  
+        
+    }
 	
     public function getType(): ?int
     {

@@ -1,5 +1,5 @@
 <style type="text/css">
-    <!--
+    
     table { vertical-align: top; }
     tr    { vertical-align: top;}
     td    { vertical-align: top; }
@@ -10,22 +10,22 @@
         th,td {
   border: inherit;
 }
-    -->
+    
 </style>
-<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt">
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt;">
     <bookmark title="Facture" level="0" ></bookmark>
-    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px">
-        <tr>
-            <td style="text-align: left; width: 50%; border:none">
-                <img style="width: 200px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+    <table cellspacing="0" style="font-size: 10pt;margin-right:4%;margin-left:4%;width: 92%;text-align:center;">
+        <tr style=" border: solid 1px black;">
+            <td style="text-align: left; width: 40%; border:none">
+                <img style="position:absolute;top:10px" src="{{ pdf_logo_path }}" alt="Logo"><br />
             </td>
-            <td style="width: 50%; border:none">
+            <td style="width: 60%; border:none">
                 <span style="font-size: 13pt;color:#b6bec5"><b style="color:#b6bec5">SPÉCIALISTE TRANSACTIONS VIAGÈRES<br />EXPERTISE ET ACCOMPAGNEMENT</b></span><br />
                 
             </td>
         </tr>
-        <tr>
-            <td style="text-align: left; width: 50%; display: flex; align-items: start; border:none">
+        <tr style=" border: solid 1px black;">
+            <td style="text-align: left; width: 40%; display: flex; align-items: start; border:none">
                 Vincent GIBELIN - Directeur <br />
                 58, rue Fondaudège <br />
                 33000 BORDEAUX <br />
@@ -33,12 +33,12 @@
                 Email : gestion@univers-viager.fr <br />
                 Site internet : www.univers-viager.fr <br />
             </td>
-            <td style="width: 50%; border:none">
+            <td style="width: 60%; border:none">
                
                 {{ parameters.city|title }}, le {{ data.current_day }}
                 <br /><br />
                 <b style="text-align:left;">
-                    <br />{{data.form.civilite}} 
+                    <br />
                     {% if data.target =='Crédirentier' %} {{data.property.getFirstname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %} {% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}
                     {% if data.target =='Crédirentier' %} {{data.property.getLastname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %} {% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}&nbsp;
                     <br />
@@ -50,6 +50,7 @@
             </td>
         </tr>
     </table>
+    <div style="margin-right:4%;margin-left:4%;">
     <br />
    <br />
    <br />
@@ -91,7 +92,31 @@
     {% for i in 0..5 %}
         &nbsp;
     {% endfor %}
-    {% if data.not_assurance_habit %} {{data.texte_assurance_habit}}. {% endif %}
+    {% if data.not_assurance_habit or data.not_assurance_chemine or data.not_assurance_chaudiere or data.not_assurance_climatisation %}Je vous remercie de bien vouloir nous faire parvenir:<br>{% endif %}
+    {% if data.not_assurance_habit %}
+        {% for i in 0..10 %}
+            &nbsp;
+        {% endfor %}
+        - {{data.texte_assurance_habit}}
+     {% endif %}<br>
+    {% if data.not_assurance_chemine %} 
+        {% for i in 0..10 %}
+            &nbsp;
+        {% endfor %}
+        - {{data.texte_assurance_chemine}}
+    {% endif %}<br>
+    {% if data.not_assurance_chaudiere %} 
+        {% for i in 0..10 %}
+            &nbsp;
+        {% endfor %}
+        - {{data.texte_assurance_chaudiere}}
+    {% endif %}<br>
+    {% if data.not_assurance_climatisation %} 
+        {% for i in 0..10 %}
+            &nbsp;
+        {% endfor %}
+        - {{data.texte_assurance_climatisation}}
+    {% endif %}<br>
   <br /><br />
     {% for i in 0..5 %}
         &nbsp;
@@ -105,10 +130,11 @@
     <br />
     <br />
      <br /> <br /> <br />
-{% for i in 0..300 %}
+{% for i in 0..280 %}
     &nbsp;
 {% endfor %}
 Vincent GIBELIN,
+</div>
 </page>
 <page_footer>
     <table cellspacing="0" style="width: 100%; text-align: center; font-size: 10px;">

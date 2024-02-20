@@ -742,7 +742,7 @@ class InvoiceController extends AbstractController
                     $recap_mails="la rente sera envoyée à ".$mailTarget1;
                 }
                 if($cond_h_n){
-                    $recap_mails.=" et les honoraires à ".$mailTarget2;
+                    $recap_mails.="les honoraires seront envoyés à ".$mailTarget2;
                 }
                 
             }

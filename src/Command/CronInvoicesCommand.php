@@ -168,6 +168,42 @@ class CronInvoicesCommand extends Command
             }
         }
 
+        
+        $io->comment('separer les factures ');
+        
+        $invoices_to_validate = $this->manager
+            ->getRepository(Invoice::class)
+            ->findToSeparate(500);
+        foreach ($invoices_to_validate as $invoice_to_validate) {
+            $io->note("Séparation facture numero ({$invoice_to_validate->getNumber()}) en cours...");
+            $invoice = new Invoice();
+            $data_h=$invoice_to_validate->getData();
+            $data_r=$invoice_to_validate->getData();
+            $data_h["amount"]=0;
+            $data_h['property']['annuity']=0;
+            $data_r['property']['honoraryRates']=0;
+            $data_r['property']['honoraryRatesTax']=0;
+            $data_r["montantht"]=0;
+            $invoice->setNumber( $invoice_to_validate->getNumber());
+            $invoice->setFile2($invoice_to_validate->getFile2());
+            $invoice->setType($invoice_to_validate->getType());
+            $invoice->setCategory($invoice_to_validate->getCategory());
+            $invoice->setDate($invoice_to_validate->getDate());
+            $invoice->setData($data_h);
+            $invoice->setProperty($invoice_to_validate->getProperty());
+            $invoice->setStatus($invoice_to_validate->getStatus());
+            $invoice->setReceipt($invoice_to_validate->getReceipt());
+            $this->manager->persist($invoice);
+            $invoice_to_validate->setData($data_r);
+            $invoice_to_validate->removeFile(2);
+            $this->manager->persist($invoice_to_validate);
+            $this->manager->flush();
+           
+
+        }
+
+
+
         $io->comment('Processing otp invoices');
         $pendingInvoices = $this->manager
             ->getRepository(PendingInvoice::class)
@@ -309,7 +345,8 @@ class CronInvoicesCommand extends Command
             }
 
         }
-        if (date('d') >= 20) {
+
+        if (date('d') < 20) {
             // Quarterly invoices ce sont les charges de copro
             if(in_array(date('m'), [12, 3, 6, 9])) { //$d->format('m')
                 $date=new DateTime('last day of last month');
@@ -721,6 +758,11 @@ class CronInvoicesCommand extends Command
             $invoice = new Invoice();
             $invoice->setCategory($category);
             $invoice->setType($data['type']);
+            $invoice2 = new Invoice();
+            $invoice2->setCategory($category);
+            $invoice2->setType($data['type']);
+            
+
             $cond_h_n=($filePath2 != -1)?true:false; //honoraires nuls ?
             $cond_r_n=($filePath != -1)?true:false; //rente nulle ?
            
@@ -753,16 +795,32 @@ class CronInvoicesCommand extends Command
             }
 			//$invoice->setFile($file);
             $invoice->setNumber($data['number_int']);
-            $invoice->setData($data);
+            $invoice2->setNumber($data['number_int']);
+            $data_h=$data;
+            $data_r=$data;
+            $data_h["amount"]=0;
+            $data_h['property']['annuity']=0;
+            $data_r['property']['honoraryRates']=0;
+            $data_r['property']['honoraryRatesTax']=0;
+            $data_r["montantht"]=0;
+            $invoice->setData($data_r);
+            $invoice2->setData($data_h);
             if($cond_r_n){
                 $invoice->setFile($file);
             }
             if($cond_h_n){
-                $invoice->setFile2($file2);
+                $invoice2->setFile2($file2);
             }
             $invoice->setDate(new DateTime());
             $invoice->setProperty($property);
-            $this->manager->persist($invoice);
+            $invoice2->setDate(new DateTime());
+            $invoice2->setProperty($property);
+            if($cond_r_n){
+                $this->manager->persist($invoice);
+            }
+            if($cond_h_n){
+                $this->manager->persist($invoice2);
+            }
             if(!$cond_h_n && !$cond_r_n){
 				if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){	
                 $io->note("no file created ");
@@ -853,17 +911,21 @@ class CronInvoicesCommand extends Command
             
                             if (!$this->areMailsDisabled() && $this->mailer->send($message1)) {
                                 $invoice->setStatus(Invoice::STATUS_SENT);
+                                $invoice2->setStatus(Invoice::STATUS_SENT);
                                 $io->note("mail mandat vendeur envoyé avec les honoraires aux mandants ".$invoice->getProperty()->getWarrant()->getMail1()." et ".$invoice->getMailCc());
                             } else {
                                 $invoice->setStatus(Invoice::STATUS_UNSENT);
+                                $invoice2->setStatus(Invoice::STATUS_UNSENT);
                             }
                         }
                         if($cond_r_n){
                             if (!$this->areMailsDisabled() && $this->mailer->send($message2)) {
                                 $invoice->setStatus(Invoice::STATUS_SENT);
+                                $invoice2->setStatus(Invoice::STATUS_SENT);
                                 $io->note("mail mandat vendeur envoyé avec la rente au buyer /acquereur/acheteur ".$invoice->getProperty()->getBuyerMail1());
                             } else {
                                 $invoice->setStatus(Invoice::STATUS_UNSENT);
+                                $invoice2->setStatus(Invoice::STATUS_UNSENT);
                             }
                         }
                         
@@ -876,9 +938,11 @@ class CronInvoicesCommand extends Command
         
                         if (!$this->areMailsDisabled() && $this->mailer->send($message)) {
                             $invoice->setStatus(Invoice::STATUS_SENT);
+                            $invoice2->setStatus(Invoice::STATUS_SENT);
                             $io->note("mail envoyé ");
                         } else {
                             $invoice->setStatus(Invoice::STATUS_UNSENT);
+                            $invoice2->setStatus(Invoice::STATUS_UNSENT);
                         }
                     }    
                     
@@ -889,14 +953,17 @@ class CronInvoicesCommand extends Command
         
                         if (!$this->areMailsDisabled() && $this->mailer->send($message)) {
                             $invoice->setStatus(Invoice::STATUS_SENT);
+                            $invoice2->setStatus(Invoice::STATUS_SENT);
                             $io->note("mail envoyé ");
                         } else {
                             $invoice->setStatus(Invoice::STATUS_UNSENT);
+                            $invoice2->setStatus(Invoice::STATUS_UNSENT);
                         }
                   }
             
         } else {
             $invoice->setStatus(Invoice::STATUS_UNSENT);
+            $invoice2->setStatus(Invoice::STATUS_UNSENT);
         }
 
             //@unlink($this->pdf_dir . $fileName);

@@ -39,7 +39,7 @@ class WarrantFormType extends AbstractType
             ->add('bank_domiciliation', TextType::class, ['required' => false])
             ->add('bank_iban', TextType::class, ['required' => false])
             ->add('bank_bic', TextType::class, ['required' => false])
-            ->add('bank_ics', TextType::class, ['required' => false])
+            ->add('bank_ics', TextType::class, ['required' => false,'disabled' => 'true',])
             ->add('rum', TextType::class, ['required' => false])
         ;
     }

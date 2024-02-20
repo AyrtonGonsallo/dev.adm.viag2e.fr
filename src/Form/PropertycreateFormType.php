@@ -38,9 +38,28 @@ class PropertycreateFormType extends AbstractType
             ->add('city', TextType::class)
             ->add('country', TextType::class)
             ->add('firstname1', TextType::class)
-            ->add('lastname1', TextType::class)
-          
-            ->add('dateofbirth1', BirthdayType::class, ['format' => 'dd-MMM-yyyy'])
+            ->add('lastname1', TextType::class);
+
+            if($options['data']->getType()==2){
+                $builder->add('buyerFirstname', TextType::class, ['required' => false])
+                ->add('buyerLastname', TextType::class, ['required' => false])
+                ->add('buyerAddress', TextType::class, ['required' => false])
+                ->add('buyerPostalCode', TextType::class, ['required' => false])
+                ->add('buyerCity', TextType::class, ['required' => false])
+                ->add('buyerCountry', TextType::class, ['required' => false])
+                ->add('buyerPhone1', TextType::class, ['required' => false])
+                ->add('buyerPhone2', TextType::class, ['required' => false])
+                ->add('buyerMail1', TextType::class, ['required' => false])
+                ->add('buyerMail2', TextType::class, ['required' => false])
+                ->add('buyer_bank_establishment_code', TextType::class, ['required' => false])
+                ->add('buyer_bank_code_box', TextType::class, ['required' => false])
+                ->add('buyer_bank_account_number', TextType::class, ['required' => false])
+                ->add('buyer_bank_key', TextType::class, ['required' => false])
+                ->add('buyer_bank_domiciliation', TextType::class, ['required' => false])
+                ->add('buyer_bank_iban', TextType::class, ['required' => false])
+                ->add('buyer_bank_bic', TextType::class, ['required' => false]);
+            }
+            $builder->add('dateofbirth1', BirthdayType::class, ['format' => 'dd-MMM-yyyy'])
             ->add('firstname2', TextType::class, ['required' => false])
             ->add('lastname2', TextType::class, ['required' => false])
             ->add('dateofbirth2', BirthdayType::class, ['required' => false, 'format' => 'dd-MMM-yyyy'])

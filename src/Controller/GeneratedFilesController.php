@@ -236,7 +236,7 @@ class GeneratedFilesController extends AbstractController
                     $file->setName($fileName);
                     $file->setWarrant($property->getWarrant());
                     $file->setProperty($property);
-                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path.'/'.$fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
                     $manager->flush();
@@ -338,7 +338,7 @@ class GeneratedFilesController extends AbstractController
                     $file->setType(File::TYPE_DOCUMENT);
                     $file->setName($fileName);
                     $file->setWarrant($property->getWarrant());
-                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path.'/'.$fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
                     $manager->flush();
@@ -582,7 +582,7 @@ class GeneratedFilesController extends AbstractController
                     $file->setDate($now_date);
                     $file->setWarrant($property->getWarrant());
                     $file->setProperty($property);
-                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path.'/'.$fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
                     $manager->flush();
@@ -806,7 +806,7 @@ class GeneratedFilesController extends AbstractController
                     $file->setName($fileName);
                     $file->setWarrant($property->getWarrant());
                     $file->setProperty($property);
-                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path.'/'.$fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
                     $manager->flush();
@@ -884,6 +884,7 @@ class GeneratedFilesController extends AbstractController
             'choices'  => [
                 'Cher Monsieur' => "Cher Monsieur",
                 'Chère Madame' => "Chère Madame",
+                'Chère Madame, Cher Monsieur' => "Chère Madame, Cher Monsieur",
             ],
             
         ])
@@ -891,6 +892,7 @@ class GeneratedFilesController extends AbstractController
             'choices'  => [
                 'Monsieur' => "Monsieur",
                 'Madame' => "Madame",
+                'Madame, Monsieur' => "Madame, Monsieur",
             ],
         ])
         ->add('date_virement', DateType::class, [ 
@@ -950,7 +952,7 @@ class GeneratedFilesController extends AbstractController
 
                 $data = [
                     'date'       => $now_date,
-                    'current_day'       => strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') )),
+                    'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
                     'annee'       => $now_date->format('Y'),
                     'date_a_f'       => $now_date->format('d/m/Y'),
                     'property'   => $property,
@@ -967,7 +969,14 @@ class GeneratedFilesController extends AbstractController
                     "debirentier_different" => null,
                     "target" => null,
                     "not_assurance_habit" => ($property->date_assurance_habitation && $property->date_assurance_habitation < $now_date )?true:false,
-                    "texte_assurance_habit" => "Je vous remercie de bien vouloir nous faire parvenir votre attestation d’assurance habitation couvrant l’année ".$now_date->format('Y'),
+                    "texte_assurance_habit" => "votre attestation d’assurance habitation couvrant l’année ".$now_date->format('Y'),
+                    "not_assurance_chemine" => ($property->date_cheminee && $property->date_cheminee < $now_date )?true:false,
+                    "texte_assurance_chemine" => "votre attestation d’assurance cheminée couvrant l’année ".$now_date->format('Y'),
+                    "not_assurance_chaudiere" => ($property->date_chaudiere && $property->date_chaudiere < $now_date )?true:false,
+                    "texte_assurance_chaudiere" => "votre attestation d’assurance chaudière couvrant l’année ".$now_date->format('Y'),
+                    "not_assurance_climatisation" => ($property->date_climatisation && $property->date_climatisation < $now_date )?true:false,
+                    "texte_assurance_climatisation" => "votre attestation d’assurance climatisation couvrant l’année ".$now_date->format('Y'),
+                    
                     "date_virement" => strftime("%B %Y", strtotime( $date_virement->format('d-m-Y') )),
                     "date_revision" => strftime("%B %Y", strtotime( $date_revision->format('d-m-Y') )),
                     "fd_next_month_d_m_y" => strftime("%d %B %Y", strtotime( $date_fdnm->format('d-m-Y') )),
@@ -1016,7 +1025,7 @@ class GeneratedFilesController extends AbstractController
                     $file->setName($fileName);
                     $file->setWarrant($property->getWarrant());
                     $file->setProperty($property);
-                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path.'/'.$fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
                     $manager->flush();
@@ -1169,7 +1178,7 @@ class GeneratedFilesController extends AbstractController
                     $file->setName($fileName);
                     $file->setWarrant($property->getWarrant());
                     $file->setProperty($property);
-                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path . $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path.'/'.$fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($file);
                     $manager->flush();
