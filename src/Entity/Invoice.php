@@ -231,6 +231,8 @@ class Invoice implements JsonSerializable
     public function getData(): ?array
     {
         $this->data['date']['month']=$this->getMonthfromNumber( $this->data['date']['month_n']);
+       
+        
         return $this->data;
     }
 
@@ -418,7 +420,7 @@ class Invoice implements JsonSerializable
     public function getMailSubject()
     {
         if($this->getCategory() === self::CATEGORY_MANUAL) {
-            return $this->getTypeString() . " {$this->getData()['period']} " . $this->getProperty()->getTitle();
+            return $this->getTypeString() . " ".utf8_decode($this->getData()['period'])." .".$this->getProperty()->getTitle();
         }
         return $this->getTypeString() . " {$this->getData()['date']['month']} {$this->getData()['date']['year']} " . $this->getProperty()->getTitle();
     }

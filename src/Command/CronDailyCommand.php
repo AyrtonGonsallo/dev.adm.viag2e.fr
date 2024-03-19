@@ -168,6 +168,7 @@ class CronDailyCommand extends Command
                 $notification = new Notification();
                 $notification->setProperty(null);
                 $notification->setType("ipc-non-renseigne");
+                $notification->setStatus(1);
                 $notification->setData(['message' => 'ménages','date'=> $now_date->format('m-Y')]);
                 $notification->setExpiry(new DateTime('tomorrow noon'));
                 $this->manager->persist($notification);
@@ -179,6 +180,7 @@ class CronDailyCommand extends Command
                 $notification = new Notification();
                 $notification->setProperty(null);
                 $notification->setType("ipc-non-renseigne");
+                $notification->setStatus(1);
                 $notification->setData(['message' => 'og2i','date'=> $now_date->format('m-Y')]);
                 $notification->setExpiry(new DateTime('tomorrow noon'));
                 $this->manager->persist($notification);
@@ -190,6 +192,7 @@ class CronDailyCommand extends Command
                 $notification = new Notification();
                 $notification->setProperty(null);
                 $notification->setType("ipc-non-renseigne");
+                $notification->setStatus(1);
                 $notification->setData(['message' => 'urbains','date'=> $now_date->format('m-Y')]);
                 $notification->setExpiry(new DateTime('tomorrow noon'));
                 $this->manager->persist($notification);
@@ -206,6 +209,7 @@ class CronDailyCommand extends Command
                 $io->note('Property comment: '.$comment->getMessage().' expiring the '.$comment->getDateButoir()->format('d-m-Y h:m:s').' added the '.$comment->getDate()->format('d-m-Y h:m:s').' is expired');
                 $notification = new Notification();
                 $notification->setProperty($p);
+                $notification->setStatus(1);
                 $notification->setType("suivi-message-expiration");
                 $notification->setData(['message' => $comment->getMessage(),'date'=> $comment->getDate()->format('d-m-Y h:m:s'), 'route' => $this->router->generate('property_view', ['propertyId' => $p->getId()], UrlGeneratorInterface::ABSOLUTE_URL)]);
                 $notification->setExpiry(new DateTime('tomorrow noon'));
@@ -215,6 +219,7 @@ class CronDailyCommand extends Command
                 $io->note('Property comment: '.$comment->getMessage().' expiring the '.$comment->getDateButoir()->format('d-m-Y h:m:s').' added the '.$comment->getDate()->format('d-m-Y h:m:s').' will expire in less than 1 day');
                 $notification = new Notification();
                 $notification->setProperty($p);
+                $notification->setStatus(1);
                 $notification->setType("suivi-message-expiration-warning");
                 $notification->setData(['message' => $comment->getMessage(),'date'=> $comment->getDate()->format('d-m-Y'), 'route' => $this->router->generate('property_view', ['propertyId' => $p->getId()], UrlGeneratorInterface::ABSOLUTE_URL)]);
                 $notification->setExpiry(new DateTime('tomorrow noon'));

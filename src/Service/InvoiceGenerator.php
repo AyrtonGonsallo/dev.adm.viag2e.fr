@@ -41,7 +41,9 @@ class InvoiceGenerator
             $pdf->pdf->SetDisplayMode('fullpage');
             if(empty($data['recursion']))
                 $data['recursion'] = Invoice::RECURSION_MONTHLY;
-
+                $data['reason'] = utf8_decode($data['reason']);
+                $data['label'] = utf8_decode($data['label']);
+                $data['property']['address'] = utf8_decode($data['property']['address']);
             switch ($data['recursion']) {
                 case Invoice::RECURSION_OTP:
 					if($data['amount']==-1){
@@ -85,7 +87,10 @@ class InvoiceGenerator
             $pdf2->pdf->SetDisplayMode('fullpage');
             if(empty($data['recursion']))
                 $data['recursion'] = Invoice::RECURSION_MONTHLY;
-
+                $data['reason'] = utf8_decode($data['reason']);
+                $data['label'] = utf8_decode($data['label']);
+                $data['property']['address'] = utf8_decode($data['property']['address']);
+                
             switch ($data['recursion']) {
                 case Invoice::RECURSION_OTP:
 					if($data['montantht']==-1){

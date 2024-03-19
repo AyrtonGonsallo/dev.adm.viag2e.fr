@@ -1,0 +1,82 @@
+<style type="text/css">
+    <!--
+    table { vertical-align: top; }
+    tr    { vertical-align: top; }
+    td    { vertical-align: top; }
+    -->
+</style>
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt;">
+    <bookmark title="Facture" level="0" ></bookmark>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px;margin-right:4%;margin-left:4%;width: 92%">
+       <tr>
+            <td style="text-align: left; width: 40%;">
+                <img style="width: 150px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+                
+            </td>
+            <td style="width: 60%; padding-top: 25px;">
+                <span style="font-size: 13pt;color:#b6bec5"><b style="color:#b6bec5">SPÉCIALISTE TRANSACTIONS VIAGÈRES<br />EXPERTISE ET ACCOMPAGNEMENT</b></span><br />   
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: left; width: 40%;">
+                Vincent GIBELIN <br />
+                Expert immobilier agréé par le CNE <br />
+                {{ parameters.address|raw }},
+                {{ parameters.postalcode }} {{ parameters.city|upper }}<br />
+                Téléphone: {{ parameters.phone }} - 06.67.11.61.83 <br />
+                Mail: info@univers-viager.fr<br />
+                Site internet : www.univers-viager.fr <br />
+            </td>
+            <td style="width: 60%; padding-top: 25px;">
+                {{ parameters.city|title }}, le {{ current_day }}
+                <br /><br /><br />
+                
+                   <b>
+                        {{ dest.name }} <br />
+                        {{ dest.address }}<br />
+                        {{ dest.postalcode }} {{ dest.city }}</b>
+                
+            </td>
+        </tr>
+    </table>
+    <br />
+    <br />
+    <div style="margin-right:4%;margin-left:4%;width: 92%">
+                            <br /><br />
+                            {% for i in 0..5 %}
+                                &nbsp;
+                            {% endfor %}
+                            Madame, Monsieur,<br /><br />
+                            {% for i in 0..5 %}
+                                &nbsp;
+                            {% endfor %}
+                            Veuillez trouver ci-dessous les montants correspondant au total des rentes  à verser pour le mois de {{date}}. <br />
+                           {% for i in 0..5 %}
+                                &nbsp;
+                            {% endfor %}
+                           <b>Rentes Opale Business 2 : {{somme}} €</b><br />
+                           {% for i in 0..5 %}
+                                &nbsp;
+                            {% endfor %}
+                           Nous restons, bien entendu, à votre disposition pour tous renseignements
+complémentaires et vous prions de croire en l’expression de nos sincères salutations.<br /><br />
+                                <br /> <br /> <br />
+                            {% for i in 0..30 %}
+                                &nbsp;
+                            {% endfor %}
+                            Vincent GIBELIN,
+               </div>         
+</page>
+<page_footer>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 10px;">
+        <tr>
+            <td style="width: 100%;">
+                UNIVERS VIAGER - Siège social : 58 Rue Fondaudège 33000 BORDEAUX, SARL au capital de 5 000 €<br/>
+                TVA FR27523654408 - Immatriculée au RCS Bordeaux N°523 654 408<br />
+                Garantie financière GALIAN 89 rue de la Boétie 75008 PARIS Montant : 120 000 €<br />
+                Carte Professionnelle Transaction et Gestion immobilière n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br />
+                « Notre agence ne détient aucun fonds pour le compte de ses clients »
+            </td>
+        </tr>
+    </table>
+</page_footer>

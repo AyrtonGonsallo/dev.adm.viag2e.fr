@@ -45,6 +45,7 @@
                                     <span class="m-list-timeline__badge m-list-timeline__badge--{{ randomColor() }}"></span>
                                     <span class="m-list-timeline__text">{{ notification.text|raw  }}</span>
                                     <span class="m-list-timeline__time">{{ notification.time  }}</span>
+                                    <span class="m-list-timeline__time" ><a href="{{ path('valider_notification', {'id': notification.id}) }}" >valider</a></span>
                                 </div>
                                 {% else %}
                                     <div class="text-center">RAS<br />Tout est en ordre</div>

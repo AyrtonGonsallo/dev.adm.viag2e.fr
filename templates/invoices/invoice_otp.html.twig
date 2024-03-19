@@ -33,6 +33,10 @@
                     {{ data.property.lastname }} {{ data.property.firstname }}<br />
                     {{ data.property.address }}<br />
                     {{ data.property.postalcode }} {{ data.property.city }}
+                {% elseif data.target == 4 %}
+                    {{ data.debirentier.prenom_debirentier }} {{ data.debirentier.nom_debirentier }}<br />
+                    {{ data.debirentier.addresse_debirentier }}<br />
+                    {{ data.debirentier.code_postal_debirentier }} {{ data.debirentier.ville_debirentier }}
                 {% else %}
                     {{ data.property.buyerlastname }} {{ data.property.buyerfirstname }}<br />
                     {{ data.property.buyeraddress }}<br />

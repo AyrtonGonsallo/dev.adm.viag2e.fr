@@ -37,7 +37,22 @@
                
                 {{ parameters.city|title }}, le {{ data.current_day }}
                 <br /><br />
-                <b style="text-align:left;">
+                
+            </td>
+        </tr>
+         <tr>
+            <td style="text-align: left; width: 40%; display: flex; align-items: start; border:none">
+                <br /> 
+                <br />
+                <br />
+                <br />
+                {% for i in 0..5 %}
+                    &nbsp;
+                {% endfor %}
+                Bonjour Monsieur JACQUEMIN,
+            </td>
+            <td style="width: 60%; border:none">
+               <b style="text-align:center;">
                     <br />
                     {% if data.target =='Crédirentier' %} {{data.property.getFirstname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %} {% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}
                     {% if data.target =='Crédirentier' %} {{data.property.getLastname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %} {% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}&nbsp;
@@ -47,6 +62,7 @@
                     {% if data.target =='Crédirentier' %} {{data.property.getPostalCode() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getCodePostalDebirentier() }}{% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %} {% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %}
                     {% if data.target =='Crédirentier' %} {{data.property.getCity() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getVilleDebirentier() }}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %}<br />
                 </b>
+               
             </td>
         </tr>
     </table>
@@ -54,14 +70,7 @@
     <br />
    <br />
    <br />
-    <br />
-    {% for i in 0..5 %}
-        &nbsp;
-    {% endfor %}
-    Bonjour Monsieur JACQUEMIN,
-   <br />
-   <br />
-   <br />
+    
     {% for i in 0..5 %}
             &nbsp;
         {% endfor %}

@@ -31,6 +31,7 @@ class NotificationRepository extends ServiceEntityRepository
     public function findDateOrderedDesc()
     {
         return $this->createQueryBuilder('n')
+            ->Where('n.status = 1')
             ->orderBy('n.date', 'DESC')
             ->getQuery()
             ->getResult();

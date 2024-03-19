@@ -22,7 +22,7 @@ class InvoiceOTPType extends AbstractType
     {
         $builder
             ->add('property', EntityType::class, ['class' => Property::class, 'data' => $options['property'], 'disabled' => $options['prop_locked'], 'query_builder' => function (EntityRepository $er) { return $er->createQueryBuilder('p')->orderBy('p.title', 'ASC'); }, 'choice_label' => 'title'])
-            ->add('target', ChoiceType::class, ['choices' => ['Mandat' => 1, 'Bien' => 2, 'Acheteur' => 3], 'choice_translation_domain' => false])
+            ->add('target', ChoiceType::class, ['choices' => ['Mandat' => 1, 'Bien' => 2, 'Acheteur' => 3, 'Débirentier' => 4], 'choice_translation_domain' => false])
             ->add('label', TextType::class, ['attr' => ['disabled' => $options['locked'], 'placeholder' => 'Texte affiché à côté du montant (ex: Rente Viagère)', 'value' => $options['label']], 'translation_domain' => false])
 			->add('email', EmailType::class, array('attr' => array('placeholder' => 'E-mail...'),'required' => false))
             ->add('amount', NumberType::class, ['attr' => ['placeholder' => 0.0,  ],'required' => false,'empty_data' => '-1','translation_domain' => false])

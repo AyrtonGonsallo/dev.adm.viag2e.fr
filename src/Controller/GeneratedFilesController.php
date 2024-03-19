@@ -229,7 +229,7 @@ class GeneratedFilesController extends AbstractController
                         'property'           => $property,
                     ];
                     $pdf->writeHTML($this->twig->render('generated_files/mandat-sepa-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -332,7 +332,7 @@ class GeneratedFilesController extends AbstractController
                         'property'           => $property,
                     ];
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-mandat-sepa-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -574,7 +574,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-regularisation-copro-06-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -799,7 +799,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-og2i-annee1-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -873,6 +873,8 @@ class GeneratedFilesController extends AbstractController
 
         }
         $defaultData = ['message' => 'Type your message here'];
+        $jour_revaluation=explode("-", $property->getRevaluationDate())[0];
+        $mois_revaluation=explode("-", $property->getRevaluationDate())[1];
         $form = $this->createFormBuilder($defaultData)
         ->add('destinataire', ChoiceType::class, [
             'choices'  => [
@@ -884,7 +886,7 @@ class GeneratedFilesController extends AbstractController
             'choices'  => [
                 'Cher Monsieur' => "Cher Monsieur",
                 'Chère Madame' => "Chère Madame",
-                'Chère Madame, Cher Monsieur' => "Chère Madame, Cher Monsieur",
+                'Chère Madame, Cher Monsieur '=> "Chère Madame, Cher Monsieur",
             ],
             
         ])
@@ -898,10 +900,12 @@ class GeneratedFilesController extends AbstractController
         ->add('date_virement', DateType::class, [ 
             'format' => 'dd-MMM-yyyy',
             'years' => range(date('Y'), date('Y') + 20),
+            'data' => new \DateTime(date('Y').'-'.$mois_revaluation.'-01'),
         ])
         ->add('date_revision', DateType::class, [ 
             'format' => 'dd-MMM-yyyy',
             'years' => range(date('Y'), date('Y') + 40),
+            'data' => new \DateTime((date('Y')+1).'-'.$mois_revaluation.'-01'),
         ])
         ->getForm();
         
@@ -971,11 +975,11 @@ class GeneratedFilesController extends AbstractController
                     "not_assurance_habit" => ($property->date_assurance_habitation && $property->date_assurance_habitation < $now_date )?true:false,
                     "texte_assurance_habit" => "votre attestation d’assurance habitation couvrant l’année ".$now_date->format('Y'),
                     "not_assurance_chemine" => ($property->date_cheminee && $property->date_cheminee < $now_date )?true:false,
-                    "texte_assurance_chemine" => "votre attestation d’assurance cheminée couvrant l’année ".$now_date->format('Y'),
+                    "texte_assurance_chemine" => "votre attestation d’entretien cheminée couvrant l’année ".$now_date->format('Y'),
                     "not_assurance_chaudiere" => ($property->date_chaudiere && $property->date_chaudiere < $now_date )?true:false,
-                    "texte_assurance_chaudiere" => "votre attestation d’assurance chaudière couvrant l’année ".$now_date->format('Y'),
+                    "texte_assurance_chaudiere" => "votre attestation d’entretien chaudière couvrant l’année ".$now_date->format('Y'),
                     "not_assurance_climatisation" => ($property->date_climatisation && $property->date_climatisation < $now_date )?true:false,
-                    "texte_assurance_climatisation" => "votre attestation d’assurance climatisation couvrant l’année ".$now_date->format('Y'),
+                    "texte_assurance_climatisation" => "votre attestation d’entretien climatisation couvrant l’année ".$now_date->format('Y'),
                     "adresse_bien"=>($property->getShowDuh())?$property->getAddress():$property->getGoodAddress(),
                     "date_virement" => utf8_encode(strftime("%B %Y", strtotime( $date_virement->format('d-m-Y') ))),
                     "date_revision" => utf8_encode(strftime("%B %Y", strtotime( $date_revision->format('d-m-Y') ))),
@@ -1018,7 +1022,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -1171,7 +1175,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-abandon-duh-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);

@@ -657,6 +657,9 @@ class InvoiceController extends AbstractController
                 }else if($data2["target"]==3){//acheteur
                     $mailTarget=$invoice->getProperty()->getBuyerMail1();
                 }
+                else if($data2["target"]==4){//debirentier
+                    $mailTarget=$invoice->getProperty()->getEmailDebirentier();
+                }
                 
             }else{
                 if($data2['recursion'] ==Invoice::RECURSION_QUARTERLY){
@@ -830,6 +833,9 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
             if ($invoice->getData()['target'] === PendingInvoice::TARGET_WARRANT) {
                 return '<a href="'.$this->generateUrl('warrant_view', ['type' => $invoice->getProperty()->getWarrant()->getTypeString(), 'warrantId' => $invoice->getProperty()->getWarrant()->getId()]).'">'.$invoice->getProperty()->getWarrant()->getFirstname().' '.$invoice->getProperty()->getWarrant()->getLastname().'</a>';
             }
+            if ($invoice->getData()['target'] === 4) {
+                return $invoice->getProperty()->getNomDebirentier().' '.$invoice->getProperty()->getPrenomDebirentier();
+            }
             elseif ($invoice->getData()['target'] === PendingInvoice::TARGET_PROPERTY) {
                 return '<a href="' . $this->generateUrl('property_view', ['propertyId' => $invoice->getProperty()->getId()]) . '">' . $invoice->getProperty()->getFirstname1() . ' ' . $invoice->getProperty()->getLastname1() . '</a>';
             }
@@ -921,6 +927,9 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                         }
                     }else if($data["target"]==3){//acheteur
                         $mailTarget=$invoice->getProperty()->getBuyerMail1();
+                    }
+                    else if($data["target"]==4){//debirentier
+                        $mailTarget=$invoice->getProperty()->getEmailDebirentier();
                     }
                     $message ->setTo("roquetigrinho@gmail.com");
                 

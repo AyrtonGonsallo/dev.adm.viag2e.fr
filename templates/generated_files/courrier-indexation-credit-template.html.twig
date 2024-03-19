@@ -37,7 +37,22 @@
                
                 {{ parameters.city|title }}, le {{ data.current_day }}
                 <br /><br />
-                <b style="text-align:left;">
+                
+            </td>
+        </tr>
+        <tr style=" border: solid 1px black;">
+            <td style="text-align: left; width: 40%; display: flex; align-items: start; border:none">
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    {% for i in 0..5 %}
+                        &nbsp;
+                    {% endfor %}
+                    {{data.form.formule}},
+            </td>
+            <td style="width: 60%; border:none">
+               <b style="text-align:center;">
                     <br />
                     {% if data.target =='Crédirentier' %} {{data.property.getFirstname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %} {% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}
                     {% if data.target =='Crédirentier' %} {{data.property.getLastname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %} {% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}&nbsp;
@@ -51,14 +66,7 @@
         </tr>
     </table>
     <div style="margin-right:4%;margin-left:4%;">
-    <br />
-   <br />
-   <br />
-    <br />
-    {% for i in 0..5 %}
-        &nbsp;
-    {% endfor %}
-    {{data.form.formule}},
+    
     <br /><br /><br />
     {% for i in 0..5 %}
         &nbsp;
@@ -126,7 +134,7 @@
     {% for i in 0..5 %}
         &nbsp;
     {% endfor %}
-    Veuillez agréer, Cher Monsieur, nos sincères salutations
+    Veuillez agréer, {{data.form.formule}}, nos sincères salutations
     <br />
     <br />
      <br /> <br /> <br />

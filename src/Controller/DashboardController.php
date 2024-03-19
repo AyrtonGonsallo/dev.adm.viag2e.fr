@@ -48,6 +48,7 @@ class DashboardController extends AbstractController
         ->select("p")
         ->from('App\Entity\Property', 'p')
         ->where('p.date_fin_exercice_copro < :date')
+        ->andWhere('p.active = 1')
         ->setParameter('date', $now_date)
             ->orderBy('p.id', 'DESC');
         $query = $qb->getQuery();
@@ -58,6 +59,7 @@ class DashboardController extends AbstractController
         ->select("p")
         ->from('App\Entity\Property', 'p')
         ->where('p.revaluation_date like :date')
+        ->andWhere('p.active = 1')
         ->setParameter('date', '%-'.intval(date("m",strtotime('first day of +1 month'))).'%')
             ->orderBy('p.revaluation_date', 'ASC');
         $query2 = $qb2->getQuery();
@@ -68,6 +70,7 @@ class DashboardController extends AbstractController
         ->select("p")
         ->from('App\Entity\Property', 'p')
         ->where('p.date_assurance_habitation < :date')
+        ->andWhere('p.active = 1')
         ->setParameter('date', $now_date)
             ->orderBy('p.date_assurance_habitation', 'ASC');
         $query3 = $qb3->getQuery();
@@ -78,6 +81,7 @@ class DashboardController extends AbstractController
         ->select("p")
         ->from('App\Entity\Property', 'p')
         ->where('p.date_chaudiere < :date')
+        ->andWhere('p.active = 1')
         ->setParameter('date', $now_date)
             ->orderBy('p.date_chaudiere', 'ASC');
         $query4 = $qb4->getQuery();
@@ -88,6 +92,7 @@ class DashboardController extends AbstractController
         ->select("p")
         ->from('App\Entity\Property', 'p')
         ->where('p.date_cheminee < :date')
+        ->andWhere('p.active = 1')
         ->setParameter('date', $now_date)
             ->orderBy('p.date_cheminee', 'ASC');
         $query5 = $qb5->getQuery();
@@ -98,6 +103,7 @@ class DashboardController extends AbstractController
         ->select("p")
         ->from('App\Entity\Property', 'p')
         ->where('p.date_climatisation < :date')
+        ->andWhere('p.active = 1')
         ->setParameter('date', $now_date)
             ->orderBy('p.date_climatisation', 'ASC');
         $query2 = $qb2->getQuery();

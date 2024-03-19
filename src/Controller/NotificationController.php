@@ -6,6 +6,8 @@ use App\Entity\Notification;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class NotificationController extends AbstractController
 {
@@ -38,5 +40,31 @@ class NotificationController extends AbstractController
             
         return new JsonResponse(['res' => $notifications]);
 
+    }
+
+    /**
+     * @Route("/notifications/valider_notification/{id}", name="valider_notification")
+     *
+     * @param Request $request
+     * 
+     * @return Response
+     */
+    public function valider_notification(Request $request)
+    {
+       
+        $n = $this->getDoctrine()
+            ->getRepository(Notification::class)
+            ->findOneBy(['id' => $request->get('id')]);
+
+        if (empty($n)) {
+            $this->addFlash('danger', 'notification introuvable');
+            return $this->redirectToRoute('dashboard', [], 302);
+        }
+        $n->setStatus(0);
+        $manager = $this->getDoctrine()->getManager();
+            $manager->persist($n);
+            $manager->flush();
+            return $this->redirectToRoute('notifications', [], 302);
+       
     }
 }

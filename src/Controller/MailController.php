@@ -421,4 +421,23 @@ class MailController extends AbstractController
 
         return $mailer->send($message);
     }
+
+    /**
+     * @Route("/mail/send_test_mail", name="send_test_mail")
+     *
+     * @param Request $request
+     * @param Swift_Mailer $mailer
+     * @return RedirectResponse
+     */
+    public function sendTestMail( Swift_Mailer $mailer)
+    {
+        $message = (new Swift_Message("Test de l'ancienne configuration smtp"))
+            ->setFrom($this->getParameter('mail_from'))
+            ->setBcc($this->getParameter('mail_from'))
+            ->setTo("ayrtongonsallo444@gmail.com")
+            ->setBody("Ceci est un mail de test. S'il est parvenu à vous c'est que l'ancienne configuration Smtp est bien faite.", 'text/html');
+		$message->setCc("roquetigrinho@gmail.com");
+        $mailer->send($message);
+        return $this->redirectToRoute('dashboard');
+    }
 }

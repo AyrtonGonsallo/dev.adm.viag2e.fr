@@ -33,7 +33,10 @@ class Notification  implements JsonSerializable
      * @ORM\Column(type="date", nullable=true)
      */
     private $expiry;
-
+ /**
+     * @ORM\Column(type="boolean")
+     */
+    private $status;
     /**
      * @ORM\Column(type="array", nullable=true)
      */
@@ -47,6 +50,7 @@ class Notification  implements JsonSerializable
     public function __construct()
     {
         $this->date = new DateTime();
+        $this->status=1;
     }
 
     public function getId(): ?int
@@ -77,7 +81,19 @@ class Notification  implements JsonSerializable
 
         return $this;
     }
+    public function getStatus(): ?bool
+    {
+        return $this->status;
+    }
 
+    public function setStatus(bool $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+   
     public function getExpiry(): ?DateTimeInterface
     {
         return $this->expiry;

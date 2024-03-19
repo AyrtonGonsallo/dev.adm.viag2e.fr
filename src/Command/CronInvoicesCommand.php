@@ -9,6 +9,8 @@ use App\Entity\Invoice;
 use App\Entity\Parameter;
 use App\Entity\PendingInvoice;
 use App\Entity\Property;
+use App\Entity\DestinataireFacture;
+use App\Entity\FactureMensuelle;
 use App\Entity\Warrant;
 use App\Entity\RevaluationHistory;
 use App\Service\Bank;
@@ -763,8 +765,8 @@ class CronInvoicesCommand extends Command
             $invoice2->setType($data['type']);
             
 
-            $cond_h_n=($filePath2 != -1)?true:false; //honoraires nuls ?
-            $cond_r_n=($filePath != -1)?true:false; //rente nulle ?
+            $cond_h_n=($filePath2 != -1)?true:false; //honoraires non nuls ?
+            $cond_r_n=($filePath != -1)?true:false; //rente non nulle ?
            
             if($cond_r_n){
                 $file = new File();
@@ -845,7 +847,18 @@ class CronInvoicesCommand extends Command
             
             if ((!empty($data['separation_type']) && ($data['separation_type'] == Property::BUYERS_ANNUITY) && !empty($property->getBuyerMail1())) || !empty($property->getWarrant()->getMail1())) {
                 
-                
+                $destinataire_address_r="";
+                $destinataire_postalcode_r="";
+                $destinataire_city_r="";
+                $destinataire_mail_r="";
+                $destinataire_name_r="";
+                $destinataire_type_r=0;
+                $destinataire_address_h="";
+                $destinataire_postalcode_h="";
+                $destinataire_city_h="";
+                $destinataire_mail_h="";
+                $destinataire_name_h="";
+                $destinataire_type_h=0;
                 if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                     if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                         $message = (new Swift_Message($invoice->getMailSubject()))
@@ -854,6 +867,12 @@ class CronInvoicesCommand extends Command
                             ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                             ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                             ->attach(Swift_Attachment::fromPath($filePath));
+                            $destinataire_mail_r=$invoice->getProperty()->getWarrant()->getMail1();
+                            $destinataire_name_r=$invoice->getProperty()->getWarrant()->getFirstname().' '.$invoice->getProperty()->getWarrant()->getLastname();
+                            $destinataire_type_r=DestinataireFacture::TYPE_MANDANT;
+                            $destinataire_address_r=$invoice->getProperty()->getWarrant()->getAddress();
+                            $destinataire_postalcode_r=$invoice->getProperty()->getWarrant()->getPostalCode();
+                            $destinataire_city_r=$invoice->getProperty()->getWarrant()->getCity();
                     }else{
                         $message = (new Swift_Message($invoice->getMailSubject()))
                             ->setFrom($this->mail_from)
@@ -861,7 +880,12 @@ class CronInvoicesCommand extends Command
                             ->setTo($invoice->getProperty()->getMail1())
                             ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                             ->attach(Swift_Attachment::fromPath($filePath));
-                            
+                            $destinataire_mail_r=$invoice->getProperty()->getMail1();
+                            $destinataire_name_r=$invoice->getProperty()->getFirstname1()." ".$invoice->getProperty()->getLastname1();
+                            $destinataire_type_r=DestinataireFacture::TYPE_CREDIRENTIER;
+                            $destinataire_address_r=$invoice->getProperty()->getAddress();
+                            $destinataire_postalcode_r=$invoice->getProperty()->getPostalCode();
+                            $destinataire_city_r=$invoice->getProperty()->getCity();
                             if(!empty($invoice->getProperty()->getMail2())) {
                                 $message->setCc($invoice->getProperty()->getMail2());
                             }
@@ -879,13 +903,29 @@ class CronInvoicesCommand extends Command
                                     ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                     ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                     ->attach(Swift_Attachment::fromPath($filePath2));
+                                    $destinataire_mail_h=$invoice->getProperty()->getWarrant()->getMail1();
+                                    $destinataire_name_h=$invoice->getProperty()->getWarrant()->getFirstname().' '.$invoice->getProperty()->getWarrant()->getLastname();
+                                    $destinataire_type_h=DestinataireFacture::TYPE_MANDANT;
+                                    $destinataire_address_h=$invoice->getProperty()->getWarrant()->getAddress();
+                                    $destinataire_postalcode_h=$invoice->getProperty()->getWarrant()->getPostalCode();
+                                    $destinataire_city_h=$invoice->getProperty()->getWarrant()->getCity();
                             }
                             //envoyer la rente au buyer /acquereur/acheteur
                             if($cond_r_n){
                                 if($invoice->getProperty()->getDebirentierDifferent()){
                                     $mailTarget_r=$invoice->getProperty()->getEmailDebirentier();
+                                    $nomTarget_r=$invoice->getProperty()->getNomDebirentier().' '.$invoice->getProperty()->getPrenomDebirentier();
+                                    $destinataire_type_r=DestinataireFacture::TYPE_DEBIRENTIER;
+                                    $destinataire_address_r=$invoice->getProperty()->getAddresseDebirentier();
+                                    $destinataire_postalcode_r=$invoice->getProperty()->getCodePostalDebirentier();
+                                    $destinataire_city_r=$invoice->getProperty()->getVilleDebirentier();
                                 }else{
                                     $mailTarget_r=$invoice->getProperty()->getWarrant()->getMail1();
+                                    $nomTarget_r=$invoice->getProperty()->getWarrant()->getFirstname().' '.$invoice->getProperty()->getWarrant()->getLastname();
+                                    $destinataire_type_r=DestinataireFacture::TYPE_MANDANT;
+                                    $destinataire_address_r=$invoice->getProperty()->getWarrant()->getAddress();
+                                    $destinataire_postalcode_r=$invoice->getProperty()->getWarrant()->getPostalCode();
+                                    $destinataire_city_r=$invoice->getProperty()->getWarrant()->getCity();
                                 }
                                 $message2 = (new Swift_Message($invoice->getMailSubject()))
                                     ->setFrom($this->mail_from)
@@ -893,6 +933,9 @@ class CronInvoicesCommand extends Command
                                     ->setTo($mailTarget_r)
                                     ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                     ->attach(Swift_Attachment::fromPath($filePath));
+                                    $destinataire_mail_r=$mailTarget_r;
+                                     $destinataire_name_r=$nomTarget_r;
+                                     
                             }
                         }else{
                             //si mandat acquereur                                
@@ -905,6 +948,18 @@ class CronInvoicesCommand extends Command
                                     ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                     ->attach(Swift_Attachment::fromPath($filePath))
                                     ->attach(Swift_Attachment::fromPath($filePath2));
+                                    $destinataire_mail_r=$invoice->getProperty()->getWarrant()->getMail1();
+                                    $destinataire_name_r=$invoice->getProperty()->getWarrant()->getFirstname().' '.$invoice->getProperty()->getWarrant()->getLastname();
+                                    $destinataire_type_r=DestinataireFacture::TYPE_MANDANT;
+                                    $destinataire_address_r=$invoice->getProperty()->getWarrant()->getAddress();
+                                    $destinataire_postalcode_r=$invoice->getProperty()->getWarrant()->getPostalCode();
+                                    $destinataire_city_r=$invoice->getProperty()->getWarrant()->getCity();
+                                    $destinataire_mail_h=$invoice->getProperty()->getWarrant()->getMail1();
+                                    $destinataire_name_h=$invoice->getProperty()->getWarrant()->getFirstname().' '.$invoice->getProperty()->getWarrant()->getLastname();
+                                    $destinataire_type_h=DestinataireFacture::TYPE_MANDANT;
+                                    $destinataire_address_h=$invoice->getProperty()->getWarrant()->getAddress();
+                                    $destinataire_postalcode_h=$invoice->getProperty()->getWarrant()->getPostalCode();
+                                    $destinataire_city_h=$invoice->getProperty()->getWarrant()->getCity();
                             }
                         }
                   }
@@ -965,6 +1020,63 @@ class CronInvoicesCommand extends Command
                             $invoice2->setStatus(Invoice::STATUS_UNSENT);
                         }
                   }
+                  if($cond_r_n ){
+                        $dest=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['email' => $destinataire_mail_r]);
+                        if($dest){
+                            $destinataireFacture = $dest;
+                            $io->note("Le destinataire ".$destinataire_mail_r." existe déja");
+                        }else{
+                            $destinataireFacture = new DestinataireFacture();
+                            $io->note("Le destinataire ".$destinataire_mail_r." n'existe pas");
+                        }
+                        
+                        $destinataireFacture->setEmail($destinataire_mail_r);
+                        $destinataireFacture->setType($destinataire_type_r);
+                        $destinataireFacture->setName($destinataire_name_r);
+                        $destinataireFacture->setAddress($destinataire_address_r);
+                        $destinataireFacture->setPostalCode($destinataire_postalcode_r);
+                        $destinataireFacture->setCity($destinataire_city_r);
+                        $factureMensuelle = new FactureMensuelle();
+                        $factureMensuelle-> setNumber($data['number']);
+                        $factureMensuelle->setAmount($data['property']['annuity']);
+                        $factureMensuelle->setDestinataire($destinataireFacture);
+                        $factureMensuelle->setType(FactureMensuelle::TYPE_RENTE);
+                        $factureMensuelle->setProperty($invoice->getProperty());
+                        $factureMensuelle->setFile($file);
+                        $destinataireFacture->addFactureMensuelle($factureMensuelle);
+                        $this->manager->persist($factureMensuelle);
+                $this->manager->persist($destinataireFacture);
+                $this->manager->flush();
+                    }
+                if($cond_h_n){
+                    $dest=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['email' => $destinataire_mail_h]);
+                    if($dest){
+                        $destinataireFacture2 = $dest;
+                        $io->note("Le destinataire ".$destinataire_mail_h." existe déja");
+                    }else{
+                        $destinataireFacture2 = new DestinataireFacture();
+                        $io->note("Le destinataire ".$destinataire_mail_h." n'existe pas");
+                    }
+                    $destinataireFacture2->setEmail($destinataire_mail_h);
+                    $destinataireFacture2->setType($destinataire_type_h);
+                    $destinataireFacture2->setName($destinataire_name_h);
+                    $destinataireFacture->setAddress($destinataire_address_h);
+                    $destinataireFacture->setPostalCode($destinataire_postalcode_h);
+                    $destinataireFacture->setCity($destinataire_city_h);
+                    $factureMensuelle2 = new FactureMensuelle();
+                    $factureMensuelle2-> setNumber($data['number']);
+                    $factureMensuelle2->setAmount($data['property']['honoraryRates']);
+                    $factureMensuelle2->setDestinataire($destinataireFacture2);
+                    $factureMensuelle2->setFile2($file2);
+                    $factureMensuelle2->setType(FactureMensuelle::TYPE_HONORAIRES);
+                    $factureMensuelle2->setProperty($invoice->getProperty());
+                    $destinataireFacture2->addFactureMensuelle($factureMensuelle2);
+                    $this->manager->persist($factureMensuelle2);
+                $this->manager->persist($destinataireFacture2);
+                $this->manager->flush();
+                }
+                
+                  
             
         } else {
             $invoice->setStatus(Invoice::STATUS_UNSENT);
@@ -975,6 +1087,7 @@ class CronInvoicesCommand extends Command
         } catch (Exception $e) {
             $io->error($e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine());
         }
+		
     }
 
 
@@ -982,6 +1095,7 @@ class CronInvoicesCommand extends Command
     {
         try {   
 			//$data['date']["month"]=utf8_decode($data['date']["month"]);
+			$data['period']=utf8_decode($data['period']);
             if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                 $io->note("manual quittance trying to be created ");
 
@@ -1073,6 +1187,9 @@ class CronInvoicesCommand extends Command
                 }
             }else if($data["target"]==3){//acheteur
                 $mailTarget=$invoice->getProperty()->getBuyerMail1();
+            }
+            else if($data["target"]==4){//debirentier
+                $mailTarget=$invoice->getProperty()->getEmailDebirentier();
             }
             $message->setTo( $mailTarget);
         
