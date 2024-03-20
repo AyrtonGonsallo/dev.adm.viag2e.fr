@@ -16,6 +16,7 @@ class FactureMensuelle
 
     public const TYPE_RENTE = 1; // rente
     public const TYPE_HONORAIRES       = 2; // honoraires
+	public const TYPE_COPRO       = 3; // copro
 
     /**
      * @ORM\Id()
@@ -193,7 +194,16 @@ class FactureMensuelle
     
     public function getTypeString(): string
     {
-        return ($this->getType() == self::TYPE_RENTE) ? 'Rente' : 'Honoraires';
+		if($this->getType() == self::TYPE_RENTE){
+			$type='Rente';
+		}
+		else if($this->getType() == self::TYPE_HONORAIRES){
+			$type='Honoraires';
+		}
+		else if($this->getType() == self::TYPE_COPRO){
+			$type="Copro";
+		}
+        return $type;
     }
 
    

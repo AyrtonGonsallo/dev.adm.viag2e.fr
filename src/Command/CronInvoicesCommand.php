@@ -308,6 +308,7 @@ class CronInvoicesCommand extends Command
             $properties = $this->manager
             ->getRepository(Property::class)
             ->findIndicestoUpdate(self::PROCESS_MAX);
+            $now_date=new DateTime();
             foreach ($properties as $property) {
                 
                     $io->note("property ".$property->getId()." active");
@@ -339,6 +340,57 @@ class CronInvoicesCommand extends Command
                         $property->valeur_indice_reference_object=$indice_m_u;
 						$property->valeur_indexation_normale=$indice_m_u->getValue();
                         $property->date_maj_indice_ref=new DateTime();
+                        $filePathDebirentier = $this->generator->generateCourrierIndexationDebirentierAutomatique($property, $parameters);
+                        $filePathCredirentier = $this->generator->generateCourrierIndexationCredirentierAutomatique($property, $parameters);
+                        $mail_debirentier=($property->getDebirentierDifferent())?$property->getEmailDebirentier():$property->getWarrant()->getMail1();
+                        $mail_credirentier=$property->getMail1();
+                        $file = new File();
+                        $file->setType(File::TYPE_DOCUMENT);
+                        $file->setName("Courrier d’indexation Débirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
+                        $file->setWarrant($property->getWarrant());
+                        $file->setProperty($property);
+                        $file->setDriveId($this->drive->addFile($file->getName(), $filePathDebirentier, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                        $manager = $this->manager;
+                        $manager->persist($file);
+                        $manager->flush();
+
+                        $message1 = (new Swift_Message("Courrier d’indexation Débirentier"))
+                        ->setFrom($this->mail_from)
+                        ->setBcc($this->mail_from)
+                        ->setTo("")
+                        //->setTo($mail_debirentier)
+                        ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => utf8_encode(strftime("%B %Y", strtotime( $now_date->format('d-m-Y') )))]), 'text/html')
+                        ->attach(Swift_Attachment::fromPath($filePathDebirentier));
+
+                        $file2 = new File();
+                        $file2->setType(File::TYPE_DOCUMENT);
+                        $file2->setName("Courrier d’indexation Crédirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
+                        $file2->setWarrant($property->getWarrant());
+                        $file2->setProperty($property);
+                        $file2->setDriveId($this->drive->addFile($file2->getName(), $filePathCredirentier, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                        $manager = $this->manager;
+                        $manager->persist($file2);
+                        $manager->flush();
+
+                        $message2 = (new Swift_Message("Courrier d’indexation Crédirentier"))
+                        ->setFrom($this->mail_from)
+                        ->setBcc($this->mail_from)
+                        ->setTo("")
+                        //->setTo($mail_credirentier)
+                        ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => utf8_encode(strftime("%B %Y", strtotime( $now_date->format('d-m-Y') )))]), 'text/html')
+                        ->attach(Swift_Attachment::fromPath($filePathCredirentier));
+
+                        if (!$this->areMailsDisabled() && $this->mailer->send($message1)) {
+                            $io->note("mail courrier indexation debirentier envoyé");
+                        } else {
+                            $io->note("mail courrier indexation debirentier non envoyé");
+                        }
+
+                        if (!$this->areMailsDisabled() && $this->mailer->send($message2)) {
+                            $io->note("mail courrier indexation credirentier envoyé");
+                        } else {
+                            $io->note("mail courrier indexation credirentier non envoyé");
+                        }
                     }
 
                 
@@ -1021,7 +1073,7 @@ class CronInvoicesCommand extends Command
                         }
                   }
                   if($cond_r_n ){
-                        $dest=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['email' => $destinataire_mail_r]);
+                        $dest=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['name' => $destinataire_name_r]);
                         if($dest){
                             $destinataireFacture = $dest;
                             $io->note("Le destinataire ".$destinataire_mail_r." existe déja");
@@ -1038,9 +1090,18 @@ class CronInvoicesCommand extends Command
                         $destinataireFacture->setCity($destinataire_city_r);
                         $factureMensuelle = new FactureMensuelle();
                         $factureMensuelle-> setNumber($data['number']);
-                        $factureMensuelle->setAmount($data['property']['annuity']);
+                        if($data['property']['annuity']){
+                            $factureMensuelle->setAmount($data['property']['annuity']);
+                           $factureMensuelle->setType(FactureMensuelle::TYPE_RENTE);
+                       }else if($data['property']['condominiumFees']){
+                                $factureMensuelle->setAmount($data['property']['condominiumFees']);
+                           $factureMensuelle->setType(FactureMensuelle::TYPE_COPRO);
+                       }else{
+                           $factureMensuelle->setAmount(0);
+                           $factureMensuelle->setType(FactureMensuelle::TYPE_RENTE);
+                       }
                         $factureMensuelle->setDestinataire($destinataireFacture);
-                        $factureMensuelle->setType(FactureMensuelle::TYPE_RENTE);
+                       
                         $factureMensuelle->setProperty($invoice->getProperty());
                         $factureMensuelle->setFile($file);
                         $destinataireFacture->addFactureMensuelle($factureMensuelle);
@@ -1049,7 +1110,7 @@ class CronInvoicesCommand extends Command
                 $this->manager->flush();
                     }
                 if($cond_h_n){
-                    $dest=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['email' => $destinataire_mail_h]);
+                    $dest=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['name' => $destinataire_name_h]);
                     if($dest){
                         $destinataireFacture2 = $dest;
                         $io->note("Le destinataire ".$destinataire_mail_h." existe déja");
@@ -1065,7 +1126,13 @@ class CronInvoicesCommand extends Command
                     $destinataireFacture->setCity($destinataire_city_h);
                     $factureMensuelle2 = new FactureMensuelle();
                     $factureMensuelle2-> setNumber($data['number']);
-                    $factureMensuelle2->setAmount($data['property']['honoraryRates']);
+                    if($data['property']['honoraryRates']){
+                        $factureMensuelle2->setAmount($data['property']['honoraryRates']);
+                   }else if($data['property']['condominiumFees']){
+                            $factureMensuelle2->setAmount($data['property']['condominiumFees']);
+                   }else{
+                       $factureMensuelle2->setAmount(0);
+                   }
                     $factureMensuelle2->setDestinataire($destinataireFacture2);
                     $factureMensuelle2->setFile2($file2);
                     $factureMensuelle2->setType(FactureMensuelle::TYPE_HONORAIRES);
