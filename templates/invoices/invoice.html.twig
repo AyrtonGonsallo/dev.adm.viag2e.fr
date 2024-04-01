@@ -12,7 +12,7 @@
             <td style="text-align: left; width: 50%;">
                 <img style="width: 150px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
                 {{ parameters.address|raw }}<br />
-                {{ parameters.postalcode }} {{ parameters.city|upper }}<br /><br />
+                {{ parameters.postalcode }} {{ parameters.city|upper }}<br /><br /><br /><br /><br /><br />
                 Téléphone: {{ parameters.phone }}<br />
                 Mail: {{ parameters.mail }}<br />
                 {{ parameters.site }}
@@ -21,7 +21,7 @@
                 <span style="font-size: 15pt"><b>{% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}AVIS D'ECHEANCE{% else %}QUITTANCE{% endif %} {{ data.number }} R</b></span><br />
                 Période de <b>{{ data.date.month }} {{ data.date.year }}</b><br />
                 <small>{{ parameters.city|title }}, le {{ data.date.current_day }}</small>
-                <br /><br /><br />
+                <br /><br /><br /><br /><br /><br /><br />
                 <b>A l'attention de:</b><br />
                 {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
                     {{ data.buyer.lastname }} {{ data.buyer.firstname }}<br />

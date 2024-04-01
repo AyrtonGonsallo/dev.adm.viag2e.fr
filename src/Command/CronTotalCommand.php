@@ -11,6 +11,7 @@ use App\Entity\PendingInvoice;
 use App\Entity\Property;
 use App\Entity\DestinataireFacture;
 use App\Entity\FactureMensuelle;
+use App\Entity\TotalFactureMensuelle;
 use App\Entity\Warrant;
 use App\Entity\RevaluationHistory;
 use App\Service\Bank;
@@ -151,83 +152,106 @@ class CronTotalCommand extends Command
 
       
         
-        if (date('d') <= 21) {
-            // Quarterly invoices ce sont les charges de copro
+        if (date('d') >= 21) {
+            
             
             $io->comment('Processing total invoices');
-            $destinataires = $this->manager
-                ->getRepository(DestinataireFacture::class)
-                ->findAll(self::PROCESS_MAX);
-
-            // $last_month = new DateTime('last day of last month');
-            // fin charges de copro
-            $done = 0;
-            /** @var Property $property */
-            foreach ($destinataires as $dest) {
-                if ($done == self::PROCESS_MAX) {
-                    break;
-                }
-
-                
-                    $this->generateTotal($io, $parameters, $dest->getFactures()->toArray(), $dest);
+            $factureMensuelles = $this->manager
+                ->getRepository(FactureMensuelle::class)
+                ->findAll();
+            $this->generateTotal($io, $parameters, $factureMensuelles);
 
                   
-            }
+            
         }
     }
        
-    public function generateTotal(SymfonyStyle &$io, array $parameters, array $factureMensuelles,DestinataireFacture $dest)
+    public function generateTotal(SymfonyStyle &$io, array $parameters, array $factureMensuelles)
     {
         try {   
 			$somme_h=0;
             $somme_r=0;
             $date_h=null;
             $date_r=null;
+            $dest_r=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['id' => 32]);
+            $dest_h=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['id' => 18]);
             foreach ($factureMensuelles as $fact) {
                 if($fact->getType()==FactureMensuelle::TYPE_RENTE){
                     $somme_r+=$fact->getAmount();
                     $date_r=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'))));
+                    $warrant_r = $fact->getProperty()->getWarrant();
                 }else if($fact->getType()==FactureMensuelle::TYPE_HONORAIRES ){
                     $somme_h+=$fact->getAmount();
                     $date_h=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'))));
+                    $warrant_h = $fact->getProperty()->getWarrant();
                 }
                
             }
+            $somme_h = round($somme_h, 2);
+            $somme_r = round($somme_r, 2);
             if($somme_r>0){
-                $filePath= $this->generator->generateFile($dest,$somme_r,$factureMensuelles, $parameters,$date_r,strftime('%A %e %B %Y'));
+                $filePath= $this->generator->generateFile($dest_r,$somme_r,$factureMensuelles, $parameters,$date_r,strftime('%A %e %B %Y'));
+                $totalFactureMensuelle= new TotalFactureMensuelle();
+                $totalFactureMensuelle->setAmount($somme_r);
+                $totalFactureMensuelle->setDestinataire($dest_r);
+                $totalFactureMensuelle->setType(TotalFactureMensuelle ::TYPE_RENTE);
+
+                $file = new File();
+                $file->setType(File::TYPE_DOCUMENT);
+                $file->setName("TOTAL_RENTES_{$dest_r->getName()}.pdf");
+                $file->setWarrant($warrant_r);
+                $file->setDriveId($this->drive->addFile($file->getName(), $filePath, File::TYPE_INVOICE, $warrant_r->getId()));
+                $this->manager->persist($file);
+                $totalFactureMensuelle->setFile($file);
+                $this->manager->persist($totalFactureMensuelle);
+                $this->manager->flush();
             }
             if($somme_h>0){
-                $filePath2= $this->generator->generateFile2($dest,$somme_h,$factureMensuelles, $parameters,$date_h,strftime('%A %e %B %Y'));
+                $filePath2= $this->generator->generateFile2($dest_h,$somme_h,$factureMensuelles, $parameters,$date_h,strftime('%A %e %B %Y'));
+                $totalFactureMensuelle= new TotalFactureMensuelle();
+                $totalFactureMensuelle->setAmount($somme_h);
+                $totalFactureMensuelle->setDestinataire($dest_h);
+                $totalFactureMensuelle->setType(TotalFactureMensuelle ::TYPE_HONORAIRES);
+
+                $file2 = new File();
+                $file2->setType(File::TYPE_DOCUMENT);
+                $file2->setName("TOTAL_HONORAIRES_{$dest_h->getName()}.pdf");
+                $file2->setWarrant($warrant_h);
+                $file2->setDriveId($this->drive->addFile($file2->getName(), $filePath2, File::TYPE_INVOICE, $warrant_h->getId()));
+                $this->manager->persist($file2);
+                $totalFactureMensuelle->setFile($file2);
+                $this->manager->persist($totalFactureMensuelle);
+                $this->manager->flush();
             }
            
 
 
             if($somme_r>0){
-                $message = (new Swift_Message("Total des rentes ".$dest->getName()))
+                $message = (new Swift_Message("Total des rentes ".$dest_r->getName()))
                     ->setFrom($this->mail_from)
                     ->setBcc($this->mail_from)
-                    //->setTo($dest->getEmail())
+                    //->setTo($dest_r->getEmail())
                     ->setTo( "roquetigrinho@gmail.com")
                     ->setBody($this->twig->render('invoices/emails/total_r.twig', [ 'date' => "{$date_r}"]), 'text/html')
                     ->attach(Swift_Attachment::fromPath($filePath));
 
                 if (!$this->areMailsDisabled() && $this->mailer->send($message)) {
-                    $io->note("mail mandat vendeur envoyé avec la somme ".$somme_r." à ".$dest->getName()." à l'adresse ".$dest->getEmail());
+                    $io->note("mail somme rente envoyé avec la somme ".$somme_r." à ".$dest_r->getName()." à l'adresse ".$dest_r->getEmail());
                 } else{
                     $io->note("erreur envoi message ");
                 }
             }
             if($somme_h>0){
-                $message2 = (new Swift_Message("Total des honoraires ".$dest->getName()))
+                $message2 = (new Swift_Message("Total des honoraires ".$dest_h->getName()))
                     ->setFrom($this->mail_from)
                     ->setBcc($this->mail_from)
-                    //->setTo($dest->getEmail())
+                    //->setTo($dest_h->getEmail())
                     ->setTo( "roquetigrinho@gmail.com")
                     ->setBody($this->twig->render('invoices/emails/total_h.twig', [ 'date' => "{$date_h}"]), 'text/html')
                     ->attach(Swift_Attachment::fromPath($filePath2));
                    
                 if (!$this->areMailsDisabled() && $this->mailer->send($message2)) {
-                    $io->note("mail mandat vendeur envoyé avec la somme ".$somme_h." à ".$dest->getName()." à l'adresse ".$dest->getEmail());
+                    $io->note("mail somme honoraires envoyé avec la somme ".$somme_h." à ".$dest_h->getName()." à l'adresse ".$dest_h->getEmail());
                 } else{
                     $io->note("erreur envoi message ");
                 }

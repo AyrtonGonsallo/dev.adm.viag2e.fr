@@ -24,7 +24,7 @@ class InvoiceRepository extends ServiceEntityRepository
     }
     function get_category($val){
         if($val=="Tous"){
-            return 4;
+            return 5;
         }
         else if($val=="Rente"){
             return 0;
@@ -34,6 +34,9 @@ class InvoiceRepository extends ServiceEntityRepository
             return 2;
         }else if($val=="Manuelle"){
             return 3;
+        }
+        else if($val=="Avoir"){
+            return 4;
         }
     }
 
@@ -69,7 +72,7 @@ class InvoiceRepository extends ServiceEntityRepository
                 ->setParameter('month', '%"month_n":"'.$data['month_concerned'].'%');
         }
 
-        if(!empty($data['Category']) && $this->get_category($data['Category'])!=4) {
+        if(!empty($data['Category']) && $this->get_category($data['Category'])!=5) {
             $query->andWhere('i.category = :category')->setParameter('category', $this->get_category($data['Category']));
         }
 
@@ -147,7 +150,79 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
+    public function  findInvoicesToRegenerate(int $max)
+    {
+        return $this->createQueryBuilder('i')
+        ->where('i.date >= :start')
+        ->andWhere('i.date < :end')
+        ->andWhere('(i.date_regeneration IS NULL OR i.date_regeneration > :today)')
+        ->andWhere('i.type = :t')
+        ->setParameter('t', 1)
+        ->setParameter('start', "2024-01-08")
+        ->setParameter('today',new DateTime('tomorrow') )
+            ->setParameter('end', "2024-01-10")
+            ->setMaxResults($max)
+            ->getQuery()
+            ->getResult();
+    }
+    public function  findQuittancesToRegenerate(int $max)
+    {
+        return $this->createQueryBuilder('i')
+        ->where('i.number >= :start')
+        ->andWhere('i.number <= :end')
+        ->andWhere('(i.date_regeneration IS NULL OR i.date_regeneration > :today)')
+        ->andWhere('i.type = :t')
+        ->setParameter('t', 2)
+        ->setParameter('start', 4882)
+        ->setParameter('today',new DateTime('tomorrow') )
+        ->setParameter('end', 5001)
+            ->setMaxResults($max)
+            ->getQuery()
+            ->getResult();
+    }
+    public function  findAvoirsTogenerate(int $max)
+    {
+        return $this->createQueryBuilder('i')
+        ->where('i.number >= :start')
+        ->andWhere('i.number <= :end')
+        ->andWhere('(i.date_generation_avoir IS NULL OR i.date_generation_avoir > :today)')
+        ->andWhere('i.type = :t')
+        ->setParameter('start', 4882)
+        ->setParameter('today', new DateTime('tomorrow'))
+        ->setParameter('t', 2)
+            ->setParameter('end', 5001)
+            ->setMaxResults($max)
+            ->getQuery()
+            ->getResult();
+    }
+    public function  findSimilarInvoice(String $numero)
+    {
+        return $this->createQueryBuilder('i')
+        ->where('i.data like :data')
+        ->andWhere('i.number >= :num')
+        ->andWhere('i.category = :cat')
+        ->setParameter('num', 5002)
+        ->setParameter('cat', 4)
+        ->setParameter('data', '%'.$numero.'%')
+        ->orderBy('i.id', 'DESC')
+        ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+    }
+    public function  findSimilarInvoice2(String $numero)
+    {
+        return $this->createQueryBuilder('i')
+        ->where('i.data like :data')
+        ->andWhere('i.number >= :num')
+        ->andWhere('i.category = :cat')
+        ->setParameter('num', 5105)
+        ->setParameter('cat', 0)
+        ->setParameter('data', '%'.$numero.'%')
+        ->orderBy('i.id', 'DESC')
+        ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+    }
     public function listByDate(DateTime $start, DateTime $end)
     {
         return $this->createQueryBuilder('i')
@@ -157,6 +232,20 @@ class InvoiceRepository extends ServiceEntityRepository
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->setParameter('type', Invoice::TYPE_RECEIPT)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function listByDate2(DateTime $start, DateTime $end)
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.date >= :start')
+            ->andWhere('i.date <= :end')
+            ->andWhere('i.type = :type or i.type = :type2')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->setParameter('type', Invoice::TYPE_RECEIPT)
+            ->setParameter('type2', Invoice::TYPE_AVOIR)
             ->getQuery()
             ->getResult();
     }

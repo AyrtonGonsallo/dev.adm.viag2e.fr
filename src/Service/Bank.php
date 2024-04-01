@@ -120,7 +120,7 @@ class Bank
         $this->message_id = $message_id;
         $this->total = new Total();
 
-        $invoices = $this->manager->getRepository(Invoice::class)->listByDateNE($start, $end);
+        $invoices = $this->manager->getRepository(Invoice::class)->listByDate2($start, $end);
         /** @var Invoice $invoice */
         foreach ($invoices as $invoice) {
             $data = $invoice->getData();

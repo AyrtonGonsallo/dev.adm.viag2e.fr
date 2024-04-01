@@ -155,7 +155,16 @@ class Notification  implements JsonSerializable
                 return "L'ipc type ' {$this->getData()['message']} n'a pas été renseigné pour ce mois {$this->getData()['date']}";
             case 'copro_expire_sur_propriete':
                 return "La date de fin d'exercice de copro sur la proprieté <a href=\"{$this->getData()['route']}\">{$this->getProperty()->getTitle()}</a> a expiré le {$this->getData()['date']}";
-                    
+            
+            case 'expiration_assurance_climatisation':
+                return "La date d'assurance climatisation sur la proprieté <a href=\"{$this->getData()['route']}\">{$this->getProperty()->getTitle()}</a> a expiré le {$this->getData()['date']}";
+            case 'expiration_assurance_cheminee':
+                return "La date d'assurance cheminée sur la proprieté <a href=\"{$this->getData()['route']}\">{$this->getProperty()->getTitle()}</a> a expiré le {$this->getData()['date']}";
+            case 'expiration_assurance_chaudiere':
+                return "La date d'assurance chaudière sur la proprieté <a href=\"{$this->getData()['route']}\">{$this->getProperty()->getTitle()}</a> a expiré le {$this->getData()['date']}";
+            case 'expiration_assurance_habitation':
+                return "La date d'assurance habitation sur la proprieté <a href=\"{$this->getData()['route']}\">{$this->getProperty()->getTitle()}</a> a expiré le {$this->getData()['date']}";
+                                                          
                   
             case 'suivi-message-expiration-warning':
                 if (!is_null($this->getProperty())) {

@@ -16,6 +16,7 @@ class Invoice implements JsonSerializable
     public const CATEGORY_CONDOMINIUM_FEES = 1; // Co-pro
     public const CATEGORY_GARBAGE = 2; // Ordures
     public const CATEGORY_MANUAL = 3; // Manuel
+    public const CATEGORY_AVOIR = 4; // inverse d'une facture / remboursement / avoirs
 
     public const RECURSION_MONTHLY   = 1; // Mensuel
     public const RECURSION_OTP       = 2; // Exceptionnel
@@ -29,6 +30,7 @@ class Invoice implements JsonSerializable
 
     public const TYPE_NOTICE_EXPIRY = 1; // Avis d'échéance
     public const TYPE_RECEIPT       = 2; // Quittance
+    public const TYPE_AVOIR       = 3;
 
     /**
      * @ORM\Id()
@@ -60,6 +62,14 @@ class Invoice implements JsonSerializable
      * @ORM\Column(type="datetime", nullable=true)
      */
     public $date_de_paiement;
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public $date_generation_avoir;
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public $date_regeneration;
 
     /**
      * @ORM\Column(type="json", nullable=true)
@@ -277,6 +287,8 @@ class Invoice implements JsonSerializable
                 return 'Frais de co-pro';
             case self::CATEGORY_GARBAGE:
                 return 'Ordures ménagères';
+            case self::CATEGORY_AVOIR:
+                    return 'Avoir';
             case self::CATEGORY_MANUAL:
             default:
                 return 'Manuelle';

@@ -602,6 +602,9 @@ class InvoiceController extends AbstractController
                 $file1=$invoice->getFile()->getDriveId();
                 $lien_telechargements='<a href="'.$this->generateUrl('file_download', ['fileId' => $file1]).'" target="_blank"><i class="la la-cloud-download" title="Télécharger"></i> Rente</a>';
             }
+            else{
+                $lien_telechargements='Pas de fichier';
+            }
 			if($this->getTableAmount($invoice)<=-1){
                 $amount='-';
             }
@@ -681,13 +684,8 @@ class InvoiceController extends AbstractController
                        
                     }
                     if($cond_r_n){
-                        if($invoice->getProperty()->getDebirentierDifferent()){
-                            $mailTarget1=$invoice->getProperty()->getEmailDebirentier();
-                        }else{
-                            $mailTarget1=$invoice->getProperty()->getWarrant()->getMail1();
-                        }
-                       
-                       
+                        $mailTarget1=$invoice->getProperty()->getBuyerMail1();
+                        
                     }
                 }else{
                     if($cond_h_n){
@@ -753,10 +751,19 @@ class InvoiceController extends AbstractController
             if($invoice->getType()===2){
                 $status_choice='<span class="'.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</span>';
             }
+           
+            if($invoice->getCategory()===Invoice::CATEGORY_AVOIR){
+                $resend="";
+                $avoir=" relatif à ".$invoice->getData()["old_number"];
+            }else{
+                $avoir="";
+                $resend='<a href="#" class="invoice-mail" data-id="'.$invoice->getId().'" data-message="'.$recap_mails.'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_mail"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>';
+            }
+            
             $data[] = [
                 'Selected' =>"<input type='checkbox' name='invoice_".$invoice->getId()."' value='invoice_".$invoice->getId()."'>",
                 'Date' => $date,
-                'Number' => $invoice->getFormattedNumber(),
+                'Number' => $invoice->getFormattedNumber().$avoir,
                 'Category' => $invoice->getCategoryString(),
                 'Type' => $invoice->getTypeString(),
                 
@@ -766,7 +773,7 @@ class InvoiceController extends AbstractController
                 'HonoraryRates' => $honoraire,
                 'Status' => $status_choice,
                 //'Resend' => '<a href="'.$this->generateUrl('invoice_resend', ['invoiceId' => $invoice->getId()]).'"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>',
-                'Resend' => '<a href="#" class="invoice-mail" data-id="'.$invoice->getId().'" data-message="'.$recap_mails.'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_mail"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>',
+                'Resend' => $resend,
                 
                 'Download' => $lien_telechargements,
             ];
@@ -794,6 +801,14 @@ class InvoiceController extends AbstractController
         elseif ($invoice->getCategory() === Invoice::CATEGORY_GARBAGE || $invoice->getCategory() === Invoice::CATEGORY_MANUAL) {
             return number_format($invoice->getData()['amount'],2, '.', ' ');
         }
+        elseif ($invoice->getCategory() === Invoice::CATEGORY_AVOIR) {
+            if(array_key_exists('annuity',$invoice->getData()['property']))
+                return number_format($invoice->getData()['property']['annuity'],2, '.', ' ');
+            else if(array_key_exists('condominiumFees',$invoice->getData()['property']) )
+                return number_format($invoice->getData()['property']['condominiumFees'], 2, '.', ' ');
+            else
+                return number_format($invoice->getData()['amount'],2, '.', ' ');
+        }
         else {
             return number_format($invoice->getData()['property']['annuity'],2, '.', ' ');
         }
@@ -806,6 +821,14 @@ class InvoiceController extends AbstractController
         }
         elseif ($invoice->getCategory() === Invoice::CATEGORY_MANUAL && $invoice->getData()['honoraryRates'] > -1) {
             return number_format($invoice->getData()['honoraryRates'],2, '.', ' ') . '(' . number_format($invoice->getData()['honoraryRates'] - $invoice->getData()['honoraryRatesTax'], 2, '.', ' ') . ' HT)';
+        }
+        elseif ($invoice->getCategory() === Invoice::CATEGORY_AVOIR) {
+            if(array_key_exists('honoraryRates',$invoice->getData()['property']))
+            return number_format($invoice->getData()['property']['honoraryRates'], 2, '.', ' ') . '(' . number_format($invoice->getData()['property']['honoraryRates'] - $invoice->getData()['property']['honoraryRatesTax'],2, '.', ' ') . ' HT)';
+            else if(array_key_exists('condominiumFees',$invoice->getData()['property']) )
+                return number_format($invoice->getData()['property']['condominiumFees'], 2, '.', ' ');
+            else
+                return number_format($invoice->getData()['amount'],2, '.', ' ');
         }
         else {
             return '-';
@@ -828,6 +851,8 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
             return '<a href="' . $this->generateUrl('warrant_view', ['type' => $invoice->getProperty()->getWarrant()->getTypeString(), 'warrantId' => $invoice->getProperty()->getWarrant()->getId()]) . '">' . $invoice->getProperty()->getWarrant()->getFirstname() . ' ' . $invoice->getProperty()->getWarrant()->getLastname() . '</a>';
         } elseif ($invoice->getCategory() === Invoice::CATEGORY_CONDOMINIUM_FEES) {
             return '<a href="' . $this->generateUrl('property_view', ['propertyId' => $invoice->getProperty()->getId()]) . '">' . $invoice->getProperty()->getFirstname1() . ' ' . $invoice->getProperty()->getLastname1() . '</a>';
+        }else  if ($invoice->getCategory() === Invoice::CATEGORY_AVOIR) {
+            return '<a href="' . $this->generateUrl('warrant_view', ['type' => $invoice->getProperty()->getWarrant()->getTypeString(), 'warrantId' => $invoice->getProperty()->getWarrant()->getId()]) . '">' . $invoice->getProperty()->getWarrant()->getFirstname() . ' ' . $invoice->getProperty()->getWarrant()->getLastname() . '</a>';
         }
         else {
             if ($invoice->getData()['target'] === PendingInvoice::TARGET_WARRANT) {

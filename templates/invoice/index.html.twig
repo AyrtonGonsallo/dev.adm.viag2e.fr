@@ -76,10 +76,11 @@
                                         </div>
                                         <div class="m-form__control">
                                             <select class="form-control m-bootstrap-select" id="m_form_category">
-                                                <option value="4">Tous</option>
+                                                <option value="5">Tous</option>
                                                 <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_ANNUITY') }}">Rente</option>
                                                 <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_CONDOMINIUM_FEES') }}">Frais de co-pro</option>
                                                 <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_GARBAGE') }}">Ordures ménagères</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_AVOIR') }}">Avoir</option>
                                                 <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_MANUAL') }}">Manuelle</option>
                                             </select>
                                         </div>
@@ -395,7 +396,7 @@ $('#select_all').click(function() {
                         datatable.reload();
                     });
                     function get_category(val){
-                        if(val==4){
+                        if(val==5){
                             return "Tous"
                         }
                         else if(val==0){
@@ -406,6 +407,9 @@ $('#select_all').click(function() {
                             return "Ordures ménagères"
                         }else if(val==3){
                             return "Manuelle"
+                        }
+                        else if(val==4){
+                            return "Avoir"
                         }
                     }
                     $('#m_form_category').selectpicker().on('change', function() {

@@ -42,7 +42,13 @@ class CronInvoicesCommand extends Command
 {
     use LockableTrait;
 
-
+    $ev_cat_event_int_titre=$res['cat_event'];
+    $date = $res['DateDebut'];
+ $annee_titre=substr($date, 0, 4);
+      
+         $titre = preg_replace('/&(?!#?[a-z0-9]+;)/', '&amp;', 'Resultats du marathon de '.$res['Nom'].' '.strftime("%Y",strtotime($res['DateDebut'])));
+          $description = 'Le '.$ev_cat_event_int_titre.' '.$annee_titre.' de '. $res['Nom'].' '.$pays->getFlagByAbreviation($res['PaysID'])['donnees']['NomPays'].' a eu lieu le '.changeDate($date).' Les vainqueurs sont '.$evresultat->getResultBySexe($res['ID'],"M")['donnees'][0]['Nom'].'(hommes) et '.$evresultat->getResultBySexe($res['ID'],"F")['donnees'][0]['Nom'].'(femmes). Résultats complets, classements et temps';
+        
     private const PROCESS_MAX = 5;
     protected static $defaultName = 'cron:invoices';
 
@@ -293,7 +299,7 @@ class CronInvoicesCommand extends Command
 
             $io->note("OTP invoice ({$data['type']}) generated for id {$pendingInvoice->getProperty()->getId()}");
         }
-        if (date('d') >= 16) {
+        if (date('d') >= 19) {
             function get_label($i){
                 if($i==1){
                     return 'Urbains';
@@ -1072,7 +1078,7 @@ class CronInvoicesCommand extends Command
                             $invoice2->setStatus(Invoice::STATUS_UNSENT);
                         }
                   }
-                  if($cond_r_n ){
+                  if($cond_r_n && $invoice->getType()==Invoice::TYPE_NOTICE_EXPIRY){
                         $dest=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['name' => $destinataire_name_r]);
                         if($dest){
                             $destinataireFacture = $dest;
@@ -1109,7 +1115,7 @@ class CronInvoicesCommand extends Command
                 $this->manager->persist($destinataireFacture);
                 $this->manager->flush();
                     }
-                if($cond_h_n){
+                if($cond_h_n && $invoice->getType()==Invoice::TYPE_NOTICE_EXPIRY){
                     $dest=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['name' => $destinataire_name_h]);
                     if($dest){
                         $destinataireFacture2 = $dest;
@@ -1121,9 +1127,9 @@ class CronInvoicesCommand extends Command
                     $destinataireFacture2->setEmail($destinataire_mail_h);
                     $destinataireFacture2->setType($destinataire_type_h);
                     $destinataireFacture2->setName($destinataire_name_h);
-                    $destinataireFacture->setAddress($destinataire_address_h);
-                    $destinataireFacture->setPostalCode($destinataire_postalcode_h);
-                    $destinataireFacture->setCity($destinataire_city_h);
+                    $destinataireFacture2->setAddress($destinataire_address_h);
+                    $destinataireFacture2->setPostalCode($destinataire_postalcode_h);
+                    $destinataireFacture2->setCity($destinataire_city_h);
                     $factureMensuelle2 = new FactureMensuelle();
                     $factureMensuelle2-> setNumber($data['number']);
                     if($data['property']['honoraryRates']){
