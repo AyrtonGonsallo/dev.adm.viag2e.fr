@@ -753,7 +753,7 @@ class InvoiceController extends AbstractController
             }
            
             if($invoice->getCategory()===Invoice::CATEGORY_AVOIR){
-                $resend="";
+                $resend='<a href="#" class="invoice-mail" data-id="'.$invoice->getId().'" data-message="'.$recap_mails.'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_mail"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>';
                 $avoir=" relatif à ".$invoice->getData()["old_number"];
             }else{
                 $avoir="";
@@ -825,10 +825,8 @@ class InvoiceController extends AbstractController
         elseif ($invoice->getCategory() === Invoice::CATEGORY_AVOIR) {
             if(array_key_exists('honoraryRates',$invoice->getData()['property']))
             return number_format($invoice->getData()['property']['honoraryRates'], 2, '.', ' ') . '(' . number_format($invoice->getData()['property']['honoraryRates'] - $invoice->getData()['property']['honoraryRatesTax'],2, '.', ' ') . ' HT)';
-            else if(array_key_exists('condominiumFees',$invoice->getData()['property']) )
-                return number_format($invoice->getData()['property']['condominiumFees'], 2, '.', ' ');
-            else
-                return number_format($invoice->getData()['amount'],2, '.', ' ');
+           else
+                return '-';
         }
         else {
             return '-';

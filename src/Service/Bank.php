@@ -85,8 +85,13 @@ class Bank
                     $PmtId = $DrctDbtTxInf->addChild('PmtId');
                     $PmtId->addChild('InstrId', '0');
                     $PmtId->addChild('EndToEndId', $property['payer']['id']);
+                    if( $invoice['type'] == Invoice::TYPE_AVOIR){
+                        $InstdAmt = $DrctDbtTxInf->addChild('InstdAmt', -$invoice['amount']);
 
-                    $InstdAmt = $DrctDbtTxInf->addChild('InstdAmt', $invoice['amount']);
+                    }else{
+                        $InstdAmt = $DrctDbtTxInf->addChild('InstdAmt', $invoice['amount']);
+
+                    }
                     $InstdAmt->addAttribute('Ccy', 'EUR');
 
                     $DrctDbtTx = $DrctDbtTxInf->addChild('DrctDbtTx');
@@ -167,14 +172,20 @@ class Bank
             if(empty($this->data[$invoice->getProperty()->getId()][$data['recursion']]['payer']['ics'])) {
                 continue; //si C'Est acquereur et que le warrant n'a pas d'ics il va sauter, si c'est vendeur et que le buyer n'a pas d'ics il va sauter exemple sur le bien 26
             }
-
-            $this->total->addTransaction($amount);
-            $this->data[$invoice->getProperty()->getId()][$data['recursion']]['total']->addTransaction($amount);
+            if($invoice->getType() == Invoice::TYPE_AVOIR) {
+                $this->total->addTransaction(-$amount);
+                $this->data[$invoice->getProperty()->getId()][$data['recursion']]['total']->addTransaction(-$amount);            
+            }else{
+                $this->total->addTransaction($amount);
+                $this->data[$invoice->getProperty()->getId()][$data['recursion']]['total']->addTransaction($amount);
+            }
+            
 
             $this->data[$invoice->getProperty()->getId()][$data['recursion']]['invoices'][] = [
                 'amount' => $amount,
                 'inv_id' => $invoice->getId(),
                 'date'   => $invoice->getDate(),
+                'type'   =>$invoice->getType(),
                 'dos'    => $invoice->getProperty()->getDosAuthenticInstrument()->format('Y-m-d'),
                 'number' => $invoice->getFormattedNumber(),
             ];

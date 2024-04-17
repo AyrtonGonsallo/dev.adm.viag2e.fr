@@ -145,11 +145,26 @@ class InvoiceRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('i')
             ->where('i.status = :status')
+            ->andWhere('i.number >= :start')
+        ->andWhere('i.number <= :end')
+            ->setParameter('status', Invoice::STATUS_PAYED)
+            ->setParameter('start', 5105)
+            ->setParameter('end', 5207)
+            ->setMaxResults($max)
+            ->getQuery()
+            ->getResult();
+    }
+/*
+    public function findReceiptsToDo(int $max)
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.status = :status')
             ->setParameter('status', Invoice::STATUS_PAYED)
             ->setMaxResults($max)
             ->getQuery()
             ->getResult();
     }
+*/
     public function  findInvoicesToRegenerate(int $max)
     {
         return $this->createQueryBuilder('i')

@@ -27,6 +27,28 @@ class InvoiceGenerator
         $this->manager = $container->get('doctrine')->getManager();
     }
 
+
+    public  function convert_from_latin1_to_utf8_recursively2($dat)
+    {
+      
+       // $dat = json_decode($dat, true);
+        if (is_string($dat)) {
+            return utf8_decode($dat);
+         } elseif (is_array($dat)) {
+            $ret = [];
+            foreach ($dat as $i => $d) $ret[ $i ] = self::convert_from_latin1_to_utf8_recursively2($d);
+            return $ret;
+         } elseif (is_object($dat)) {
+            foreach ($dat as $i => $d) $dat->$i = self::convert_from_latin1_to_utf8_recursively2($d);
+            return $dat;
+         } else {
+            return $dat;
+         }
+         
+         
+       
+    }
+
     /**
      * @param array $data
      * @param array $parameters
@@ -41,12 +63,14 @@ class InvoiceGenerator
         $pdf      = new Html2Pdf('P', 'A4', 'fr');
         $fileName = "/invoice_{$data['number']}-file1.pdf";
         try {
+            $data=$this->convert_from_latin1_to_utf8_recursively2($data);
+
             $pdf->pdf->SetDisplayMode('fullpage');
             if(empty($data['recursion']))
                 $data['recursion'] = Invoice::RECURSION_MONTHLY;
                 //$data['reason'] = utf8_decode($data['reason']);
                 //$data['label'] = utf8_decode($data['label']);
-                $data['property']['address'] = utf8_decode($data['property']['address']);
+                //$data['property']['address'] = utf8_decode($data['property']['address']);
             switch ($data['recursion']) {
                 case Invoice::RECURSION_OTP:
 					if($data['amount']==-1){
@@ -84,6 +108,8 @@ class InvoiceGenerator
     }
     public function generateFile2(array $data, array $parameters)
     {
+        $data=$this->convert_from_latin1_to_utf8_recursively2($data);
+
         $pdf2      = new Html2Pdf('P', 'A4', 'fr');
         $fileName = "/invoice_{$data['number']}-file2.pdf";
         try {
@@ -92,7 +118,7 @@ class InvoiceGenerator
                 $data['recursion'] = Invoice::RECURSION_MONTHLY;
                 //$data['reason'] = utf8_decode($data['reason']);
                 //$data['label'] = utf8_decode($data['label']);
-                $data['property']['address'] = utf8_decode($data['property']['address']);
+                //$data['property']['address'] = utf8_decode($data['property']['address']);
                 
             switch ($data['recursion']) {
                 case Invoice::RECURSION_OTP:
@@ -131,15 +157,18 @@ class InvoiceGenerator
         }
     }
     
+    
+
     public function generateAvoirFile(array $data, array $parameters)
     {
         $pdf      = new Html2Pdf('P', 'A4', 'fr');
         $fileName = "/avoir_{$data['number']}-file1.pdf";
+        $data=$this->convert_from_latin1_to_utf8_recursively2($data);
         try {
             $pdf->pdf->SetDisplayMode('fullpage');
             if(empty($data['recursion']))
                 $data['recursion'] = Invoice::RECURSION_MONTHLY;
-                $data['property']['address'] = utf8_decode($data['property']['address']);
+                //$data['property']['address'] = utf8_decode($data['property']['address']);
             switch ($data['recursion']) {
                 case Invoice::RECURSION_OTP:
 					if($data['amount']==-1){
@@ -179,11 +208,12 @@ class InvoiceGenerator
     {
         $pdf2      = new Html2Pdf('P', 'A4', 'fr');
         $fileName = "/avoir_{$data['number']}-file2.pdf";
+        $data=$this->convert_from_latin1_to_utf8_recursively2($data);
         try {
             $pdf2->pdf->SetDisplayMode('fullpage');
             if(empty($data['recursion']))
                 $data['recursion'] = Invoice::RECURSION_MONTHLY;
-                $data['property']['address'] = utf8_decode($data['property']['address']);
+                //$data['property']['address'] = utf8_decode($data['property']['address']);
                 
             switch ($data['recursion']) {
                 case Invoice::RECURSION_OTP:

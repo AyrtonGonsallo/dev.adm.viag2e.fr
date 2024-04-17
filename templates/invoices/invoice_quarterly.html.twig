@@ -24,8 +24,7 @@
                 <br /><br /><br />
                 <b>A l'attention de:</b><br />
                 {{ data.property.lastname }} {{ data.property.firstname }}<br />
-                {{ data.property.address }}<br />
-                {{ data.property.postalcode }} {{ data.property.city }}
+                {{  data.property.address | raw  }}<br />
             </td>
         </tr>
     </table>
@@ -51,8 +50,7 @@
                             {% endif %}<br />
                             pour la période du {{ data.trimester.start }} au {{ data.trimester.end }} <br />concernant le bien situé:<br /><br />
                             {{ data.property.firstname }} {{ data.property.lastname }}{% if not data.property.firstname2 is empty %} - {{ data.property.firstname2 }} {% if not data.property.lastname2 is empty %}{{ data.property.lastname2 }}{% else %}{{ data.property.lastname }}{% endif %}{% endif %}<br />
-                            {{ data.property.address }}<br />
-                            {{ data.property.postalcode }} {{ data.property.city }}<br /><br />
+                            {{  data.property.address | raw  }}<br /><br />
                             {% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}Dans l'attente de votre prochain règlement,<br />{% endif %}
                             Nous restons à votre disposition.<br /><br />
                             Bien cordialement.<br /><br />

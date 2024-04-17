@@ -33,7 +33,7 @@ en cas de bug sur le prod activer le end=dev
 avent d'uploader generated files remplacer
 /var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf
 /var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/
-les boss recoivent un copie des emails remplacer
+les boss recoivent une copie des emails remplacer
 ->setFrom($this->mail_from)
 ->setBcc($this->mail_from)
 ->setTo($invoice->getMailTarget())
@@ -96,3 +96,105 @@ generée: L'avis d'echéance est payé et le cron a tourné et généré la quit
  la quittance est validée dans le back office au niveau de la liste des factures
  le cron a tourné et a envoyé la quittance payée, la quittance est marquée envoyée
 Donc la question c'est "une quittance n'a que 2 status ? généré et envoyé ?"
+
+
+
+
+
+
+
+
+
+seules les factures du 09 et du 08 janvier sont concernées a cause des suppresssions effectuées pendant cette période pour les destinataires qui n'étaient pas corrects
+on avait fait plusieurs series de generations
+premiere par exemple 4454 a 4554 incorrecte
+2eme par exemple 4555 a 4655
+3eme 4656 a 4756
+4eme 4757 a 4857
+5eme 4857 a 4881
+derniere et bonne 4802 a 5001 on garde celle la comme elle a ete envoyée et on supprime les autres
+lors de la prochaine execution il repart a 4559
+solution regenerer celles de janvier avec des numeros entre 4455 et 4558
+
+depuis le 09 janvier facture 5001
+4326 le 20 novembre
+20 03 2024  4765 a 4867 86 avis rentes et honoraires + 16 frais de copros
+23 02 2024  4754 a 4764
+22 02 2024  4753
+20 02 2024  4659 a 4752
+22 01 2024  4559 a 4645
+9 01 2024   4902 a 5001 
+8 01 2024   4882 a 4901 
+22 12 2023  4454(4334)
+29 11 2023  4334
+4332
+
+
+
+
+    SELECT * FROM `invoice` where date >= "2024-01-08" and date <"2024-01-10" order by number +1;
+
+    toutes les quittances copros
+    SELECT * FROM `invoice` where number >= 4882 and number <=5001 and type=2 and category=1 ORDER BY `invoice`.`number` DESC;
+    tous les avis copros
+    SELECT * FROM `invoice` where number >= 4882 and number <=5001 and type=1 and category=1 ORDER BY `invoice`.`number` DESC;
+    toutes les quittances rentes
+    SELECT * FROM `invoice` where number >= 4882 and number <=5001 and type=2 and category=0 ORDER BY `invoice`.`number` DESC;
+    tous les avis rentes
+    SELECT * FROM `invoice` where number >= 4882 and number <=5001 and type=1 and category=0 ORDER BY `invoice`.`number` DESC;
+     toutes les avis (190)
+    SELECT * FROM `invoice` where number >= 4882 and number <=5001 and type=1 ORDER BY `invoice`.`number` ASC;
+    toutes les quittances (187) avoirs
+    SELECT * FROM `invoice` where number >= 4882 and number <=5001 and type=2 ORDER BY `invoice`.`number` ASC;
+    avoirs 5002 a 5189
+    5190 a 5380
+
+
+
+
+
+
+
+
+- Créer un avoir pour chacune des factures  QUITTANCES de janvier : Les avis d’échéances non quittancés ne sont pas à émettre en avoir. 
+Numérotation : à la suite de la dernière facture du dernier avis d’échéance de janvier : en effet, à partir de la 5002
+
+
+
+
+de 5002 a 5104 avoirs sur les quittances payées 103 (16 copros + 84 honoraires+rentes +3 rentes) 187 fichiers  les honoraires de (4933,4934,4965) ne sont pas payés
+
+81 mails/ 187 cas SELECT * FROM `invoice` WHERE number <=5001 and number >=4882 and type=2; 187
+16 copros  SELECT * FROM `invoice` WHERE number <=5001 and number >=4882 and type=2 and category=1;
+84 honoraires SELECT * FROM `invoice` WHERE number <=5001 and number >=4882 and type=2 and category=0 and file_id is null;
+87 rentes SELECT * FROM `invoice` WHERE number <=5001 and number >=4882 and type=2 and category=0 and file2_id is null;
+
+- Re-générer TOUS les avis d'échéances de janvier :
+
+de 5105 a 5207 102 (16 copros + 87 honoraires+rentes) 190 fichiers
+ 190 cas SELECT * FROM `invoice` WHERE number <=5001 and number >=4882 and type=1; 190
+
+- Re-générer les quittances de janvier uniquement celles dont le paiement à bien été validé :
+
+de 5105 a 5207  102 (16 copros + 84 honoraires+rentes +3 rentes) 187 fichiers
+
+ 187 cas  SELECT * FROM `invoice` WHERE number <=5001 and number >=4882 and type=2;
+
+
+janvier
+ 174 avis 87 biens
+ 16 copros
+ quittances
+ 171 quittances ( 87 AVEC rentes seul et 84 avec honn seuls) 84 bien ont les 2 et 3 n'ont que la rente (4933,4934,4965) donc supprimer (5156,5157,5188)
+ 16 quittances copro
+ 102= 86+16
+
+ UPDATE invoice set status=4 where number<=5207 and number>=5105;
+  UPDATE invoice set status=2 where number in (5156,5157,5188) and file_id is null
+
+
+  cmsport-padelmaroc
+  zCi8x==J=^fu
+
+  admin
+  a2c2DVP7b%

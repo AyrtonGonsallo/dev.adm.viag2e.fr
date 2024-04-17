@@ -217,7 +217,7 @@ class Invoice implements JsonSerializable
     {
       
         if (is_string($dat)) {
-            return utf8_decode($dat);
+            return json_decode($dat, true);
          } elseif (is_array($dat)) {
             $ret = [];
             foreach ($dat as $i => $d) $ret[ $i ] = self::convert_from_latin1_to_utf8_recursively2($d);
@@ -240,9 +240,9 @@ class Invoice implements JsonSerializable
     }
     public function getData(): ?array
     {
+        //$this->data = $this->convert_from_latin1_to_utf8_recursively2($this->data);
         $this->data['date']['month']=$this->getMonthfromNumber( $this->data['date']['month_n']);
-       
-        
+
         return $this->data;
     }
 
@@ -376,7 +376,15 @@ class Invoice implements JsonSerializable
 
     public function getFormattedNumber()
     {
-        return (($this->getType() == Invoice::TYPE_NOTICE_EXPIRY) ? 'FA' : 'QU') . str_pad($this->getNumber(), 8, '0', STR_PAD_LEFT);
+        $res='';
+        if($this->getType() == Invoice::TYPE_NOTICE_EXPIRY){
+            $res='FA';
+        }else if($this->getType() == Invoice::TYPE_AVOIR){
+            $res='AV';
+        }else{
+            $res='QU';
+        }
+        return $res. str_pad($this->getNumber(), 8, '0', STR_PAD_LEFT);
     }
 
     public static function formatNumber(int $number, int $type)
@@ -453,6 +461,38 @@ class Invoice implements JsonSerializable
                 ];
             }
             elseif($this->getCategory() === self::CATEGORY_ANNUITY) { // was CATEGORY_CONDOMINIUM_FEES ??
+                if (!empty($data['warrant']['firstname']) && !empty($data['warrant']['lastname'])) {
+                    if ($data['warrant']['firstname'] == $this->getProperty()->getWarrant()->getFirstname() && $data['warrant']['lastname'] == $this->getProperty()->getWarrant()->getLastname()) {
+                        $this->payer = [
+                            'id'        => $this->getProperty()->getWarrant()->getId() . '00',
+                            'firstname' => $data['warrant']['firstname'],
+                            'lastname'  => $data['warrant']['lastname'],
+                            'bic'       => $this->getProperty()->getWarrant()->getBankBic(),
+                            'iban'      => str_replace(' ', '', $this->getProperty()->getWarrant()->getBankIban()),
+                            'ics'       => $this->getProperty()->getWarrant()->getBankIcs(),
+                        ];
+                    } elseif ($data['warrant']['firstname'] == $this->getProperty()->getBuyerFirstname() && $data['warrant']['lastname'] == $this->getProperty()->getBuyerLastname()) {
+                        $this->payer = [
+                            'id'        => $this->getProperty()->getId() . '01',
+                            'firstname' => $data['property']['buyerfirstname'],
+                            'lastname'  => $data['property']['buyerlastname'],
+                            'bic'       => $this->getProperty()->getBuyerBankBic(),
+                            'iban'      => str_replace(' ', '', $this->getProperty()->getBuyerBankIban()),
+                            'ics'       => $this->getProperty()->getBuyerBankIcs(),
+                        ];
+                    }
+                } else {
+                    $this->payer = [
+                        'id'        => $this->getProperty()->getId() . '02',
+                        'firstname' => $data['property']['firstname'],
+                        'lastname'  => $data['property']['lastname'],
+                        'bic'       => $this->getProperty()->getBankBic(),
+                        'iban'      => str_replace(' ', '', $this->getProperty()->getBankIban()),
+                        'ics'       => $this->getProperty()->getBankIcs(),
+                    ];
+                }
+            }
+            elseif($this->getCategory() === self::CATEGORY_AVOIR) { // was CATEGORY_CONDOMINIUM_FEES ??
                 if (!empty($data['warrant']['firstname']) && !empty($data['warrant']['lastname'])) {
                     if ($data['warrant']['firstname'] == $this->getProperty()->getWarrant()->getFirstname() && $data['warrant']['lastname'] == $this->getProperty()->getWarrant()->getLastname()) {
                         $this->payer = [
