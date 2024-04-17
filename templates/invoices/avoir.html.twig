@@ -1,0 +1,128 @@
+<style type="text/css">
+    <!--
+    table { vertical-align: top; }
+    tr    { vertical-align: top; }
+    td    { vertical-align: top; }
+    -->
+</style>
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt">
+    <bookmark title="Facture" level="0" ></bookmark>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px">
+        <tr>
+            <td style="text-align: left; width: 50%;">
+                <img style="width: 150px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+                {{ parameters.address|raw }}<br />
+                {{ parameters.postalcode }} {{ parameters.city|upper }}<br /><br /><br /><br /><br /><br />
+                Téléphone: {{ parameters.phone }}<br />
+                Mail: {{ parameters.mail }}<br />
+                {{ parameters.site }}
+            </td>
+            <td style="width: 50%; padding-top: 25px;">
+                <span style="font-size: 15pt"><b>AVOIR {{ data.number }} R</b></span><br />
+                Période de <b>{{ data.date.month }} {{ data.date.year }}</b><br />
+                <small>{{ parameters.city|title }}, le {{ data.date.current_day }}</small>
+                <br /><br /><br /><br /><br /><br /><br />
+                <b>A l'attention de:</b><br />
+                {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
+                    {{ data.buyer.lastname }} {{ data.buyer.firstname }}<br />
+                    {{ data.buyer.address }}<br />
+                    {{ data.buyer.postalcode }} {{ data.buyer.city }}
+                {% else %}
+                    {% if data.property.is_og2i %}
+                        {% if data.debirentier_different %}
+                            {{ data.debirentier.prenom_debirentier }} {{ data.debirentier.nom_debirentier }}<br />
+                            {{ data.debirentier.addresse_debirentier }}<br />
+                            {{ data.debirentier.code_postal_debirentier }} {{ data.debirentier.ville_debirentier }}
+                        {% else %}
+                            {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                            {{ data.warrant.address }}<br />
+                            {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                        {% endif %}
+                    {% else %}
+                       {% if data.debirentier_different %}
+                            {{ data.debirentier.prenom_debirentier }} {{ data.debirentier.nom_debirentier }}<br />
+                            {{ data.debirentier.addresse_debirentier }}<br />
+                            {{ data.debirentier.code_postal_debirentier }} {{ data.debirentier.ville_debirentier }}
+                        {% else %}
+                             {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                            {{ data.warrant.address }}<br />
+                            {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                
+                    
+            </td>
+        </tr>
+    </table>
+    <br />
+    <br />
+    <table cellspacing="0" style="width: 100%; border: solid 1px black; font-size: 10pt;">
+        <tr>
+            <td style="width: 60%; border-right: solid 1px black;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="width: 100%;">
+                        <td style="border-bottom: solid 1px black; border-collapse: collapse; width: 50%;">Numéro du bien: <b>{{ data.property.id }}</b></td>
+                        <td style="border-bottom: solid 1px black; border-collapse: collapse; width: 50%;">Numéro de client: <b>{{ data.warrant.id }}</b></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <br /><br />
+                            Madame, Monsieur,<br /><br />
+                            Nous vous prions de trouver ci-joint votre avoir <br /> relatif à la {% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}
+                                
+                                    appel de Rente Viagère
+                                
+                            {% else %}
+                                quittance
+                            {% endif %} {{ numero}} R 
+                            <br />
+                            pour la période du 01/{{ data.date.month_n }}/{{ data.date.year }} au {{ data.date.max_days }}/{{ data.date.month_n }}/{{ data.date.year }} <br />concernant le bien de:<br /><br />
+                            {{ data.property.firstname }} {{ data.property.lastname }}{% if not data.property.firstname2 is empty %} - {{ data.property.firstname2 }} {% if not data.property.lastname2 is empty %}{{ data.property.lastname2 }}{% else %}{{ data.property.lastname }}{% endif %}{% endif %}<br />
+                            {{  data.property.address | raw  }}<br /><br />
+                             {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}Vendeur: {{ data.seller.firstname }} {{ data.seller.lastname }}<br /><br />{% endif %}
+                            
+                            Nous restons à votre disposition.<br /><br />
+                            Bien cordialement.<br /><br />
+                            <b>Univers Viager</b><br /><br />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: 40%;">
+                <br /><br />
+                <table style="width: 100%;">
+                    <colgroup>
+                        <col style="width: 60%; text-align: left">
+                        <col style="width: 40%; text-align: right">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center;"><b>Détails de l'appel de la période</b></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Rente Viagère</td>
+                        <td>{{ data.property.annuity|number_format(2, '.', ' ') }} €</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <br /><br /><br /><br /><br />
+            </td>
+        </tr>
+    </table>
+</page>
+<page_footer>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 10px;">
+        <tr>
+            <td style="width: 100%;">
+                UNIVERS VIAGER - Siège social : 58 Rue Fondaudège 33000 BORDEAUX, SARL au capital de 5 000 €<br />
+                TVA FR27523654408 - Immatriculée au RCS Bordeaux N°523 654 408<br />
+                Garantie financière GALIAN 89 rue de la Boétie 75008 PARIS Montant : 120 000 €<br />
+                Carte Professionnelle Transaction et Gestion immobilière n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br />
+                « Notre agence ne détient aucun fonds pour le compte de ses clients »
+            </td>
+        </tr>
+    </table>
+</page_footer>
