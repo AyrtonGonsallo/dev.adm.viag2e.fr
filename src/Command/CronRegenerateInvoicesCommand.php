@@ -102,7 +102,7 @@ class CronRegenerateInvoicesCommand extends Command
 
         $start = microtime(true);
 
-        $this->noMail = true;
+        $this->noMail = $input->getOption('no-mail');
         if ($this->areMailsDisabled()) {
             $io->note('Mails are disabled');
         }
@@ -160,19 +160,19 @@ class CronRegenerateInvoicesCommand extends Command
           }
       
 
-        if (date('d') == 17) {
+        if (date('d') == 18) {
         
             
 
-/*
+
             $io->comment('Creating avoirs');
             $quittances = $this->manager
                 ->getRepository(Invoice::class)
                 ->findAvoirsTogenerate(50);
                 $old_number=0;
                 //$number=5002;
-                //$number=5052;
-                $number=5102;
+                $number=5052;
+                //$number=5102;
                 //$number=5105;
             foreach ($quittances as $quittance) {
                 $data=$quittance->getData();
@@ -200,9 +200,9 @@ class CronRegenerateInvoicesCommand extends Command
                 }
                 
             }
-        */
+        
 
-
+/*
             $io->comment('Recreating invoices');
             $invoices = $this->manager
                 ->getRepository(Invoice::class)
@@ -236,7 +236,7 @@ class CronRegenerateInvoicesCommand extends Command
                     $number+=1;
                 }
             }
-
+*/
 
              /*
             $io->comment('Recreating payed quittances');
@@ -337,6 +337,7 @@ class CronRegenerateInvoicesCommand extends Command
         $invoice2->setData($data);
         $data = $invoice2->getData();
         $invoice2->setDate(new DateTime());
+        $invoice2->setStatus(Invoice::STATUS_SENT);
         $invoice2->setProperty($property);
        // $invoice2->setData($data);
         $invoice->date_generation_avoir=new DateTime();
@@ -395,7 +396,7 @@ class CronRegenerateInvoicesCommand extends Command
                     $message = (new Swift_Message('Avoir '.$invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
-                        ->setTo("roquetigrinho@gmail.com")
+                        ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_avoir.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
                        
@@ -403,7 +404,7 @@ class CronRegenerateInvoicesCommand extends Command
                     $message = (new Swift_Message('Avoir '.$invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
-                        ->setTo("roquetigrinho@gmail.com")
+                        ->setTo($invoice->getProperty()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_avoir.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
                       
@@ -421,7 +422,7 @@ class CronRegenerateInvoicesCommand extends Command
                             $message1 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_avoir.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath2));
                                
@@ -440,7 +441,7 @@ class CronRegenerateInvoicesCommand extends Command
                             $message2 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setTo($mailTarget_r)
                                 ->setBody($this->twig->render('invoices/emails/notice_avoir.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath));
                               
@@ -451,7 +452,7 @@ class CronRegenerateInvoicesCommand extends Command
                         $message = (new Swift_Message('Avoir '.$invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_avoir.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ;
                         if($cond_h_n){
@@ -642,7 +643,7 @@ class CronRegenerateInvoicesCommand extends Command
                     $message = (new Swift_Message($invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
-                        ->setTo("roquetigrinho@gmail.com")
+                        ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
                        
@@ -650,7 +651,7 @@ class CronRegenerateInvoicesCommand extends Command
                     $message = (new Swift_Message($invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
-                        ->setTo("roquetigrinho@gmail.com")
+                        ->setTo($invoice->getProperty()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
                       
@@ -668,7 +669,7 @@ class CronRegenerateInvoicesCommand extends Command
                             $message1 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath2));
                                
@@ -687,7 +688,7 @@ class CronRegenerateInvoicesCommand extends Command
                             $message2 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setTo($mailTarget_r)
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath));
                               
@@ -698,7 +699,7 @@ class CronRegenerateInvoicesCommand extends Command
                         $message = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ;
                         if($cond_h_n){
@@ -879,7 +880,7 @@ class CronRegenerateInvoicesCommand extends Command
                     $message = (new Swift_Message($invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
-                        ->setTo("roquetigrinho@gmail.com")
+                        ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
                        
@@ -887,7 +888,7 @@ class CronRegenerateInvoicesCommand extends Command
                     $message = (new Swift_Message($invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
-                        ->setTo("roquetigrinho@gmail.com")
+                        ->setTo($invoice->getProperty()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
                       
@@ -905,7 +906,7 @@ class CronRegenerateInvoicesCommand extends Command
                             $message1 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath2));
                                
@@ -924,7 +925,7 @@ class CronRegenerateInvoicesCommand extends Command
                             $message2 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setTo($mailTarget_r)
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath));
                               
@@ -935,7 +936,7 @@ class CronRegenerateInvoicesCommand extends Command
                         $message = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 ->setBcc($this->mail_from)
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ;
                         if($cond_h_n){

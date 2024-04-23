@@ -193,8 +193,4 @@ janvier
   UPDATE invoice set status=2 where number in (5156,5157,5188) and file_id is null
 
 
-  cmsport-padelmaroc
-  zCi8x==J=^fu
-
-  admin
-  a2c2DVP7b%
+SELECT id,active,billing_disabled,start_date_management,valeur_indexation_normale, last_invoice FROM `property` WHERE active=1 and billing_disabled=0 and start_date_management<"2024-05-31" and last_invoice<"2024-03-31" order by id desc;
