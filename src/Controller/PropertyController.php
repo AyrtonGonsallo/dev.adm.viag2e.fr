@@ -140,7 +140,7 @@ class PropertyController extends AbstractController
             $property->climatisation_pompe_chaleur=0;
             $property->chaudiere=0;
             $property->valeur_indice_ref_og2_i=0;
-            $property->valeur_indexation_normale=0;
+            
             $property->num_mandat_gestion=0;
             $property->hide_honorary_export=0;
             $property->setDebirentierDifferent(0);
@@ -151,7 +151,14 @@ class PropertyController extends AbstractController
             $property->setWarrant($warrant);
             $property->setCreationUser($this->getUser());
             $property->setEditionUser($this->getUser());
+            $property->setGoodAddress($property->getAddress()." ".$property->getPostalCode()." ".$property->getCity());
+            if($property->initial_index_object){
+                $property->valeur_indexation_normale=$property->valeur_indice_reference_object->getValue();
 
+            }else{
+                $property->valeur_indexation_normale=0;
+
+            }
             $manager = $this->getDoctrine()->getManager();
             $manager->persist($property);
 

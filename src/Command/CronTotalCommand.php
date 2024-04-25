@@ -156,9 +156,17 @@ class CronTotalCommand extends Command
             
             
             $io->comment('Processing total invoices');
-            $factureMensuelles = $this->manager
-                ->getRepository(FactureMensuelle::class)
-                ->findAll();
+			// Obtenez la date du 20 du mois actuel
+        $dateLimite = date('Y-m-20');
+
+        // Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
+        $queryBuilder = $this->manager->createQueryBuilder();
+            $factureMensuelles = $queryBuilder->select('f')
+            ->from(FactureMensuelle::class, 'f')
+            ->where('f.date > :dateLimite')
+            ->setParameter('dateLimite', $dateLimite)
+            ->getQuery()
+            ->getResult();
             $this->generateTotal($io, $parameters, $factureMensuelles);
 
                   

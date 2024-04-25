@@ -453,7 +453,7 @@ class CronInvoicesCommand extends Command
                             'lastname'   => $property->getLastname1(),
                             'firstname2' => $property->getFirstname2(),
                             'lastname2'  => $property->getLastname2(),
-                            'address'    => formatter_adresse($property->getGoodAddress());
+                            'address'    => formatter_adresse($property->getGoodAddress()),
                             'postalcode' => $property->getPostalCode(),
                             'city'       => $property->getCity(),
                             'is_og2i'       => $property->getClauseOG2I(),
@@ -592,7 +592,7 @@ class CronInvoicesCommand extends Command
                             'lastname'   => $property->getLastname1(),
                             'firstname2' => $property->getFirstname2(),
                             'lastname2'  => $property->getLastname2(),
-                            'address'    => formatter_adresse($property->getGoodAddress());
+                            'address'    => formatter_adresse($property->getGoodAddress()),
                             'postalcode' => $property->getPostalCode(),
                             'city'       => $property->getCity(),
                             'is_og2i'       => $property->getClauseOG2I(),
@@ -685,7 +685,7 @@ class CronInvoicesCommand extends Command
                             'lastname'   => $property->getLastname1(),
                             'firstname2' => $property->getFirstname2(),
                             'lastname2'  => $property->getLastname2(),
-                            'address'    => formatter_adresse($property->getGoodAddress());
+                            'address'    => formatter_adresse($property->getGoodAddress()),
                             'postalcode' => $property->getPostalCode(),
                             'is_og2i'       => $property->getClauseOG2I(),
                             'city'       => $property->getCity(),

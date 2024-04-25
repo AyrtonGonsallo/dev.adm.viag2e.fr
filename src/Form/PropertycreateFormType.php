@@ -69,6 +69,38 @@ class PropertycreateFormType extends AbstractType
             ->add('abandonmentIndex', TextType::class, ['required' => false])
             ->add('revaluationDate', DayType::class)
             ->add('initialAmount', TextType::class)
+            ->add('valeur_indice_reference_object', EntityType::class, [
+                'required' => false,
+                'class' => RevaluationHistory::class,
+                'query_builder' => function (EntityRepository $er)  use($options){
+                    
+                        return $er->createQueryBuilder('rh')
+                        ->where('rh.type LIKE :key1 or rh.type LIKE :key2 or rh.type LIKE :key3')
+                        ->setParameter('key1', "Urbains")
+                        ->setParameter('key2', "Ménages")
+                        ->setParameter('key3', "OGI")
+                        ->orderBy('rh.type', 'ASC')
+                        ->addOrderBy('rh.date', 'DESC');
+                    
+                    
+                },
+                'choice_attr' => function($package) use ($options) {
+                    if($options['data']->valeur_indice_reference_object){
+                        $selected = false;
+                        if($package == $options['data']->valeur_indice_reference_object) {
+                            $selected = true;
+                        }
+                        return ['selected' => $selected];
+                    }else{
+                        return ['selected' => false];
+                    }
+                    
+                },
+                'choice_label' => function (RevaluationHistory $rh): string {
+                    return $rh->getValue().' '.$rh->getType().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp()));
+                },
+                'choice_value' => 'id',
+            ])
             ->add('condominiumFees', TextType::class, ['required' => false])
             ->add('garbageTax', TextType::class, ['required' => false])
             ->add('bank_establishment_code', TextType::class, ['required' => false])
@@ -114,12 +146,12 @@ class PropertycreateFormType extends AbstractType
                     
                 },
                 'choice_label' => function (RevaluationHistory $rh): string {
-                    return $rh->getValue().' '.$rh->getType().' mois de '.strftime('%B %Y',$rh->getDate()->getTimestamp());
+                    return $rh->getValue().' '.$rh->getType().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp()));
                 },
                 'choice_value' => 'id',
             ])
             ->add('mail2', EmailType::class, ['required' => false])
-           
+
             ->add('goodType', ChoiceType::class, ['choices' => array_flip(Property::LIFETIME_TYPES), 'choice_translation_domain' => false])
             ->add('propertyType', TextType::class, ['required' => false])
             //->add('date_signature_acte_authentique', BirthdayType::class, ['required' => false, 'format' => 'dd-MMM-yyyy'])

@@ -51,7 +51,7 @@ class PropertyPaymentFormType extends AbstractType
                
             },
             'choice_label' => function (RevaluationHistory $rh): string {
-                return $rh->getValue().' mois de '.strftime('%B %Y',$rh->getDate()->getTimestamp());
+                return $rh->getValue().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp()));
             },
             'choice_value' => 'id',
         ])
@@ -83,7 +83,7 @@ class PropertyPaymentFormType extends AbstractType
                     
                 },
                 'choice_label' => function (RevaluationHistory $rh): string {
-                    return $rh->getValue().' '.$rh->getType().' mois de '.strftime('%B %Y',$rh->getDate()->getTimestamp());
+                    return $rh->getValue().' '.$rh->getType().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp()));
                 },
                 'choice_value' => 'id',
             ])
@@ -115,7 +115,7 @@ class PropertyPaymentFormType extends AbstractType
                     
                 },
                 'choice_label' => function (RevaluationHistory $rh): string {
-                    return $rh->getValue().' '.$rh->getType().' mois de '.strftime('%B %Y',$rh->getDate()->getTimestamp());
+                    return $rh->getValue().' '.$rh->getType().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp()));
                 },
                 'choice_value' => 'id',
             ])

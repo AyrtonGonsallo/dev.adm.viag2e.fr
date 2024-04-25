@@ -67,6 +67,73 @@ complémentaires et vous prions de croire en l’expression de nos sincères sal
                             Vincent GIBELIN,
         </div>                
 </page>
+
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt;">
+    <bookmark title="Facture" level="0" ></bookmark>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px;margin-right:4%;margin-left:4%;width: 92%">
+        <tr>
+            <td style="text-align: left; width: 40%;">
+                <img style="width: 150px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+                
+            </td>
+            <td style="width: 60%; padding-top: 25px;">
+            </td>
+        </tr>
+       
+    </table>
+    <br />
+    <br />
+      <div style="width: 100%; text-align: center; font-weight:bolder;font-size: 14px;margin-right:4%;margin-left:4%;">
+            <b><u>APPEL DE FONDS<br />
+        UNIVERS VIAGER GESTION - {{periode}}<br />
+        {{dest.name}}</u></b>
+        </div>
+    <table cellspacing="0" style="width: 100%;border: solid 1px black; text-align: center; font-size: 11px;margin-right:4%;margin-left:4%;width: 92%">
+        <tr>
+            <td style=" width: 50%;border: solid 1px black;background-color: #def5ef;">                
+                Dossiers
+            </td>
+            <td style="width: 20%;border: solid 1px black;background-color: #d4ff9d;">
+                Honoraires appellés
+            </td>
+            <td style="width: 30%;border: solid 1px black;background-color: #d4ff9d;">
+                Notes
+            </td>
+        </tr>
+        {% for f in factures %}
+            {% if f.type ==2%}
+                <tr {% if f.property.date_maj_indice_ref > date('first day of this month') %} style="background-color: #ffc000;" {% elseif f.property.date_duh > date('first day of last month') %}   style="background-color: #9ee1f8;"  {% endif %}>
+                    <td style=" width: 50%;border: solid 1px black;">
+                        {{f.property.title}}
+                    </td>
+                    <td style="width: 20%;border: solid 1px black; ">
+                    {{f.amount | round(2) }} €
+                    </td>
+                    <td style="width: 30%;border: solid 1px black; ">
+                        {% if f.property.date_maj_indice_ref > date('first day of this month') %}
+                            Indexation
+                        {% elseif f.property.date_duh > date('first day of last month') %}
+                            Nouveau bien
+                        {% endif %}                
+                    </td>
+                </tr>
+            {% endif %}  
+         {% endfor %}
+             <tr>
+                <td tyle=" width: 50%;border: solid 1px black;;">
+                    honoraires {{dest.name}}
+                </td>
+                <td style="width: 20%;border: solid 1px black; ">
+                <b>{{somme | round(2) }} €</b>
+                </td>
+                <td style="width: 30%;border: solid 1px black; ">
+                
+                </td>
+            </tr>
+    </table>
+                
+</page>
+
 <page_footer>
     <table cellspacing="0" style="width: 100%; text-align: center; font-size: 10px;">
         <tr>

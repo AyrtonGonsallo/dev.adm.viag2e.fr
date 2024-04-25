@@ -216,6 +216,7 @@
                                                     {{ form_row(form.address, {'attr': {'class': 'form-control m-input'}, 'id': 'form-address', 'label': false}) }}
                                                 </div>
                                             </div>
+                                           
                                             <div class="form-group m-form__group row">
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-postalCode">* Code postal:</label>
                                                 <div class="col-xl-9 col-lg-9">
@@ -359,6 +360,12 @@
                                                     <label class="col-xl-3 col-lg-3 col-form-label" for="form-initialIndex">* Indice initial du bien:</label>
                                                     <div class="col-xl-9 col-lg-9">
                                                         {{ form_row(form.initial_index_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initialIndex', 'label': false}) }}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group m-form__group row">
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-valeur_indice_reference_object">* Valeur Indice de référence</label>
+                                                    <div class="col-xl-9 col-lg-9">
+                                                        {{ form_row(form.valeur_indice_reference_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-valeur_indice_reference_object', 'label': false}) }}
                                                     </div>
                                                 </div>
                                                 <div class="form-group m-form__group row">
