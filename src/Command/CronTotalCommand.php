@@ -161,12 +161,15 @@ class CronTotalCommand extends Command
 
         // Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
         $queryBuilder = $this->manager->createQueryBuilder();
-            $factureMensuelles = $queryBuilder->select('f')
-            ->from(FactureMensuelle::class, 'f')
-            ->where('f.date > :dateLimite')
-            ->setParameter('dateLimite', $dateLimite)
-            ->getQuery()
-            ->getResult();
+        $factureMensuelles = $queryBuilder->select('f')
+		->from(FactureMensuelle::class, 'f')
+		->join('f.property', 'p') // Rejoindre la table Property
+		->where('f.date > :dateLimite')
+		->andWhere('p.warrant = 16')
+		->setParameter('dateLimite', $dateLimite)
+		->orderBy('p.title', 'ASC') // Tri par la propriété "title" de l'objet Property
+		->getQuery()
+		->getResult();
             $this->generateTotal($io, $parameters, $factureMensuelles);
 
                   

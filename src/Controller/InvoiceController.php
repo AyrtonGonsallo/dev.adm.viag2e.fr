@@ -1009,7 +1009,16 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                             }
                         }else{
                             //si mandat acquereur                                
-                            if($cond_h_n && $cond_r_n){
+                            if($cond_h_n){
+                                $message = (new Swift_Message($invoice->getMailSubject()))
+                                    ->setFrom($this->getParameter('mail_from'))
+                                    ->setBcc($this->getParameter('mail_from'))
+                                    ->setTo("roquetigrinho@gmail.com")
+                                    ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+                                    //->attach(Swift_Attachment::fromPath($filePath))
+                                    //->attach(Swift_Attachment::fromPath($filePath2));
+                            }
+							else if($cond_r_n){
                                 $message = (new Swift_Message($invoice->getMailSubject()))
                                     ->setFrom($this->getParameter('mail_from'))
                                     ->setBcc($this->getParameter('mail_from'))
@@ -1052,7 +1061,7 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                             }
                         }
                     }else if($data['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() != Warrant::TYPE_SELLERS){
-                        if($cond_h_n && $cond_r_n){
+                        if($cond_h_n || $cond_r_n){
                             if(!empty($invoice->getMailCc())) {
                                 $message->setCc("roquetigrinho@gmail.com");
                             }
