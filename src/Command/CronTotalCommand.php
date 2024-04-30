@@ -189,11 +189,11 @@ class CronTotalCommand extends Command
             foreach ($factureMensuelles as $fact) {
                 if($fact->getType()==FactureMensuelle::TYPE_RENTE){
                     $somme_r+=$fact->getAmount();
-                    $date_r=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'))));
+                    $date_r=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'). ' +1 month')));
                     $warrant_r = $fact->getProperty()->getWarrant();
                 }else if($fact->getType()==FactureMensuelle::TYPE_HONORAIRES ){
                     $somme_h+=$fact->getAmount();
-                    $date_h=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'))));
+                    $date_h=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'). ' +1 month')));
                     $warrant_h = $fact->getProperty()->getWarrant();
                 }
                
@@ -234,11 +234,11 @@ class CronTotalCommand extends Command
                 $this->manager->persist($totalFactureMensuelle);
                 $this->manager->flush();
             }
-           
+            $d = new DateTime('First day of next month');
 
 
             if($somme_r>0){
-                $message = (new Swift_Message("Total des rentes ".$dest_r->getName()))
+                $message = (new Swift_Message("ADF ".$d->format('m/y')." OB2"))
                     ->setFrom($this->mail_from)
                     ->setBcc($this->mail_from)
                     //->setTo($dest_r->getEmail())
@@ -253,7 +253,7 @@ class CronTotalCommand extends Command
                 }
             }
             if($somme_h>0){
-                $message2 = (new Swift_Message("Total des honoraires ".$dest_h->getName()))
+                $message2 = (new Swift_Message("ADF ".$d->format('m/y')."  OG2I"))
                     ->setFrom($this->mail_from)
                     ->setBcc($this->mail_from)
                     //->setTo($dest_h->getEmail())

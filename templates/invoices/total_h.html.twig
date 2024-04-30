@@ -24,7 +24,7 @@
                 {{ parameters.address|raw }},
                 {{ parameters.postalcode }} {{ parameters.city|upper }}<br />
                 Téléphone: {{ parameters.phone }} - 06.67.11.61.83 <br />
-                Mail: info@univers-viager.fr<br />
+                Mail: gestion@univers-viager.fr<br />
                 Site internet : www.univers-viager.fr <br />
             </td>
             <td style="width: 60%; padding-top: 25px;">
@@ -50,18 +50,18 @@
                             {% for i in 0..5 %}
                                 &nbsp;
                             {% endfor %}
-                            Veuillez trouver ci-dessous les montants correspondant au total des honoraires de gestion à verser pour le mois de {{date}}. <br />
+                            Veuillez trouver ci-dessous les montants correspondant au total des honoraires de gestion à verser pour le mois de {{date}}. <br /><br />
                            {% for i in 0..5 %}
                                 &nbsp;
                             {% endfor %}
-                           <b>Honoraires de gestion : {{somme}} €</b><br />
+                           <b>Honoraires de gestion : {{somme}} €</b><br /><br />
                            {% for i in 0..5 %}
                                 &nbsp;
                             {% endfor %}
                            Nous restons, bien entendu, à votre disposition pour tous renseignements
 complémentaires et vous prions de croire en l’expression de nos sincères salutations.<br /><br />
                                 <br /> <br /> <br />
-                            {% for i in 0..30 %}
+                            {% for i in 0..50 %}
                                 &nbsp;
                             {% endfor %}
                             Vincent GIBELIN,
@@ -83,21 +83,21 @@ complémentaires et vous prions de croire en l’expression de nos sincères sal
     </table>
     <br />
     <br />
-      <div style="width: 100%; text-align: center; font-weight:bolder;font-size: 14px;margin-right:4%;margin-left:4%;">
+      <div style="width: 100%; text-align: center; text-transform:uppercase; font-weight:bolder;font-size: 14px;margin-right:4%;margin-left:4%;">
             <b><u>APPEL DE FONDS<br />
         UNIVERS VIAGER GESTION - {{periode}}<br />
         {{dest.name}}</u></b>
         </div>
     <table cellspacing="0" style="width: 100%;border: solid 1px black; text-align: center; font-size: 11px;margin-right:4%;margin-left:4%;width: 92%">
         <tr>
-            <td style=" width: 50%;border: solid 1px black;background-color: #def5ef;">                
-                Dossiers
+            <td style="text-transform:uppercase; width: 50%;border: solid 1px black;background-color: #def5ef;">                
+                <b>Dossiers</b>
             </td>
             <td style="width: 20%;border: solid 1px black;background-color: #d4ff9d;">
-                Honoraires appellés
+                <b>Honoraires appellés</b>
             </td>
             <td style="width: 30%;border: solid 1px black;background-color: #d4ff9d;">
-                Notes
+                <b>Notes</b>
             </td>
         </tr>
         {% for f in factures %}
@@ -120,8 +120,8 @@ complémentaires et vous prions de croire en l’expression de nos sincères sal
             {% endif %}  
          {% endfor %}
              <tr>
-                <td tyle=" width: 50%;border: solid 1px black;;">
-                    honoraires {{dest.name}}
+                <td style="width: 50%;border: solid 1px black;text-transform:uppercase;">
+                    <b>honoraires {{dest.name}}</b>
                 </td>
                 <td style="width: 20%;border: solid 1px black; ">
                 <b>{{somme | round(2) }} €</b>
