@@ -54,7 +54,7 @@
                            {% for i in 0..5 %}
                                 &nbsp;
                             {% endfor %}
-                           <b>Honoraires de gestion : {{somme}} €</b><br /><br />
+                           <b>Honoraires de gestion : {{somme | number_format(2, '.', ' ')}} €</b><br /><br />
                            {% for i in 0..5 %}
                                 &nbsp;
                             {% endfor %}
@@ -107,7 +107,7 @@ complémentaires et vous prions de croire en l’expression de nos sincères sal
                         {{f.property.title}}
                     </td>
                     <td style="width: 20%;border: solid 1px black; ">
-                    {{f.amount | round(2) }} €
+                    {{f.amount | round(2, 'floor') | number_format(2, '.', ' ')}} €
                     </td>
                     <td style="width: 30%;border: solid 1px black; ">
                         {% if f.property.date_maj_indice_ref > date('first day of this month') %}
@@ -124,7 +124,7 @@ complémentaires et vous prions de croire en l’expression de nos sincères sal
                     <b>honoraires {{dest.name}}</b>
                 </td>
                 <td style="width: 20%;border: solid 1px black; ">
-                <b>{{somme | round(2) }} €</b>
+                <b>{{somme | round(2) | number_format(2, '.', ' ') }} €</b>
                 </td>
                 <td style="width: 30%;border: solid 1px black; ">
                 

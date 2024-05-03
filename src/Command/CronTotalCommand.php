@@ -188,11 +188,11 @@ class CronTotalCommand extends Command
             $dest_h=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['id' => 18]);
             foreach ($factureMensuelles as $fact) {
                 if($fact->getType()==FactureMensuelle::TYPE_RENTE){
-                    $somme_r+=$fact->getAmount();
+                    $somme_r+=round($fact->getAmount(), 2, PHP_ROUND_HALF_DOWN);
                     $date_r=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'). ' +1 month')));
                     $warrant_r = $fact->getProperty()->getWarrant();
                 }else if($fact->getType()==FactureMensuelle::TYPE_HONORAIRES ){
-                    $somme_h+=$fact->getAmount();
+                    $somme_h+=round($invoice->getData()['property']['honoraryRates']);
                     $date_h=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'). ' +1 month')));
                     $warrant_h = $fact->getProperty()->getWarrant();
                 }
