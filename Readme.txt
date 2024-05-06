@@ -194,3 +194,6 @@ janvier
 
 
 SELECT id,active,billing_disabled,start_date_management,valeur_indexation_normale, last_invoice FROM `property` WHERE active=1 and billing_disabled=0 and start_date_management<"2024-05-31" and last_invoice<"2024-03-31" order by id desc;
+
+SELECT f.id,f.number,p.title FROM `facture_mensuelle` f,property p WHERE f.property_id=p.Id and p.warrant_id=16 and f.date>"2024-04-19" order by f.number desc;
+ajouter facture_id dans invoice et invoice_id dans facture

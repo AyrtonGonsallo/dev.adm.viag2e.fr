@@ -64,8 +64,10 @@ class PropertycreateFormType extends AbstractType
             ->add('lastname2', TextType::class, ['required' => false])
             ->add('dateofbirth2', BirthdayType::class, ['required' => false, 'format' => 'dd-MMM-yyyy'])
             ->add('mail1', EmailType::class, ['required' => false])
+            ->add('intitules_indices_initial', ChoiceType::class, ['choices' => array_flip(Property::intitules_indices_initial), 'choice_translation_domain' => false])
+            ->add('mois_indice_initial', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy','years' => range(date("Y")-12, date("Y")) ])
+
             ->add('honorariesDisabled', CheckboxType::class, ['required' => false])
-            ->add('revaluationIndex', TextType::class, ['required' => false])
             ->add('abandonmentIndex', TextType::class, ['required' => false])
             ->add('revaluationDate', DayType::class)
             ->add('initialAmount', TextType::class)

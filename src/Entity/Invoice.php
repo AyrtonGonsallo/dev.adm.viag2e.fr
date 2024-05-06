@@ -81,7 +81,11 @@ class Invoice implements JsonSerializable
      * @ORM\JoinColumn(nullable=false)
      */
     private $property;
-
+/**
+     * @ORM\OneToOne(targetEntity="App\Entity\FactureMensuelle", inversedBy="invoice", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $facture;
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\File", inversedBy="invoice", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)

@@ -323,7 +323,10 @@ class Property
      * @ORM\OneToMany(targetEntity="App\Entity\File", mappedBy="property")
      */
     private $documents;
-
+/**
+     * @ORM\OneToMany(targetEntity="App\Entity\FactureMensuelle", mappedBy="property")
+     */
+    private $factures;
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
@@ -669,7 +672,7 @@ class Property
         $this->setInitialIndex(0.0);
         $this->setAbandonmentIndex(0.0);
         $this->setRevaluationDate('01-01');
-        $this->setInitialAmount(0.0);
+        //$this->setInitialAmount(0.0);
         $this->setHonoraryRates(0.0);
         $this->setCondominiumFees(0.0);
         $this->setGarbageTax(0.0);

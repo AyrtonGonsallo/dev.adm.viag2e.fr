@@ -52,10 +52,16 @@ class FactureMensuelle
   
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Property", inversedBy="invoices")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Property", inversedBy="factures")
      * @ORM\JoinColumn(nullable=false)
      */
     private $property;
+
+     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Invoice", inversedBy="facture")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $invoice;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\File", inversedBy="invoice", cascade={"persist", "remove"})
@@ -178,7 +184,17 @@ class FactureMensuelle
 
         return $this;
     }
+    public function getInvoice(): ?Invoice
+    {
+        return $this->invoice;
+    }
 
+    public function setInvoice(?Invoice $invoice): self
+    {
+        $this->invoice = $invoice;
+
+        return $this;
+    }
     public function getFile(): ?File
     {
         return $this->file;

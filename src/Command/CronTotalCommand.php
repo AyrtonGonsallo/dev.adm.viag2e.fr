@@ -148,35 +148,97 @@ class CronTotalCommand extends Command
 
         $last_number = $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_number']);
         $io->comment('jour: '.date('d').' date totale:'.date('Y-m-d H:i:s'));
+   
+/*
         
-
-      
+        $io->comment('Recuperation des factures et ajout des invoices');
+        $dateLimite = date('Y-04-20');
+        // Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
+        $queryBuilder = $this->manager->createQueryBuilder();
+        $factureMensuelles = $queryBuilder->select('f')
+        ->from(FactureMensuelle::class, 'f')
+        ->join('f.property', 'p') // Rejoindre la table Property
+        ->where('f.date > :dateLimite')
+        ->andWhere('p.warrant = 16')
+        ->setParameter('dateLimite', $dateLimite)
+        ->orderBy('f.number', 'DESC') // Tri par la propriété "title" de l'objet Property
+        ->getQuery()
+        ->getResult();
+        $this->addInvoices($io, $factureMensuelles);
+      */
         
         if (date('d') >= 21) {
             
             
             $io->comment('Processing total invoices');
 			// Obtenez la date du 20 du mois actuel
-        $dateLimite = date('Y-m-20');
+            $dateLimite = date('Y-04-20');
 
-        // Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
-        $queryBuilder = $this->manager->createQueryBuilder();
-        $factureMensuelles = $queryBuilder->select('f')
-		->from(FactureMensuelle::class, 'f')
-		->join('f.property', 'p') // Rejoindre la table Property
-		->where('f.date > :dateLimite')
-		->andWhere('p.warrant = 16')
-		->setParameter('dateLimite', $dateLimite)
-		->orderBy('p.title', 'ASC') // Tri par la propriété "title" de l'objet Property
-		->getQuery()
-		->getResult();
+            // Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
+            $queryBuilder = $this->manager->createQueryBuilder();
+            $factureMensuelles = $queryBuilder->select('f')
+            ->from(FactureMensuelle::class, 'f')
+            ->join('f.property', 'p') // Rejoindre la table Property
+            ->where('f.date > :dateLimite')
+            ->andWhere('p.warrant = 16')
+            ->setParameter('dateLimite', $dateLimite)
+            ->orderBy('p.title', 'ASC') // Tri par la propriété "title" de l'objet Property
+            ->getQuery()
+            ->getResult();
             $this->generateTotal($io, $parameters, $factureMensuelles);
 
-                  
+                    
             
         }
     }
        
+    public function addInvoices(SymfonyStyle &$io, array $factureMensuelles)
+    {
+        
+        
+            foreach ($factureMensuelles as $fact) {
+                if($fact->getType()==FactureMensuelle::TYPE_RENTE){
+                    $queryBuilder = $this->manager->createQueryBuilder();
+                    $invoice_data = $queryBuilder->select('i')
+                    ->from(Invoice::class, 'i')
+                    ->where('i.number = :num')
+                    ->andWhere('i.file2 is Null')
+                    //->andWhere("i.date > '2024-04-19'")
+                    ->setParameter('num', substr($fact->getNumber(), -4))
+                    ->orderBy('i.date', 'DESC')
+                    ->getQuery()
+                    ->getResult();
+                    $invoice=$invoice_data[0];
+                    $montant=round($invoice->getData()['property']['annuity'],2);
+                    $fact->setInvoice($invoice);
+                    $fact->setAmount($montant);
+                    $io->note('Facture rente n '.substr($fact->getNumber(), -4).' correspondant a l\'invoice '.$invoice->getId().' de montant '.$montant);
+                }else if($fact->getType()==FactureMensuelle::TYPE_HONORAIRES ){
+                    $queryBuilder = $this->manager->createQueryBuilder();
+                    $invoice_data = $queryBuilder->select('i')
+                    ->from(Invoice::class, 'i')
+                    ->where('i.number = :num')
+                    ->andWhere('i.file is Null')
+                    //->andWhere("i.date > '2024-04-19'")
+                    ->setParameter('num', substr($fact->getNumber(), -4))
+                    ->orderBy('i.date', 'DESC')
+                    ->getQuery()
+                    ->getResult();
+                    $invoice=$invoice_data[0];
+                    $montant=round($invoice->getData()['property']['honoraryRates'],2);
+                    $fact->setInvoice($invoice);
+                    $fact->setAmount($montant);
+
+                    $io->note('Facture honoraires n '.substr($fact->getNumber(), -4).' correspondant a l\'invoice '.$invoice->getId().' de montant '.$montant);
+                }
+                $this->manager->persist($fact);
+                
+               
+            }
+            $this->manager->flush();
+		
+    }
+
     public function generateTotal(SymfonyStyle &$io, array $parameters, array $factureMensuelles)
     {
         try {   
@@ -188,11 +250,11 @@ class CronTotalCommand extends Command
             $dest_h=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['id' => 18]);
             foreach ($factureMensuelles as $fact) {
                 if($fact->getType()==FactureMensuelle::TYPE_RENTE){
-                    $somme_r+=round($fact->getAmount(), 2, PHP_ROUND_HALF_DOWN);
+                    $somme_r+=$fact->getAmount();
                     $date_r=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'). ' +1 month')));
                     $warrant_r = $fact->getProperty()->getWarrant();
                 }else if($fact->getType()==FactureMensuelle::TYPE_HONORAIRES ){
-                    $somme_h+=round($invoice->getData()['property']['honoraryRates']);
+                    $somme_h+=$fact->getAmount();
                     $date_h=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'). ' +1 month')));
                     $warrant_h = $fact->getProperty()->getWarrant();
                 }
@@ -281,7 +343,7 @@ class CronTotalCommand extends Command
 		
     }
 
-
+    
     private function areMailsDisabled()
     {
         return $this->noMail;

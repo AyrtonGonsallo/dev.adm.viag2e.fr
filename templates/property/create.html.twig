@@ -349,17 +349,24 @@
                                                     </span>
                                                 </div>
                                             </div>
+                                            
                                             <div id="billingBox">
-                                                <div class="form-group m-form__group row">
-                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-revaluationIndex">Indice de revalorisation:</label>
+                                                 <div class="form-group m-form__group row">
+                                                    <label for="form-intitules_indices_initial" class="col-xl-3 col-lg-3 col-form-label">Intitulé indice initial <span class="m--font-danger">*</span></label>
                                                     <div class="col-xl-9 col-lg-9">
-                                                        {{ form_row(form.revaluationIndex, {'attr': {'class': 'form-control m-input'}, 'id': 'form-revaluationIndex', 'label': false}) }}
+                                                        {{ form_row(form.intitules_indices_initial, {'attr': {'class': 'form-control m-input'}, 'id': 'form-intitules_indices_initial', 'label': false}) }}
                                                     </div>
                                                 </div>
                                                 <div class="form-group m-form__group row">
-                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-initialIndex">* Indice initial du bien:</label>
+                                                    <label for="form-mois_indice_initial" class="col-xl-3 col-lg-3 col-form-label">Mois indice initial<span class="m--font-danger">*</span></label>
                                                     <div class="col-xl-9 col-lg-9">
-                                                        {{ form_row(form.initial_index_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initialIndex', 'label': false}) }}
+                                                        {{ form_row(form.mois_indice_initial, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mois_indice_initial', 'label': false,'date_pattern': '<span style="display: none;">{{ day }}</span> {{ month }} <span class="delim">&#47;</span> {{ year }}' }) }}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group m-form__group row">
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-initial_index_object">* Indice initial du bien:</label>
+                                                    <div class="col-xl-9 col-lg-9">
+                                                        {{ form_row(form.initial_index_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initial_index_object', 'label': false}) }}
                                                     </div>
                                                 </div>
                                                 <div class="form-group m-form__group row">
@@ -375,11 +382,12 @@
                                                     </div>
                                                 </div>
                                                 <div class="form-group m-form__group row">
-                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-revaluationDate">Date de revalorisation:</label>
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-revaluationDate">Date d’indexation:</label>
                                                     <div class="col-xl-9 col-lg-9">
                                                         {{ form_row(form.revaluationDate, {'attr': {'class': 'form-control m-input'}, 'id': 'form-revaluationDate', 'label': false}) }}
                                                     </div>
                                                 </div>
+                                                
                                                 <div class="form-group m-form__group row">
                                                     <label class="col-xl-3 col-lg-3 col-form-label" for="form-initialAmount">* Montant initial:</label>
                                                     <div class="col-xl-9 col-lg-9">
@@ -610,9 +618,126 @@
             </div>
         </div>
     </div>
-{% endblock %}
+    {% endblock %}
 
 {% block scripts %}
+   
+    {{ encore_entry_script_tags('property') }}
+    {{ encore_entry_script_tags('property-billing') }}
+    {{ encore_entry_script_tags('html-table.warrants') }}
+
+
+    {{ encore_entry_script_tags('warrant') }}
+    <script type="text/javascript">
+$('#propertycreate_form_mois_indice_initial_day').val("1").change();
+    $('#propertycreate_form_mois_indice_initial_year').on('change', function() {
+        function get_label(id){
+            if(id==2){return "Ménages";}
+            else if(id==1){return "Urbains"}
+        }
+        id=$('#form-intitules_indices_initial').find(":selected").val();
+        setTimeout(function(){ 
+            var selected=get_label(id);
+            var selected_month=($('#propertycreate_form_mois_indice_initial_month').find(":selected").val())?$('#propertycreate_form_mois_indice_initial_month').find(":selected").val():10;
+            var selected_year=($('#propertycreate_form_mois_indice_initial_year').find(":selected").val())?$('#propertycreate_form_mois_indice_initial_year').find(":selected").val():2023;
+            //propertycreate_form_mois_indice_initial_month
+            let route = "{{ path('get_ipcs', {'type':'eee','month':'mmm','year':'yyy'}) }}";
+            changePath1 = route.replace('mmm', selected_month);
+            changePath2 = changePath1.replace('yyy', selected_year);
+            changePath = changePath2.replace('eee', selected);
+            console.log( selected,selected_month,selected_year );
+            $.ajax({
+                method: "post",
+                url:changePath,
+            // url: '{{ path('get_ipcs', {'type':'Ménages'}) }}',
+                data: { myid: 123456 },
+                success: function(data) {
+                    console.log(data)
+                    $('#form-initial_index_object').html(data['options'])
+                    $('#form-valeur_indice_reference_object option[value="'+data['valeur_indice_de_référence_id']+'"]').prop('selected', true)
+                }
+            });
+        }, 1000);
+      
+    });
+    $('#propertycreate_form_mois_indice_initial_month').on('change', function() {
+        function get_label(id){
+            if(id==2){return "Ménages";}
+            else if(id==1){return "Urbains"}
+        }
+        id=$('#form-intitules_indices_initial').find(":selected").val();
+        setTimeout(function(){ 
+            var selected=get_label(id);
+            var selected_month=($('#propertycreate_form_mois_indice_initial_month').find(":selected").val())?$('#propertycreate_form_mois_indice_initial_month').find(":selected").val():10;
+            var selected_year=($('#propertycreate_form_mois_indice_initial_year').find(":selected").val())?$('#propertycreate_form_mois_indice_initial_year').find(":selected").val():2023;
+            //propertycreate_form_mois_indice_initial_month
+            let route = "{{ path('get_ipcs', {'type':'eee','month':'mmm','year':'yyy'}) }}";
+            changePath1 = route.replace('mmm', selected_month);
+            changePath2 = changePath1.replace('yyy', selected_year);
+            changePath = changePath2.replace('eee', selected);
+            console.log( selected,selected_month,selected_year );
+            $.ajax({
+                method: "post",
+                url:changePath,
+            // url: '{{ path('get_ipcs', {'type':'Ménages'}) }}',
+                data: { myid: 123456 },
+                success: function(data) {
+                    console.log(data)
+                    $('#form-initial_index_object').html(data['options'])
+                    $('#form-valeur_indice_reference_object option[value="'+data['valeur_indice_de_référence_id']+'"]').prop('selected', true)
+                }
+            });
+        }, 1000);
+       
+    });
+    $('#form-intitules_indices_initial').on('change', function() {
+        function get_label(id){
+            if(id==2){return "Ménages";}
+            else if(id==1){return "Urbains"}
+        }
+        id=$(this).find(":selected").val();
+        setTimeout(function(){ 
+            var selected=get_label(id);
+            var selected_month=($('#propertycreate_form_mois_indice_initial_month').find(":selected").val())?$('#propertycreate_form_mois_indice_initial_month').find(":selected").val():10;
+            var selected_year=($('#propertycreate_form_mois_indice_initial_year').find(":selected").val())?$('#propertycreate_form_mois_indice_initial_year').find(":selected").val():2023;
+            //propertycreate_form_mois_indice_initial_month
+            let route = "{{ path('get_ipcs', {'type':'eee','month':'mmm','year':'yyy'}) }}";
+            changePath1 = route.replace('mmm', selected_month);
+            changePath2 = changePath1.replace('yyy', selected_year);
+            changePath = changePath2.replace('eee', selected);
+            console.log( selected,selected_month,selected_year );
+            $.ajax({
+                method: "post",
+                url:changePath,
+            // url: '{{ path('get_ipcs', {'type':'Ménages'}) }}',
+                data: { myid: 123456 },
+                success: function(data) {
+                    console.log(data)
+                    $('#form-initial_index_object').html(data['options'])
+                    $('#form-valeur_indice_reference_object option[value="'+data['valeur_indice_de_référence_id']+'"]').prop('selected', true)
+                }
+            });
+        }, 1000);
+        setTimeout(function(){ 
+            var selected=get_label(id);
+            let route = "{{ path('get_currents_ipcs', {'type':'eee'}) }}";
+            changePath = route.replace('eee', selected);
+            console.log( selected );
+            $.ajax({
+                method: "post",
+                url:changePath,
+            // url: '{{ path('get_currents_ipcs', {'type':'Ménages'}) }}',
+                data: { myid: 123456 },
+                success: function(data) {
+                    console.log(data)
+                    $('#form-valeur_indice_reference_object option[value="'+data['options']['id']+'"]').prop('selected', true)
+                }
+            });
+        }, 2000);
+        
+    });
+    </script>
+
     {{ encore_entry_script_tags('wizard') }}
     {{ encore_entry_script_tags('property-billing') }}
 {% endblock %}
