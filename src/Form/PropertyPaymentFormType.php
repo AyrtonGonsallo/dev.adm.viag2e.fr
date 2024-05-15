@@ -121,7 +121,7 @@ class PropertyPaymentFormType extends AbstractType
             ])
             ->add('abandonmentIndex', TextType::class, ['required' => false])
             ->add('revaluationDate', DayType::class)
-            ->add('mois_indice_initial', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy','years' => range(date("Y")-12, date("Y")) ])
+            ->add('mois_indice_initial', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy','years' => range(date("Y")-22, date("Y")) ])
             ->add('initialAmount', TextType::class)
             ->add('honorary_rates_object',  EntityType::class, [
                 'class' => Honoraire::class,

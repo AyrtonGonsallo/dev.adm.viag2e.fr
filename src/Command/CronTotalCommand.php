@@ -167,7 +167,7 @@ class CronTotalCommand extends Command
         $this->addInvoices($io, $factureMensuelles);
       */
         
-        if (date('d') >= 21) {
+        if (date('d') == 7) {
             
             
             $io->comment('Processing total invoices');

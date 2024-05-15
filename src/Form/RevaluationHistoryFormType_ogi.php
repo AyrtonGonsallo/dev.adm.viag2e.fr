@@ -18,7 +18,7 @@ class RevaluationHistoryFormType_ogi extends AbstractType
     {
         $builder
             ->add('value', TextType::class, array('label' => false,))
-            ->add('date', DateType::class, ['label' => false,'required' => false, 'format' => 'dd-MMM-yyyy', ])
+            ->add('date', DateType::class, ['label' => false,'required' => false, 'format' => 'dd-MMM-yyyy','years' => range(date("Y")-22, date("Y")) ])
             ->add('comment', TextareaType::class, array('required' => false, 'attr' => ['class' => 'tinymce'],'label' => false));
     }
 
