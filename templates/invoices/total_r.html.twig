@@ -106,7 +106,7 @@ complémentaires et vous prions de croire en l’expression de nos sincères sal
                         {{f.property.title}}
                     </td>
                     <td style="width: 20%;border: solid 1px black; ">
-                    {{f.amount  | number_format(2, '.', ' ')}} €
+                    {{f.invoice.data.property.annuity | number_format(2, '.', ' ')}} €
                     </td>
                     <td style="width: 30%;border: solid 1px black; ">
                         {% if f.property.date_maj_indice_ref > date('first day of this month') %}

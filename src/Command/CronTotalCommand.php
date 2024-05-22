@@ -167,12 +167,12 @@ class CronTotalCommand extends Command
         $this->addInvoices($io, $factureMensuelles);
       */
         
-        if (date('d') == 7) {
+        if (date('d') >= 21) {
             
             
             $io->comment('Processing total invoices');
 			// Obtenez la date du 20 du mois actuel
-            $dateLimite = date('Y-04-20');
+            $dateLimite = date('Y-m-20');
 
             // Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
             $queryBuilder = $this->manager->createQueryBuilder();
@@ -250,11 +250,11 @@ class CronTotalCommand extends Command
             $dest_h=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['id' => 18]);
             foreach ($factureMensuelles as $fact) {
                 if($fact->getType()==FactureMensuelle::TYPE_RENTE){
-                    $somme_r+=$fact->getAmount();
+                    $somme_r+=round($fact->getInvoice()->getData()['property']['annuity'], 2);
                     $date_r=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'). ' +1 month')));
                     $warrant_r = $fact->getProperty()->getWarrant();
                 }else if($fact->getType()==FactureMensuelle::TYPE_HONORAIRES ){
-                    $somme_h+=$fact->getAmount();
+                    $somme_h+=round($fact->getInvoice()->getData()['property']['honoraryRates'], 2);
                     $date_h=utf8_encode(strftime("%B %Y",strtotime($fact->getDate()->format('Y-m-d H:i:s'). ' +1 month')));
                     $warrant_h = $fact->getProperty()->getWarrant();
                 }

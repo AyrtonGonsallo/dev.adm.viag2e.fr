@@ -27,6 +27,16 @@ class InvoiceGenerator
         $this->manager = $container->get('doctrine')->getManager();
     }
 
+    public function get_label($i){
+        if($i==1){
+            return 'Urbains';
+        }else if($i==2){
+            return 'Ménages';
+        }else{
+            return 'Ménages';
+        }
+
+    }
 
     public  function convert_from_latin1_to_utf8_recursively2($dat)
     {
@@ -99,7 +109,7 @@ class InvoiceGenerator
                     break;
             }
 
-            $pdf->output($this->path. $fileName, 'F');
+            $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {
             $pdf->clean();
@@ -149,7 +159,7 @@ class InvoiceGenerator
                     break;
             }
 
-            $pdf2->output($this->path. $fileName, 'F');
+            $pdf2->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {
             $pdf2->clean();
@@ -197,7 +207,7 @@ class InvoiceGenerator
                     break;
             }
 
-            $pdf->output($this->path. $fileName, 'F');
+            $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {
             $pdf->clean();
@@ -244,7 +254,7 @@ class InvoiceGenerator
                     break;
             }
 
-            $pdf2->output($this->path. $fileName, 'F');
+            $pdf2->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {
             $pdf2->clean();
@@ -276,7 +286,7 @@ class InvoiceGenerator
                 ->where('rh.type LIKE :key')
                 ->andWhere('rh.date <= :end')
                 ->andWhere('rh.date like  :endmonth')
-                ->setParameter('key', get_label($property->getIntitulesIndicesInitial()))
+                ->setParameter('key', $this->get_label($property->getIntitulesIndicesInitial()))
                 ->setParameter('endmonth',  "%-%".$month_m_u."-%")
                 ->setParameter('end', $endDate_m_u)
                     ->orderBy('rh.date', 'DESC');
@@ -306,7 +316,7 @@ class InvoiceGenerator
                     ],
                     "debirentier" => null,
                     "debirentier_different" => null,
-                    "target" => 'Débirentier',
+                    "target" => null,
                     "not_assurance_habit" => ($property->date_assurance_habitation && $property->date_assurance_habitation < $now_date )?true:false,
                     "texte_assurance_habit" => "votre attestation d’assurance habitation couvrant l’année ".$now_date->format('Y'),
                     "not_assurance_chemine" => ($property->date_cheminee && $property->date_cheminee < $now_date )?true:false,
@@ -345,7 +355,7 @@ class InvoiceGenerator
                 try {
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-debit-template-auto.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output($this->path.'/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     return  $this->path."/".$fileName;
 
                 } catch (Html2PdfException $e) {
@@ -377,7 +387,7 @@ class InvoiceGenerator
                 ->where('rh.type LIKE :key')
                 ->andWhere('rh.date <= :end')
                 ->andWhere('rh.date like  :endmonth')
-                ->setParameter('key', get_label($property->getIntitulesIndicesInitial()))
+                ->setParameter('key', $this->get_label($property->getIntitulesIndicesInitial()))
                 ->setParameter('endmonth',  "%-%".$month_m_u."-%")
                 ->setParameter('end', $endDate_m_u)
                     ->orderBy('rh.date', 'DESC');
@@ -407,7 +417,7 @@ class InvoiceGenerator
                     ],
                     "debirentier" => null,
                     "debirentier_different" => null,
-                    "target" => 'Crédirentier',
+                    "target" => null,
                     "not_assurance_habit" => ($property->date_assurance_habitation && $property->date_assurance_habitation < $now_date )?true:false,
                     "texte_assurance_habit" => "votre attestation d’assurance habitation couvrant l’année ".$now_date->format('Y'),
                     "not_assurance_chemine" => ($property->date_cheminee && $property->date_cheminee < $now_date )?true:false,
@@ -423,9 +433,9 @@ class InvoiceGenerator
                     "fd_next_month_m_y" => strftime("%B %Y", strtotime( $date_fdnm->format('d-m-Y') )),
                     "nom_compte" => explode("/", $property->getTitle())[0],
                     
-                    "date_indice_base" =>  strftime("%B %Y", strtotime( $property->initial_index_object->getDate()->format('d-m-Y') )),
+                    "date_indice_base" =>  utf8_encode(strftime("%B %Y", strtotime( $property->initial_index_object->getDate()->format('d-m-Y') ))),
                     "montant_indice_base" => $property->initial_index_object->getValue(),
-                    "date_indice_actuel" =>  strftime("%B %Y", strtotime( $indice_m_u->getDate()->format('d-m-Y') )),
+                    "date_indice_actuel" =>  utf8_encode(strftime("%B %Y", strtotime( $indice_m_u->getDate()->format('d-m-Y') ))),
                     "montant_indice_actuel" => $indice_m_u->getValue(),
                     "ia" => $property->getInitialAmount(),
                     "rente" => round($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()),2),
@@ -446,7 +456,7 @@ class InvoiceGenerator
                 try {
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-credit-template-auto.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output($this->path.'/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     return  $this->path."/".$fileName;
 
                 } catch (Html2PdfException $e) {
