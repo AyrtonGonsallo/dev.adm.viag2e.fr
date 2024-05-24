@@ -197,3 +197,12 @@ SELECT id,active,billing_disabled,start_date_management,valeur_indexation_normal
 
 SELECT f.id,f.number,p.title FROM `facture_mensuelle` f,property p WHERE f.property_id=p.Id and p.warrant_id=16 and f.date>"2024-04-19" order by f.number desc;
 ajouter facture_id dans invoice et invoice_id dans facture
+
+
+Pour faire simple:
+Sur les mandats vendeurs:
+Le débirentier est l’acheteur(buyer)
+Le crédirentier est le mandant(warrant) si il est différent c’est celui tout en bas qu’il faut prendre
+Sur les mandats acquéreurs:
+Le débirentier est le mandant
+Le crédirentier est le mandant(warrant) si il est différent c’est celui tout en bas qu’il faut prendre

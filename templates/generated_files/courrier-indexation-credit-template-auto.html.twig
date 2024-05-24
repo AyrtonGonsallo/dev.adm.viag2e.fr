@@ -54,13 +54,13 @@
             <td style="width: 60%; border:none">
                <b style="text-align:center;">
                     <br />
-                    {% if data.target =='Crédirentier' %} {{data.property.getFirstname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %} {% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}
-                    {% if data.target =='Crédirentier' %} {{data.property.getLastname1()}} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %} {% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}&nbsp;
+                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerFirstname()}} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}   {% endif %}
+                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerLastname()}} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}   {% endif %}&nbsp;
                     <br />
-                    {% if data.target =='Crédirentier' %} {{data.property.getAddress() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getAddresseDebirentier() }}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}
+                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerAddress() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getAddresseDebirentier() }}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}  {% endif %}
                     <br />
-                    {% if data.target =='Crédirentier' %} {{data.property.getPostalCode() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getCodePostalDebirentier() }}{% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %} {% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %}
-                    {% if data.target =='Crédirentier' %} {{data.property.getCity() }} {% elseif data.target =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getVilleDebirentier() }}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %}<br />
+                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerPostalCode() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getCodePostalDebirentier() }}{% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %}   {% endif %}
+                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerCity() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getVilleDebirentier() }}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %} {% endif %}<br />
                 </b>
             </td>
         </tr>

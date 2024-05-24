@@ -266,13 +266,15 @@ class InvoiceGenerator
     {
                 $data = array();
                 $now_date=new DateTime();
-                
-                $date_virement = utf8_encode(strftime("%B %Y", strtotime( $now_date->format('d-m-Y') )));
-                $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $now_date->format('d-m-Y') ))));
+                $now_date2=new DateTime();
+                $next_month_date=$now_date2->modify('+1 month');
+                $date_virement = utf8_encode(strftime("%B %Y", strtotime( $next_month_date->format('d-m-Y') )));
+                $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $next_month_date->format('d-m-Y') ))));
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                
                 $date_fdnm = new DateTime('First day of next month');
-                $fileName = "Courrier d’indexation Débirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                //ne pas toucher meme si ca parait insensé
+                $fileName = "Courrier d’indexation Crédirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 
                 
                 $month_m_u=$property->initial_index_object->getDate()->format('m');
@@ -368,12 +370,15 @@ class InvoiceGenerator
     {
                 $data = array();
                 $now_date=new DateTime();
-                $date_virement = utf8_encode(strftime("%B %Y", strtotime( $now_date->format('d-m-Y') )));
-                $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $now_date->format('d-m-Y') ))));
+                $now_date2=new DateTime();
+                $next_month_date=$now_date2->modify('+1 month');
+                $date_virement = utf8_encode(strftime("%B %Y", strtotime( $next_month_date->format('d-m-Y') )));
+                $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $next_month_date->format('d-m-Y') ))));
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                
                 $date_fdnm = new DateTime('First day of next month');
-                $fileName = "Courrier d’indexation Crédirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                //ne pas toucher meme si ca parait insensé
+                $fileName = "Courrier d’indexation Débirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 
                 
                 $month_m_u=$property->initial_index_object->getDate()->format('m');

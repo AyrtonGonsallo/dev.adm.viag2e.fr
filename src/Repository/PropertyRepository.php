@@ -139,11 +139,13 @@ pour faire les tests sur les charges de copro
     {
         return $this->createQueryBuilder('p')
             ->where('p.date_maj_indice_ref <= :date')
-            ->andWhere('p.billing_disabled = false')
+			->andWhere('p.initial_index_object IS NOT NULL')
+            //->andWhere('p.billing_disabled = false')
+            ->andWhere('p.active = true')
             //->andWhere('p.honoraries_disabled = false')
             ->andWhere('p.revaluation_date like :pattern_indexation')
            // ->andWhere('p.annuities_disabled = false')
-            //->andWhere('p.active = true')
+           
             ->setParameter('date', new DateTime("-15 days"))
             ->setParameter('pattern_indexation', "%-".(intval(date("m")+1)."%"))
             ->orderBy('p.id', 'ASC')

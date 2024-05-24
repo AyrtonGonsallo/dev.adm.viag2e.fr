@@ -341,11 +341,20 @@ class CronInvoicesCommand extends Command
                         $property->date_maj_indice_ref=new DateTime();
                         $filePathDebirentier = $this->generator->generateCourrierIndexationDebirentierAutomatique($property, $parameters);
                         $filePathCredirentier = $this->generator->generateCourrierIndexationCredirentierAutomatique($property, $parameters);
-                        $mail_debirentier=($property->getDebirentierDifferent())?$property->getEmailDebirentier():$property->getWarrant()->getMail1();
-                        $mail_credirentier=$property->getMail1();
+                        if($property->getWarrant()->getType() === Warrant::TYPE_SELLERS){
+							$mail_debirentier=$property->getBuyerMail1();
+                            $mail_credirentier=($property->getDebirentierDifferent())?$property->getEmailDebirentier():$property->getMail1();
+
+						}else{
+							$mail_debirentier=($property->getDebirentierDifferent())?$property->getEmailDebirentier():$property->getWarrant()->getMail1();
+                            $mail_credirentier=$property->getMail1();
+
+						}                        
+                        
                         $file = new File();
                         $file->setType(File::TYPE_DOCUMENT);
-                        $file->setName("Courrier d’indexation Débirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
+                        //ne pas toucher meme si ca parait insensé
+                        $file->setName("Courrier d’indexation Crédirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
                         $file->setWarrant($property->getWarrant());
                         $file->setProperty($property);
                         $file->setDriveId($this->drive->addFile($file->getName(), $filePathDebirentier, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
@@ -353,17 +362,18 @@ class CronInvoicesCommand extends Command
                         $manager->persist($file);
                         $manager->flush();
 
-                        $message1 = (new Swift_Message("Courrier d’indexation ".$property->getTitle()))
+                        $message1 = (new Swift_Message("Courrier d’indexation ".$property->getTitle()." ".$mail_credirentier))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
                         ->setTo("roquetigrinho@gmail.com")
-                        //->setTo($mail_debirentier)
-                        ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => utf8_encode(strftime("%B %Y", strtotime( $now_date->format('d-m-Y') )))]), 'text/html')
+                        //->setTo($mail_credirentier)
+                        ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => utf8_encode(strftime("%B %Y", strtotime( $now_date->modify('+1 month')->format('d-m-Y') )))]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePathDebirentier));
 
                         $file2 = new File();
                         $file2->setType(File::TYPE_DOCUMENT);
-                        $file2->setName("Courrier d’indexation Crédirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
+                        //ne pas toucher meme si ca parait insensé
+                        $file2->setName("Courrier d’indexation Débirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
                         $file2->setWarrant($property->getWarrant());
                         $file2->setProperty($property);
                         $file2->setDriveId($this->drive->addFile($file2->getName(), $filePathCredirentier, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
@@ -371,12 +381,14 @@ class CronInvoicesCommand extends Command
                         $manager->persist($file2);
                         $manager->flush();
 
-                        $message2 = (new Swift_Message("Courrier d’indexation ".$property->getTitle()))
+                        $now_date=new DateTime();
+                        
+                        $message2 = (new Swift_Message("Courrier d’indexation ".$property->getTitle()." ".$mail_debirentier))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
                         ->setTo("roquetigrinho@gmail.com")
-                        //->setTo($mail_credirentier)
-                        ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => utf8_encode(strftime("%B %Y", strtotime( $now_date->format('d-m-Y') )))]), 'text/html')
+                        //->setTo($mail_debirentier)
+                        ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => utf8_encode(strftime("%B %Y", strtotime( $now_date->modify('+1 month')->format('d-m-Y') )))]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePathCredirentier));
 
                         if (!$this->areMailsDisabled() && $this->mailer->send($message1)) {
