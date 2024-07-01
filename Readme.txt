@@ -200,9 +200,15 @@ ajouter facture_id dans invoice et invoice_id dans facture
 
 
 Pour faire simple:
-Sur les mandats vendeurs:
+Sur un mandat vendeur:
 Le débirentier est l’acheteur(buyer)
-Le crédirentier est le mandant(warrant) si il est différent c’est celui tout en bas qu’il faut prendre
+Le débirentier est le mandant (si tout en bas de l'onglet bien, la case "débirentier différent du mandant" est cochée c'est cette partie qu’il faut prendre )
+Le crédirentier est au niveau des premiers champs de l'onglet bien
+exemple: https://adm.viag2e.fr/property/view/22?onglet=m_tabs_pay
+
 Sur les mandats acquéreurs:
-Le débirentier est le mandant
-Le crédirentier est le mandant(warrant) si il est différent c’est celui tout en bas qu’il faut prendre
+Le débirentier est le mandant (si tout en bas de l'onglet bien, la case "débirentier différent du mandant" est cochée c'est cette partie qu’il faut prendre )
+Le crédirentier est au niveau des premiers champs de l'onglet bien
+exemple: https://adm.viag2e.fr/property/view/44
+
+SELECT p.id,p.title,w.firstname,w.lastname,p.firstname1,p.lastname1,p.firstname2,p.lastname2 FROM `property` p,warrant w WHERE p.warrant_id=w.id and (w.firstname=p.firstname1 or w.firstname=p.firstname2)

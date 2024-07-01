@@ -52,16 +52,19 @@
                     Madame , Monsieur,
             </td>
             <td style="width: 60%; border:none">
-               <b style="text-align:center;">
+              <b style="text-align:center;">
                     <br />
-                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerFirstname()}} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}   {% endif %}
-                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerLastname()}} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}   {% endif %}&nbsp;
+                     {{data.property.getFirstname1()}} &nbsp;
+                     {{data.property.getLastname1()}} &nbsp;&nbsp;&nbsp;
+                     {% if data.property.getFirstname2() %}{{data.property.getFirstname2() }}  {% endif %}&nbsp;
+                     {% if data.property.getLastname2() %}{{data.property.getLastname2() }} {% endif %}&nbsp;
                     <br />
-                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerAddress() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getAddresseDebirentier() }}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}  {% endif %}
+                     {{data.property.getAddress() }}  
                     <br />
-                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerPostalCode() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getCodePostalDebirentier() }}{% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %}   {% endif %}
-                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerCity() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getVilleDebirentier() }}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %} {% endif %}<br />
+                     {{data.property.getPostalCode() }}  
+                     {{data.property.getCity() }}  <br />
                 </b>
+              
             </td>
         </tr>
     </table>
@@ -77,7 +80,7 @@
     {% for i in 0..5 %}
         &nbsp;
     {% endfor %}
-    Nous avons le plaisir de vous informer du nouveau montant de rente à percevoir à 
+    Nous avons le plaisir de vous informer du nouveau montant de rente à 
     compter du mois de {{data.date_virement}} : 
   <br /><br />
     {% for i in 0..5 %}
@@ -91,6 +94,10 @@
     {% endfor %}
     Le nouveau montant de la rente viagère sera ainsi porté à {{data.rente}} € pour le virement 
     de la rente du mois de {{data.date_virement}}.
+    {% if (data.property.firstname1 == data.property.warrant.firstname  or  data.property.firstname2 == data.property.warrant.firstname )  %}
+        <br />
+        <b>Les honoraires de gestion passent eux à {{data.honoraires}} € TTC. </b><br /><br />
+    {% endif %}
   <br /><br />
     {% for i in 0..5 %}
         &nbsp;

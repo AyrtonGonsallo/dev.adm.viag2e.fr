@@ -49,20 +49,20 @@
                 {% for i in 0..5 %}
                     &nbsp;
                 {% endfor %}
-                Bonjour Monsieur JACQUEMIN,
+                Bonjour Monsieur,
             </td>
             <td style="width: 60%; border:none">
-               <b style="text-align:center;">
-                    <br />
-                       {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_BUYERS')  %} {{data.property.getFirstname1()}} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getFirstname1() }}  {% endif %}   {% endif %}
-                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_BUYERS')  %} {{data.property.getLastname1()}} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getLastname1() }}  {% endif %}   {% endif %}&nbsp;
-                    <br />
-                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_BUYERS')  %} {{data.property.getAddress() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getAddresseDebirentier() }}{% else %}{{data.property.getAddress() }}  {% endif %}  {% endif %}
-                    <br />
-                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_BUYERS')  %} {{data.property.getPostalCode() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getCodePostalDebirentier() }}{% else %}{{data.property.getPostalCode() }}  {% endif %}   {% endif %}
-                    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_BUYERS')  %} {{data.property.getCity() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getVilleDebirentier() }}{% else %}{{data.property.getCity() }}  {% endif %} {% endif %}<br />
-                </b>
-               
+           <b style="text-align:center;">
+           <br />
+                {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerFirstname()}} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}   {% endif %}
+                {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerLastname()}} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}   {% endif %}&nbsp;
+                <br />
+                {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerAddress() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getAddresseDebirentier() }}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}  {% endif %}
+                <br />
+                {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerPostalCode() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getCodePostalDebirentier() }}{% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %}   {% endif %}
+                {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS')  %} {{data.property.getBuyerCity() }} {% else %} {% if data.property.getDebirentierDifferent() %}{{data.property.getVilleDebirentier() }}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %} {% endif %}<br /> 
+            </b>
+
             </td>
         </tr>
     </table>
@@ -77,17 +77,19 @@
     La rente viagère de votre crédirentier vient à révision à la date du {{data.fd_next_month_d_m_y}} pour le bien suivant :<br />
     Réf. : <b>{{ data.property.getTitle() }}</b><br />
     {{data.adresse_bien }}<br />
-    {{data.property.getPostalCode() }} {{data.property.getCity() }}<br /><br />
+    <br /><br />
 
     <b>Le nouveau montant de la rente viagère sera ainsi porté à {{data.rente}} €</b> pour le virement 
     de la rente du mois de {{data.date_virement}}:<br /><br />
     Rente initiale ({{data.ia}} €) x Nouvel indice de {{data.date_indice_actuel|convert_encoding('UTF-8', 'ISO-8859-1')}} ({{data.montant_indice_actuel}}) / Indice de base de 
     {{data.date_indice_base|convert_encoding('UTF-8', 'ISO-8859-1')}} ({{data.montant_indice_base}}). <br /><br />
-    <b>Les honoraires de gestion passent eux à {{data.honoraires}} € TTC. </b><br /><br />
+    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_BUYERS') and not data.property.getDebirentierDifferent()  %}
+        <b>Les honoraires de gestion passent eux à {{data.honoraires}} € TTC. </b><br /><br />
+    {% endif %}
     La prochaine date de révision est fixée pour le mois de {{data.date_revision}}. <br /><br />
     Merci de prendre en compte ces nouveaux montants pour vos prochains virements.  <br /><br />
     Nous restons bien entendu à votre disposition pour tout complément d’information. <br /><br />
-    Veuillez agréer, Monsieur JACQUEMIN, nos sincères salutations.
+    Veuillez agréer, nos sincères salutations.
     <br />
     <br />
      <br /> <br /> <br />

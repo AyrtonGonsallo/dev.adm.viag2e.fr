@@ -292,7 +292,7 @@ class CronInvoicesCommand extends Command
 
             $io->note("OTP invoice ({$data['type']}) generated for id {$pendingInvoice->getProperty()->getId()}");
         }
-        if (date('d') >= 19) {
+        if (date('d') == 1) {
             function get_label($i){
                 if($i==1){
                     return 'Urbains';
@@ -354,7 +354,7 @@ class CronInvoicesCommand extends Command
                         $file = new File();
                         $file->setType(File::TYPE_DOCUMENT);
                         //ne pas toucher meme si ca parait insensé
-                        $file->setName("Courrier d’indexation Crédirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
+                        $file->setName("Courrier d’indexation Débirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
                         $file->setWarrant($property->getWarrant());
                         $file->setProperty($property);
                         $file->setDriveId($this->drive->addFile($file->getName(), $filePathDebirentier, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
@@ -362,18 +362,18 @@ class CronInvoicesCommand extends Command
                         $manager->persist($file);
                         $manager->flush();
 
-                        $message1 = (new Swift_Message("Courrier d’indexation ".$property->getTitle()." ".$mail_credirentier))
+                        $message1 = (new Swift_Message("Courrier d’indexation ".$property->getTitle()))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
                         ->setTo("roquetigrinho@gmail.com")
-                        //->setTo($mail_credirentier)
+                        //->setTo($mail_debirentier)
                         ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => utf8_encode(strftime("%B %Y", strtotime( $now_date->modify('+1 month')->format('d-m-Y') )))]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePathDebirentier));
 
                         $file2 = new File();
                         $file2->setType(File::TYPE_DOCUMENT);
                         //ne pas toucher meme si ca parait insensé
-                        $file2->setName("Courrier d’indexation Débirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
+                        $file2->setName("Courrier d’indexation Crédirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
                         $file2->setWarrant($property->getWarrant());
                         $file2->setProperty($property);
                         $file2->setDriveId($this->drive->addFile($file2->getName(), $filePathCredirentier, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
@@ -383,11 +383,11 @@ class CronInvoicesCommand extends Command
 
                         $now_date=new DateTime();
                         
-                        $message2 = (new Swift_Message("Courrier d’indexation ".$property->getTitle()." ".$mail_debirentier))
+                        $message2 = (new Swift_Message("Courrier d’indexation ".$property->getTitle()))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
                         ->setTo("roquetigrinho@gmail.com")
-                        //->setTo($mail_debirentier)
+                        //->setTo($mail_credirentier)
                         ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => utf8_encode(strftime("%B %Y", strtotime( $now_date->modify('+1 month')->format('d-m-Y') )))]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePathCredirentier));
 
@@ -1361,36 +1361,36 @@ class CronInvoicesCommand extends Command
                 if($filePath ==-1 && $filePath2 ==-1){
 					
 					$io->note("no file created ");
-						$message = (new Swift_Message($invoice->getMailSubject()))
+						$message = (new Swift_Message($invoice->getMailSubject().' '.$mail_to))
 						->setFrom($this->mail_from)
 						->setBcc($this->mail_from)
-						->setTo($mail_to)
+						->setTo("roquetigrinho@gmail.com")
 						->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
 				}
 				 if($filePath ==-1 && $filePath2 !=-1){
 					 $io->note("Only file2 created ");
-						$message = (new Swift_Message($invoice->getMailSubject()))
+						$message = (new Swift_Message($invoice->getMailSubject().' '.$mail_to))
 						->setFrom($this->mail_from)
 						->setBcc($this->mail_from)
-						->setTo($mail_to)
+						->setTo("roquetigrinho@gmail.com")
 						->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
 						->attach(Swift_Attachment::fromPath($filePath2));
 				}
 				 if($filePath !=-1 && $filePath2 ==-1){
 					  $io->note("Only file1 created ");
-						$message = (new Swift_Message($invoice->getMailSubject()))
+						$message = (new Swift_Message($invoice->getMailSubject().' '.$mail_to))
 						->setFrom($this->mail_from)
 						->setBcc($this->mail_from)
-						->setTo($mail_to)
+						->setTo("roquetigrinho@gmail.com")
 						->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
 						->attach(Swift_Attachment::fromPath($filePath));
 				}
 				 if($filePath !=-1 && $filePath2 !=-1){
 					  $io->note("Both file1 and file2 created ");
-						$message = (new Swift_Message($invoice->getMailSubject()))
+                      $message = (new Swift_Message($invoice->getMailSubject().' '.$mail_to))
 						->setFrom($this->mail_from)
 						->setBcc($this->mail_from)
-						->setTo($mail_to)
+						->setTo("roquetigrinho@gmail.com")
 						->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
 						->attach(Swift_Attachment::fromPath($filePath))
 						->attach(Swift_Attachment::fromPath($filePath2));
