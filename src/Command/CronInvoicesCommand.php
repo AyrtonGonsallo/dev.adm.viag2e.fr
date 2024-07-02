@@ -308,6 +308,7 @@ class CronInvoicesCommand extends Command
             ->getRepository(Property::class)
             ->findIndicestoUpdate(self::PROCESS_MAX);
             $now_date=new DateTime();
+            $mail_date=utf8_encode(strftime("%B %Y", strtotime( $now_date->modify('+1 month')->format('d-m-Y') )));
             foreach ($properties as $property) {
                 
                     $io->note("property ".$property->getId()." active");
@@ -343,13 +344,13 @@ class CronInvoicesCommand extends Command
                         $filePathCredirentier = $this->generator->generateCourrierIndexationCredirentierAutomatique($property, $parameters);
                         if($property->getWarrant()->getType() === Warrant::TYPE_SELLERS){
 							$mail_debirentier=$property->getBuyerMail1();
-                            $mail_credirentier=($property->getDebirentierDifferent())?$property->getEmailDebirentier():$property->getMail1();
-
+                            $mail_credirentier=$property->getMail1();
+                            $mail_credirentier2=$property->getMail2();
 						}else{
 							$mail_debirentier=($property->getDebirentierDifferent())?$property->getEmailDebirentier():$property->getWarrant()->getMail1();
                             $mail_credirentier=$property->getMail1();
-
-						}                        
+                            $mail_credirentier2=$property->getMail2();
+						}                       
                         
                         $file = new File();
                         $file->setType(File::TYPE_DOCUMENT);
@@ -367,7 +368,7 @@ class CronInvoicesCommand extends Command
                         ->setBcc($this->mail_from)
                         ->setTo("roquetigrinho@gmail.com")
                         //->setTo($mail_debirentier)
-                        ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => utf8_encode(strftime("%B %Y", strtotime( $now_date->modify('+1 month')->format('d-m-Y') )))]), 'text/html')
+                        ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => $mail_date]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePathDebirentier));
 
                         $file2 = new File();
@@ -381,14 +382,17 @@ class CronInvoicesCommand extends Command
                         $manager->persist($file2);
                         $manager->flush();
 
-                        $now_date=new DateTime();
+                       // $now_date=new DateTime("last day of last month");
                         
                         $message2 = (new Swift_Message("Courrier d’indexation ".$property->getTitle()))
                         ->setFrom($this->mail_from)
                         ->setBcc($this->mail_from)
-                        ->setTo("roquetigrinho@gmail.com")
+                        ->setTo("roquetigrinho@gmail.com");
+                        if($mail_credirentier2){
+                            $message2->setCc($mail_credirentier2);
+                        }
                         //->setTo($mail_credirentier)
-                        ->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => utf8_encode(strftime("%B %Y", strtotime( $now_date->modify('+1 month')->format('d-m-Y') )))]), 'text/html')
+                        $message2->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => $mail_date ]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePathCredirentier));
 
                         if (!$this->areMailsDisabled() && $this->mailer->send($message1)) {

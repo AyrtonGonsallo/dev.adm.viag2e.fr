@@ -274,7 +274,7 @@ class InvoiceGenerator
                
                 $date_fdnm = new DateTime('First day of next month');
                 //ne pas toucher meme si ca parait insensé
-                $fileName = "Courrier d’indexation Crédirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                $fileName = "Courrier d’indexation Débirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 
                 
                 $month_m_u=$property->initial_index_object->getDate()->format('m');
@@ -378,7 +378,7 @@ class InvoiceGenerator
                
                 $date_fdnm = new DateTime('First day of next month');
                 //ne pas toucher meme si ca parait insensé
-                $fileName = "Courrier d’indexation Débirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                $fileName = "Courrier d’indexation Crédirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 
                 
                 $month_m_u=$property->initial_index_object->getDate()->format('m');

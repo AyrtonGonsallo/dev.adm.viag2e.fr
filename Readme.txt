@@ -211,4 +211,6 @@ Le débirentier est le mandant (si tout en bas de l'onglet bien, la case "débir
 Le crédirentier est au niveau des premiers champs de l'onglet bien
 exemple: https://adm.viag2e.fr/property/view/44
 
+
+update `property` set date_maj_indice_ref="2024-03-04" where revaluation_date like "%1-7%";
 SELECT p.id,p.title,w.firstname,w.lastname,p.firstname1,p.lastname1,p.firstname2,p.lastname2 FROM `property` p,warrant w WHERE p.warrant_id=w.id and (w.firstname=p.firstname1 or w.firstname=p.firstname2)
