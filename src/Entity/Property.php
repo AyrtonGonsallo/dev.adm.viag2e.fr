@@ -140,6 +140,34 @@ class Property
      */
     private $dateofbirth2;
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $adresse_credirentier1;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $code_postal_credirentier1;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $ville_credirentier1;
+/**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $adresse_credirentier2;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $code_postal_credirentier2;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $ville_credirentier2;
+    /**
      * @ORM\Column(type="date", nullable=true)
      */
     private $mois_indice_initial;
@@ -851,6 +879,78 @@ class Property
     public function setDateofbirth2(?DateTimeInterface $dateofbirth2): self
     {
         $this->dateofbirth2 = $dateofbirth2;
+
+        return $this;
+    }
+
+    public function getAdresseCredirentier1(): ?string
+    {
+        return $this->adresse_credirentier1;
+    }
+
+    public function setAdresseCredirentier1(?string $adresse_credirentier1): self
+    {
+        $this->adresse_credirentier1 = $adresse_credirentier1;
+
+        return $this;
+    }
+
+    public function getAdresseCredirentier2(): ?string
+    {
+        return $this->adresse_credirentier2;
+    }
+
+    public function setAdresseCredirentier2(?string $adresse_credirentier2): self
+    {
+        $this->adresse_credirentier2 = $adresse_credirentier2;
+
+        return $this;
+    }
+
+    public function getCodePostalCredirentier1(): ?string
+    {
+        return $this->code_postal_credirentier1;
+    }
+
+    public function setCodePostalCredirentier1(?string $code_postal_credirentier1): self
+    {
+        $this->code_postal_credirentier1 = $code_postal_credirentier1;
+
+        return $this;
+    }
+
+    public function getCodePostalCredirentier2(): ?string
+    {
+        return $this->code_postal_credirentier2;
+    }
+
+    public function setCodePostalCredirentier2(?string $code_postal_credirentier2): self
+    {
+        $this->code_postal_credirentier2 = $code_postal_credirentier2;
+
+        return $this;
+    }
+
+    public function getVilleCredirentier1(): ?string
+    {
+        return $this->ville_credirentier1;
+    }
+
+    public function setVilleCredirentier1(?string $ville_credirentier1): self
+    {
+        $this->ville_credirentier1 = $ville_credirentier1;
+
+        return $this;
+    }
+
+    public function getVilleCredirentier2(): ?string
+    {
+        return $this->ville_credirentier2;
+    }
+
+    public function setVilleCredirentier2(?string $ville_credirentier2): self
+    {
+        $this->ville_credirentier2 = $ville_credirentier2;
 
         return $this;
     }

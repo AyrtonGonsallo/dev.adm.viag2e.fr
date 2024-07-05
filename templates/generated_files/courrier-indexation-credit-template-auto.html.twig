@@ -59,10 +59,17 @@
                      {% if data.property.getFirstname2() %}{{data.property.getFirstname2() }}  {% endif %}
                      {% if data.property.getLastname2() %}{{data.property.getLastname2() }} {% endif %}&nbsp;
                     <br />
-                     {{data.property.getAddress() }}  
+                     {% if data.property.getAdresseCredirentier1() %}{{data.property.getAdresseCredirentier1() }} {% else %} {{data.property.getAddress() }} {% endif %} 
                     <br />
-                     {{data.property.getPostalCode() }}  
-                     {{data.property.getCity() }}  <br />
+                     {% if data.property.getCodePostalCredirentier1() %}{{data.property.getCodePostalCredirentier1() }} {% else %} {{data.property.getPostalCode() }} {% endif %} 
+                      {% if data.property.getVilleCredirentier1() %}{{data.property.getVilleCredirentier1() }} {% else %} {{data.property.getCity() }} {% endif %} 
+                     <br />
+
+                     {% if data.property.getAdresseCredirentier2() %}{{data.property.getAdresseCredirentier2() }}  {% endif %} 
+                    <br />
+                     {% if data.property.getCodePostalCredirentier2() %}{{data.property.getCodePostalCredirentier2() }}  {% endif %} 
+                      {% if data.property.getVilleCredirentier2() %}{{data.property.getVilleCredirentier2() }}  {% endif %} 
+                     <br />
                 </b>
               
             </td>
