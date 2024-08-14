@@ -599,6 +599,10 @@ class Property
     /**
      * @ORM\Column(type="boolean")
      */
+    private $indexation_OG2I;	
+    /**
+     * @ORM\Column(type="boolean")
+     */
     private $debirentier_different;
     /**
      * @ORM\Column(type="boolean")
@@ -707,7 +711,7 @@ class Property
 
         $this->setCountry('France');
         $this->setBuyerCountry('France');
-
+        $this->setMoisIndiceInitial(new DateTime());
         $this->setStartDateManagement(new DateTime());
 
         $this->setLastInvoice(new DateTime('1970-01-01'));
@@ -1868,6 +1872,16 @@ class Property
     public function setClauseOG2I(bool $clause_OG2I): self
     {
         $this->clause_OG2I = $clause_OG2I;
+
+        return $this;
+    }
+    public function getIndexationOG2I(): ?bool
+    {
+        return $this->indexation_OG2I;
+    }
+    public function setIndexationOG2I(bool $indexation_OG2I): self
+    {
+        $this->indexation_OG2I = $indexation_OG2I;
 
         return $this;
     }

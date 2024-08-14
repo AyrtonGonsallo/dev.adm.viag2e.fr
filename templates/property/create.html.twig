@@ -363,6 +363,17 @@
                                             <div class="m-form__heading">
                                                 <h3 class="m-form__heading-title">Informations</h3>
                                             </div>
+                                             <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-noindex">Désactiver l'indexation:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                        <label>
+                                                            <input type="checkbox" id="form-noindex" class="form-control m-input" name="noindex">
+                                                            <span></span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
                                             <div class="form-group m-form__group row">
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-billingDisabled">Désactiver la facturation:</label>
                                                 <div class="col-xl-9 col-lg-9">
@@ -385,28 +396,29 @@
                                                     </span>
                                                 </div>
                                             </div>
+                                          
                                             
                                             <div id="billingBox">
                                                  <div class="form-group m-form__group row">
-                                                    <label for="form-intitules_indices_initial" class="col-xl-3 col-lg-3 col-form-label">Intitulé indice initial <span class="m--font-danger">*</span></label>
+                                                    <label for="form-intitules_indices_initial" class="col-xl-3 col-lg-3 col-form-label">Intitulé indice initial </label>
                                                     <div class="col-xl-9 col-lg-9">
                                                         {{ form_row(form.intitules_indices_initial, {'attr': {'class': 'form-control m-input'}, 'id': 'form-intitules_indices_initial', 'label': false}) }}
                                                     </div>
                                                 </div>
                                                 <div class="form-group m-form__group row">
-                                                    <label for="form-mois_indice_initial" class="col-xl-3 col-lg-3 col-form-label">Mois indice initial<span class="m--font-danger">*</span></label>
+                                                    <label for="form-mois_indice_initial" class="col-xl-3 col-lg-3 col-form-label">Mois indice initial</label>
                                                     <div class="col-xl-9 col-lg-9">
                                                         {{ form_row(form.mois_indice_initial, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mois_indice_initial', 'label': false,'date_pattern': '<span style="display: none;">{{ day }}</span> {{ month }} <span class="delim">&#47;</span> {{ year }}' }) }}
                                                     </div>
                                                 </div>
                                                 <div class="form-group m-form__group row">
-                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-initial_index_object">* Indice initial du bien:</label>
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-initial_index_object"> Indice initial du bien:</label>
                                                     <div class="col-xl-9 col-lg-9">
                                                         {{ form_row(form.initial_index_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initial_index_object', 'label': false}) }}
                                                     </div>
                                                 </div>
                                                 <div class="form-group m-form__group row">
-                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-valeur_indice_reference_object">* Valeur Indice de référence</label>
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-valeur_indice_reference_object">Valeur Indice de référence</label>
                                                     <div class="col-xl-9 col-lg-9">
                                                         {{ form_row(form.valeur_indice_reference_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-valeur_indice_reference_object', 'label': false}) }}
                                                     </div>
@@ -425,7 +437,7 @@
                                                 </div>
                                                 
                                                 <div class="form-group m-form__group row">
-                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-initialAmount">* Montant initial:</label>
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-initialAmount">Montant initial:</label>
                                                     <div class="col-xl-9 col-lg-9">
                                                         {{ form_row(form.initialAmount, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initialAmount', 'label': false}) }}
                                                     </div>
@@ -468,6 +480,13 @@
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-endDateManagement">Date de fin de contrat:</label>
                                                 <div class="col-xl-9 col-lg-9">
                                                     {{ form_row(form.endDateManagement, {'attr': {'class': 'form-control m-input'}, 'id': 'form-endDateManagement', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                        
+                                            <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-num_mandat_gestion">N° du mandat de gestion<span class="m--font-danger">*</span></label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.num_mandat_gestion, {'attr': {'class': 'form-control m-input'}, 'id': 'form-num_mandat_gestion', 'label': false}) }}
                                                 </div>
                                             </div>
                                         </div>
@@ -665,6 +684,11 @@
 
     {{ encore_entry_script_tags('warrant') }}
     <script type="text/javascript">
+    
+    $('#form-noindex').click(function() {
+    $('#billingBox')[this.checked ? "hide" : "show"]();
+    $('#form-billingDisabled').prop('checked', this.checked);
+});
 $('#propertycreate_form_mois_indice_initial_day').val("1").change();
     $('#propertycreate_form_mois_indice_initial_year').on('change', function() {
         function get_label(id){

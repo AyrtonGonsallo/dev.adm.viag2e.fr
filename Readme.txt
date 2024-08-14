@@ -68,7 +68,9 @@ regarder le pb ics si elle rajoute un bien
 SELECT * FROM `invoice` WHERE date >="2024-01-08 00:00:01" and date <="2024-01-31 23:59:01" and category in (0) ORDER BY `date` DESC;
 
 comment fonctionne l'export bank ?
-dans invoice repository listByDateNE
+dans invoice repository listByDate2 autrefois listByDateNE
+SELECT i.id, i.date, i.data, w.bank_ics, p.id AS property_id, p.title, p.active FROM `invoice` i JOIN `property` p ON i.property_id = p.id JOIN `warrant` w ON w.id = p.warrant_id WHERE i.date >= '2024-06-01' AND i.date <= '2024-06-30' AND i.type = 1;
+SELECT i.id,i.date,i.data FROM `invoice` i WHERE i.date>="2024-06-01" and i.date<="2024-06-30" and i.type=1;
 
 update `property` set last_invoice="2023-12-20" WHERE last_invoice="2024-01-08" or last_invoice="2024-01-09";
 
@@ -214,3 +216,15 @@ exemple: https://adm.viag2e.fr/property/view/44
 
 update `property` set date_maj_indice_ref="2024-03-04" where revaluation_date like "%1-7%";
 SELECT p.id,p.title,w.firstname,w.lastname,p.firstname1,p.lastname1,p.firstname2,p.lastname2 FROM `property` p,warrant w WHERE p.warrant_id=w.id and (w.firstname=p.firstname1 or w.firstname=p.firstname2)
+
+SELECT * FROM `invoice` WHERE property_id=16 and date<="2023-12-31" and date>="2023-01-01" and category=1 and type=1 and status=5;
+SELECT * FROM `property` where active=1 and revaluation_date like "%1-8%";
+25,26,35,64,80,81,105,116
+concernes
+64,105,
+
+
+update `property` set date_maj_indice_ref="2024-03-04" where id=81 and revaluation_date like "%1-8%";
+
+31,43,63,82,103,119,124,126
+63,103,119,124,126

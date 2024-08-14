@@ -136,10 +136,10 @@ class CronInvoicesCommand extends Command
         $d = new DateTime('First day of next month');
 
         $this->date = [
-            'current_day'   => strftime('%A %e %B %Y'),
+            'current_day'   => (strftime('%A %e %B %Y')),
             'current_month' => date('m'),
             'max_days'      => cal_days_in_month(CAL_GREGORIAN, $d->format('m'), $d->format('Y')),
-            'month'         => strftime('%B', $d->getTimestamp()),
+            'month'         => (strftime('%B', $d->getTimestamp())),
             'month_n'       => $d->format('m'),
             'year'          => $d->format('Y'),
         ];
@@ -292,7 +292,7 @@ class CronInvoicesCommand extends Command
 
             $io->note("OTP invoice ({$data['type']}) generated for id {$pendingInvoice->getProperty()->getId()}");
         }
-        if (date('d') == 1) {
+        if (date('d') == 19) {
             function get_label($i){
                 if($i==1){
                     return 'Urbains';
@@ -350,7 +350,8 @@ class CronInvoicesCommand extends Command
 							$mail_debirentier=($property->getDebirentierDifferent())?$property->getEmailDebirentier():$property->getWarrant()->getMail1();
                             $mail_credirentier=$property->getMail1();
                             $mail_credirentier2=$property->getMail2();
-						}                       
+						}  
+                                          
                         
                         $file = new File();
                         $file->setType(File::TYPE_DOCUMENT);
@@ -406,6 +407,34 @@ class CronInvoicesCommand extends Command
                         } else {
                             $io->note("mail courrier indexation credirentier non envoyé");
                         }
+
+                        if($property->getDebirentierDifferent() && $property->getWarrant()->getId()==16){
+                            $filePathmandant = $this->generator->generateCourrierIndexationMandantAutomatique($property, $parameters);
+                            $file3 = new File();
+                            $file3->setType(File::TYPE_DOCUMENT);
+                            //ne pas toucher meme si ca parait insensé
+                            $file3->setName("Courrier d’indexation Mandant -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf");
+                            $file3->setWarrant($property->getWarrant());
+                            $file3->setProperty($property);
+                            $file3->setDriveId($this->drive->addFile($file3->getName(), $filePathmandant, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                            $manager = $this->manager;
+                            $manager->persist($file3);
+                            $manager->flush();
+                            $mail_mandant=$property->getWarrant()->getMail1();
+                            $message3 = (new Swift_Message("Courrier d’indexation ".$property->getTitle()))
+                                ->setFrom($this->mail_from)
+                                ->setBcc($this->mail_from)
+                                ->setTo("roquetigrinho@gmail.com");
+                                //->setTo($mail_mandant)
+                                $message3->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => $mail_date ]), 'text/html')
+                                ->attach(Swift_Attachment::fromPath($filePathmandant));
+
+                                }  
+                                if (!$this->areMailsDisabled() && $this->mailer->send($message3)) {
+                                    $io->note("mail courrier indexation mandant envoyé");
+                                } else {
+                                    $io->note("mail courrier indexation mandant non envoyé");
+                                }
                     }
 
                 
@@ -511,7 +540,7 @@ class CronInvoicesCommand extends Command
                 $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                 */
                 //($property->honorary_rates_object)?(($property->getInitialAmount() * $property->honorary_rates_object->getValeur())/100):0.0,
-                if($property->getClauseOG2I() && $property->valeur_indice_ref_og2_i_object){
+                if($property->getIndexationOG2I() && $property->valeur_indice_ref_og2_i_object){
                     $startDate = \DateTime::createFromFormat('d-n-Y', "01-".date('m')."-".date('Y'));
                     $startDate->setTime(0, 0 ,0);
                     $endDate = \DateTime::createFromFormat('d-n-Y', "01-".(date('m')+1)."-".date('Y'));
@@ -559,7 +588,7 @@ class CronInvoicesCommand extends Command
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity_base * $property->honorary_rates_object->getValeur()/100;
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                     //$honoraryRates    +=$honoraryRatesTax;
-                }else if(!$property->getClauseOG2I()){
+                }else if(!$property->getIndexationOG2I()){
                     $annuity=$property->valeur_indexation_normale / $property->initial_index_object->getValue() * $property->getInitialAmount() ;
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
@@ -744,7 +773,8 @@ class CronInvoicesCommand extends Command
             }
 
             $data = $invoice->getData();
-            $data['date']['current_day'] = strftime('%A %e %B %Y');
+            $data['date']['current_day'] = (strftime('%A %e %B %Y'));
+            $data['date']['month'] = (strftime('%B'));
             $data['type'] = Invoice::TYPE_RECEIPT;
             $data['number'] = Invoice::formatNumber($data['number_int'], Invoice::TYPE_RECEIPT);
 

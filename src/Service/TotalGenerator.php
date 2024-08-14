@@ -41,7 +41,7 @@ class TotalGenerator
         try {
             $pdf->pdf->SetDisplayMode('fullpage');
             $fileName = "/TOTAL_RENTES_{$dest->getName()}.pdf";
-            $pdf->writeHTML($this->twig->render('invoices/total_r.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'dest' => $dest,'somme'=>$somme,'factures'=>$factures,'periode'=>strftime("%B %Y",strtotime("+1 month", time())),'date'=>$date,'current_day'=>$current_day]));
+            $pdf->writeHTML($this->twig->render('invoices/total_r.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'dest' => $dest,'somme'=>$somme,'factures'=>$factures,'periode'=>utf8_encode(strftime("%B %Y",strtotime("+1 month", time()))),'date'=>$date,'current_day'=>$current_day]));
             $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {
@@ -56,7 +56,7 @@ class TotalGenerator
         try {
             $pdf2->pdf->SetDisplayMode('fullpage');
             $fileName = "/TOTAL_HONORAIRES_{$dest->getName()}.pdf";
-            $pdf2->writeHTML($this->twig->render('invoices/total_h.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'dest' => $dest,'somme'=>$somme,'factures'=>$factures,'date'=>$date,'periode'=>strftime("%B %Y",strtotime("+1 month", time())),'current_day'=>$current_day]));  
+            $pdf2->writeHTML($this->twig->render('invoices/total_h.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'dest' => $dest,'somme'=>$somme,'factures'=>$factures,'date'=>$date,'periode'=>utf8_encode(strftime("%B %Y",strtotime("+1 month", time()))),'current_day'=>$current_day]));  
             $pdf2->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {

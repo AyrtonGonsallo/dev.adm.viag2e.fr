@@ -431,6 +431,7 @@ class GeneratedFilesController extends AbstractController
             'required' => false,
         ])
         ->add('pieces_jointes', FileType::class, [
+            'required' => false,
             'multiple' => true,
             'attr'     => [
                 'accept' => 'application/pdf',
@@ -456,7 +457,7 @@ class GeneratedFilesController extends AbstractController
                 $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
                 ->select("inv")
                 ->from('App\Entity\Invoice', 'inv')
-                ->where('inv.property = :property AND inv.category = 1 AND inv.date BETWEEN :start AND :end')
+                ->where('inv.property = :property AND inv.category = 1 AND inv.type=1 AND inv.status=5 AND inv.file2 is null AND inv.date BETWEEN :start AND :end')
                 ->setParameter('property', $property)
                 ->setParameter('start', $date_reg_debut)
                 ->setParameter('end', $date_reg_fin)
@@ -592,7 +593,7 @@ class GeneratedFilesController extends AbstractController
                     return $this->render('generated_files/courrier-regularisation-copro.html.twig', [
                         'property' => $property,
                         'form' => $form->createView(),
-                        'message' => 'fichier mandat sepa créé avec succès',
+                        'message' => 'fichier courrier de régularisation créé avec succès',
                     ]);
 
                 } catch (Html2PdfException $e) {

@@ -856,12 +856,23 @@
                                             {{ form_row(form_payment.abandonmentIndex, {'attr': {'class': 'form-control m-input'}, 'id': 'form-abandonmentIndex', 'label': false}) }}
                                         </div>
                                     </div>
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-12">
                                         <label for="form-clause_OG2I" class="col-4 col-form-label">CLAUSE OG2I</label>
                                         <div class="col-12">
                                             <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
                                             <label>
                                                 {{ form_widget(form_payment.clause_OG2I, {'attr': {'class': 'form-control m-input'}, 'id': 'form-clause_OG2I', 'label': false}) }}
+                                                <span></span>
+                                            </label>
+                                        </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12" id="avec_indexation">
+                                        <label for="form-indexation_OG2I" class="col-4 col-form-label">INDEXATION OG2I</label>
+                                        <div class="col-12">
+                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                            <label>
+                                                {{ form_widget(form_payment.indexation_OG2I, {'attr': {'class': 'form-control m-input'}, 'id': 'form-indexation_OG2I', 'label': false}) }}
                                                 <span></span>
                                             </label>
                                         </span>
@@ -1525,9 +1536,10 @@ function load_payment_datas(){
             if($("#form-bank_rum").val().length>2){
                 $("#form-bank_rum").prop('disabled', true);
             }
-            $('#form-clause_OG2I').is(":checked")? $('#ogi2').show() : $('#ogi2').hide();
+            $('#form-indexation_OG2I').is(":checked")? $('#ogi2').show() : $('#ogi2').hide();
+            
 
-            if($('#form-clause_OG2I').is(":checked") ){
+            if($('#form-indexation_OG2I').is(":checked") ){
                 $("#property_payment_form_mois_indice_ref_og2_i_day").val("1").change();
                 console.log("bien avec og2i")
                 $('#ogi2').show()
@@ -1577,7 +1589,7 @@ function load_payment_datas(){
             ri=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
             ia=$(this).val()
             ii=$('#form-initial_index_object').find(":selected").val()
-            if(ia>0 && ri>0 && ii>0 && !$('#form-clause_OG2I').is(":checked")){
+            if(ia>0 && ri>0 && ii>0 && !$('#form-indexation_OG2I').is(":checked")){
                 get_nv_montant_rente(ri,ii,ia)
             }
         });
@@ -1682,7 +1694,7 @@ function load_payment_datas(){
     }else{
         $('#date_assurance_habitation').hide()
     };
-    if($('#form-clause_OG2I').is(":checked")){
+    if($('#form-indexation_OG2I').is(":checked")){
         val_indice_m_u=$('#form-indice_og2i_hide').val() 
         $('#form-valeur_indice_reference_object option[value="'+val_indice_m_u+'"]').prop('selected', true)
     }else{
@@ -1902,7 +1914,7 @@ function load_payment_datas(){
        $('#property_payment_form_mois_indice_initial_day').val("1").change();
         $('#adresse_crédirentier').hide();
         $('#partie-debirentier').hide();
-        $('#form-clause_OG2I').click(function() {
+        $('#form-indexation_OG2I').click(function() {
             $('#ogi2')[this.checked ? "show" : "hide"]();
             $("#property_payment_form_mois_indice_ref_og2_i_day").val("1").change();
             val_indice_m_u=(this.checked ? $('#form-indice_og2i_hide').val() : $('#form-indice_m_u_hide').val())
@@ -1910,8 +1922,13 @@ function load_payment_datas(){
             //form-indice_m_u
             //form-indice_m_u_hide
             //form-indice_og2i_hide
+load_payment_datas()
 
-
+        });
+        $('#form-clause_OG2I').is(':checked') ? $('#avec_indexation').show() : $('#avec_indexation').hide();
+        $('#form-clause_OG2I').click(function() {
+            $('#avec_indexation')[this.checked ? "show" : "hide"]();
+            load_payment_datas()
         });
         $('#form-debirentier_different').click(function() {
             $('#partie-debirentier')[this.checked ? "show" : "hide"]();
@@ -2045,13 +2062,13 @@ function load_payment_datas(){
             ri=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
             ia=$(this).val()
             ii=$('#form-initial_index_object').find(":selected").val()
-            if(ia>0 && ri>0 && ii>0 && !$('#form-clause_OG2I').is(":checked")){
+            if(ia>0 && ri>0 && ii>0 && !$('#form-indexation_OG2I').is(":checked")){
                 get_nv_montant_rente(ri,ii,ia)
             }
         });
         $("#form-honorary_rates_object").on('change', function()
         {
-            if( !$('#form-clause_OG2I').is(":checked")){
+            if( !$('#form-indexation_OG2I').is(":checked")){
                 if($('#nv_montant_rente').html()!="0.00€"){
                     taux=$(this).find(":selected").val()
                     rdb=parseFloat($('#nv_montant_rente').html().split(" ")[0])

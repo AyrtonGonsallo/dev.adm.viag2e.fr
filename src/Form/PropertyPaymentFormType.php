@@ -61,6 +61,7 @@ class PropertyPaymentFormType extends AbstractType
             ->add('honorariesDisabled', CheckboxType::class, ['required' => false])
             ->add('billingDisabled', CheckboxType::class, ['required' => false])
             ->add('clause_OG2I', CheckboxType::class, ['required' => false])
+            ->add('indexation_OG2I', CheckboxType::class, ['required' => false])
             ->add('mois_indice_ref_og2_i', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy', ])
 
             //->add('revaluationIndex', TextType::class, ['required' => false])

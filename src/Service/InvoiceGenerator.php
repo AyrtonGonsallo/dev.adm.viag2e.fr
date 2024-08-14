@@ -330,8 +330,8 @@ class InvoiceGenerator
                     "adresse_bien"=>($property->getShowDuh())?$property->getGoodAddress():$property->getAddress(),
                     "date_virement" => $date_virement,
                     "date_revision" => $date_revision,
-                    "fd_next_month_d_m_y" => strftime("%d %B %Y", strtotime( $date_fdnm->format('d-m-Y') )),
-                    "fd_next_month_m_y" => strftime("%B %Y", strtotime( $date_fdnm->format('d-m-Y') )),
+                    "fd_next_month_d_m_y" => utf8_encode(strftime("%d %B %Y", strtotime( $date_fdnm->format('d-m-Y') ))),
+                    "fd_next_month_m_y" => utf8_encode(strftime("%B %Y", strtotime( $date_fdnm->format('d-m-Y') ))),
                     "nom_compte" => explode("/", $property->getTitle())[0],
                     
                     "date_indice_base" =>  utf8_encode(strftime("%B %Y", strtotime( $property->initial_index_object->getDate()->format('d-m-Y') ))),
@@ -434,8 +434,8 @@ class InvoiceGenerator
                     "adresse_bien"=>($property->getShowDuh())?$property->getGoodAddress():$property->getAddress(),
                     "date_virement" => $date_virement,
                     "date_revision" => $date_revision,
-                    "fd_next_month_d_m_y" => strftime("%d %B %Y", strtotime( $date_fdnm->format('d-m-Y') )),
-                    "fd_next_month_m_y" => strftime("%B %Y", strtotime( $date_fdnm->format('d-m-Y') )),
+                    "fd_next_month_d_m_y" => utf8_encode(strftime("%d %B %Y", strtotime( $date_fdnm->format('d-m-Y') ))),
+                    "fd_next_month_m_y" => utf8_encode(strftime("%B %Y", strtotime( $date_fdnm->format('d-m-Y') ))),
                     "nom_compte" => explode("/", $property->getTitle())[0],
                     
                     "date_indice_base" =>  utf8_encode(strftime("%B %Y", strtotime( $property->initial_index_object->getDate()->format('d-m-Y') ))),
@@ -461,6 +461,110 @@ class InvoiceGenerator
                 try {
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-credit-template-auto.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    return  $this->path."/".$fileName;
+
+                } catch (Html2PdfException $e) {
+                    $pdf->clean();
+                    throw new Exception($e->getMessage());
+                }
+    }
+
+    public function generateCourrierIndexationMandantAutomatique(Property $property, array $parameters)
+    {
+                $data = array();
+                $now_date=new DateTime();
+                $now_date2=new DateTime();
+                $next_month_date=$now_date2->modify('+1 month');
+                $date_virement = utf8_encode(strftime("%B %Y", strtotime( $next_month_date->format('d-m-Y') )));
+                $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $next_month_date->format('d-m-Y') ))));
+                $pdf      = new Html2Pdf('P', 'A4', 'fr');
+               
+                $date_fdnm = new DateTime('First day of next month');
+                //ne pas toucher meme si ca parait insensé
+                $fileName = "Courrier d’indexation Mandant - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                
+                
+                $month_m_u=$property->initial_index_object->getDate()->format('m');
+                $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
+                $endDate_m_u->setTime(0, 0, 0);
+                // recuperer Valeur Indice de référence* (indexation)
+                
+                $qb4=$this->manager->createQueryBuilder()
+                ->select("rh")
+                ->from('App\Entity\RevaluationHistory', 'rh')
+                ->where('rh.type LIKE :key')
+                ->andWhere('rh.date <= :end')
+                ->andWhere('rh.date like  :endmonth')
+                ->setParameter('key', $this->get_label($property->getIntitulesIndicesInitial()))
+                ->setParameter('endmonth',  "%-%".$month_m_u."-%")
+                ->setParameter('end', $endDate_m_u)
+                    ->orderBy('rh.date', 'DESC');
+                $query4 = $qb4->getQuery();
+                // Execute Query
+                if($query4->getResult()){
+                    $indice_m_u = $query4->getResult()[0]; 
+                    $property->valeur_indice_reference_object=$query4->getResult()[0];
+                }else{
+                    $indice_m_u = (object) array('value' => 0,'id'=>0);
+                }
+
+                $data = [
+                    'date'       => $now_date,
+                    'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
+                    'annee'       => $now_date->format('Y'),
+                    'date_a_f'       => $now_date->format('d/m/Y'),
+                    'property'   => $property,
+                    'warrant'    => [
+                        'id'         => $property->getWarrant()->getId(),
+                        'type'       => $property->getWarrant()->getType(),
+                        'firstname'  => $property->getWarrant()->getFirstname(),
+                        'lastname'   => $property->getWarrant()->getLastname(),
+                        'address'    => ($property->getWarrant()->hasFactAddress()) ? $property->getWarrant()->getFactAddress() : $property->getWarrant()->getAddress(),
+                        'postalcode' => ($property->getWarrant()->hasFactAddress()) ? $property->getWarrant()->getFactPostalCode() : $property->getWarrant()->getPostalCode(),
+                        'city'       => ($property->getWarrant()->hasFactAddress()) ? $property->getWarrant()->getFactCity() : $property->getWarrant()->getCity(),
+                    ],
+                    "debirentier" => null,
+                    "debirentier_different" => null,
+                    "target" => null,
+                    "not_assurance_habit" => ($property->date_assurance_habitation && $property->date_assurance_habitation < $now_date )?true:false,
+                    "texte_assurance_habit" => "votre attestation d’assurance habitation couvrant l’année ".$now_date->format('Y'),
+                    "not_assurance_chemine" => ($property->date_cheminee && $property->date_cheminee < $now_date )?true:false,
+                    "texte_assurance_chemine" => "votre attestation d’entretien cheminée couvrant l’année ".$now_date->format('Y'),
+                    "not_assurance_chaudiere" => ($property->date_chaudiere && $property->date_chaudiere < $now_date )?true:false,
+                    "texte_assurance_chaudiere" => "votre attestation d’entretien chaudière couvrant l’année ".$now_date->format('Y'),
+                    "not_assurance_climatisation" => ($property->date_climatisation && $property->date_climatisation < $now_date )?true:false,
+                    "texte_assurance_climatisation" => "votre attestation d’entretien climatisation couvrant l’année ".$now_date->format('Y'),
+                    "adresse_bien"=>($property->getShowDuh())?$property->getGoodAddress():$property->getAddress(),
+                    "date_virement" => $date_virement,
+                    "date_revision" => $date_revision,
+                    "fd_next_month_d_m_y" => utf8_encode(strftime("%d %B %Y", strtotime( $date_fdnm->format('d-m-Y') ))),
+                    "fd_next_month_m_y" => utf8_encode(strftime("%B %Y", strtotime( $date_fdnm->format('d-m-Y') ))),
+                    "nom_compte" => explode("/", $property->getTitle())[0],
+                    
+                    "date_indice_base" =>  utf8_encode(strftime("%B %Y", strtotime( $property->initial_index_object->getDate()->format('d-m-Y') ))),
+                    "montant_indice_base" => $property->initial_index_object->getValue(),
+                    "date_indice_actuel" =>  utf8_encode(strftime("%B %Y", strtotime( $indice_m_u->getDate()->format('d-m-Y') ))),
+                    "montant_indice_actuel" => $indice_m_u->getValue(),
+                    "ia" => $property->getInitialAmount(),
+                    "rente" => round($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()),2),
+                    "honoraires" => round(($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100,2),
+                ];
+                if($property->getDebirentierDifferent()){
+                    $debirentier    = [
+                        'nom_debirentier'         => $property->getNomDebirentier(),
+                        'prenom_debirentier'       => $property->getPrenomDebirentier(),
+                        'addresse_debirentier'  => $property->getAddresseDebirentier(),
+                        'code_postal_debirentier'   => $property->getCodePostalDebirentier(),
+                        'ville_debirentier'    => $property->getVilleDebirentier(),
+                    ];
+                    $data["debirentier"]=$debirentier;
+                    $data["debirentier_different"]=$property->getDebirentierDifferent();
+                }
+                
+                try {
+                    $pdf->pdf->SetDisplayMode('fullpage');
+                    $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-mandant-template-auto.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     return  $this->path."/".$fileName;
 

@@ -133,6 +133,10 @@ class PropertyController extends AbstractController
             if (empty($property->getRevaluationIndex())) {
                 $property->setRevaluationIndex(0.0);
             }
+            if (!$property->getInitialAmount()) {
+                $property->setInitialAmount(0.0);
+            }
+            
             $property->date_duh=new DateTime();
             $property->setMoisIndiceInitial(new DateTime());
             $property->setCoordonneesSyndic("");
@@ -141,12 +145,14 @@ class PropertyController extends AbstractController
             $property->chaudiere=0;
             $property->valeur_indice_ref_og2_i=0;
             
-            $property->num_mandat_gestion=0;
+            
             $property->hide_honorary_export=0;
             $property->setDebirentierDifferent(0);
             $property->setBankRum("");
             $property->setAnnuitiesDisabled(0);
             $property->setShowDuh(0);
+            $property->setIndexationOG2I(0);
+            $property->setBankIcs("FR12ZZZ886B32");
             $property->setClauseOG2I(0);
             $property->setWarrant($warrant);
             $property->setCreationUser($this->getUser());
@@ -820,7 +826,7 @@ class PropertyController extends AbstractController
         $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
         ->select("inv")
         ->from('App\Entity\Invoice', 'inv')
-        ->where('inv.property = :property AND inv.category = 1 AND inv.date BETWEEN :start AND :end')
+        ->where('inv.property = :property AND inv.category = 1 AND inv.type=1 AND inv.status=5 AND inv.file2 is null AND inv.date BETWEEN :start AND :end')
         ->setParameter('property', $property)
         ->setParameter('start', $startDate)
         ->setParameter('end', $endDate)

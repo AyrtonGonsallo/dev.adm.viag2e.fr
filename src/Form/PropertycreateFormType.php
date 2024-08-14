@@ -117,8 +117,8 @@ class PropertycreateFormType extends AbstractType
             ->add('bank_domiciliation', TextType::class, ['required' => false])
             ->add('bank_iban', TextType::class, ['required' => false])
             ->add('bank_bic', TextType::class, ['required' => false])
-            ->add('bank_ics', TextType::class, ['required' => false,'disabled' => 'true'],)
-          
+            ->add('bank_ics', TextType::class, ['required' => false,'disabled' => 'true','data' => 'FR12ZZZ886B32'],)
+            ->add('num_mandat_gestion', TextType::class, ['required' => true])
             ->add('comment', TextareaType::class, ['required' => false])
             ->add('hide_export_monthly', CheckboxType::class, ['required' => false])
             ->add('hide_export_otp', CheckboxType::class, ['required' => false])
