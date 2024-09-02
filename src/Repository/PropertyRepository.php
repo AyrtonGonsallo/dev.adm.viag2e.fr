@@ -37,6 +37,18 @@ class PropertyRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findInvoiceToDo(int $id)
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.id = :id')
+            
+            ->andWhere('p.billing_disabled = false')
+            ->andWhere('p.active = true')
+            ->setParameter('id',$id)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findQuarterlyInvoicesToDo(int $max)
     {
         return $this->createQueryBuilder('p')

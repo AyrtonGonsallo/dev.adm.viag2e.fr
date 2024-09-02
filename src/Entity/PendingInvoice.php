@@ -50,6 +50,10 @@ class PendingInvoice
      * @ORM\Column(type="float", nullable=true)
      */
     private $montantht ;
+      /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $montantttc ;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -148,6 +152,19 @@ class PendingInvoice
     {
 		
         $this->montantht = $montantht;
+
+        return $this;
+    }
+
+    public function getMontantttc(): ?float
+    {
+        return $this->montantttc;
+    }
+
+    public function setMontantttc(float $montantttc): self
+    {
+		
+        $this->montantttc = $montantttc;
 
         return $this;
     }

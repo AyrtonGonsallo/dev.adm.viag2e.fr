@@ -445,6 +445,8 @@ class Invoice implements JsonSerializable
     {
         if($this->getCategory() === self::CATEGORY_MANUAL) {
             return $this->getTypeString() . " ".utf8_decode($this->getData()['period'])." .".$this->getProperty()->getTitle();
+        }else if($this->getCategory() === self::CATEGORY_CONDOMINIUM_FEES){
+            return "Regul de charges de copropriété";
         }
         return $this->getTypeString() . " {$this->getData()['date']['month']} {$this->getData()['date']['year']} " . $this->getProperty()->getTitle();
     }

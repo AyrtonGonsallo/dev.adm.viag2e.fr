@@ -8,6 +8,7 @@ use App\Entity\PendingInvoice;
 use App\Entity\Property;
 use App\Entity\Warrant;
 use App\Form\InvoiceOTPType;
+use App\Form\InvoiceReguleType;
 use App\Service\DriveManager;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -508,6 +509,58 @@ class InvoiceController extends AbstractController
         }
 
         return $this->render('invoice/otp.html.twig', ['form' => $form->createView(),'prop' => $property]);
+    }
+
+
+    /**
+     * @Route("/invoice/create/regule/{propertyId}", name="invoice_create_regule")
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function create_regule(Request $request)
+    {
+        /** @var Property $property */
+        $property = $this->getDoctrine()
+            ->getRepository(Property::class)
+            ->find($request->get('propertyId'));
+
+        if(empty($property)) {
+            $this->addFlash('danger', 'Bien introuvable');
+            return $this->redirectToRoute('dashboard');
+        }
+
+        $pendingInvoice = new PendingInvoice();
+        $pendingInvoice->setProperty($property);
+        $form = $this->createForm(InvoiceReguleType::class, $pendingInvoice, [
+            'amount'      => $property->getGarbageTax(),
+            'label'       => 'Regul de charges de copropriété',
+            'property'    => $property,
+            'reason'      => 'Regul de charges de copropriété',
+            'locked'      => false,
+            'prop_locked' => true,
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($pendingInvoice->getTarget() === PendingInvoice::TARGET_BUYER && (!$property->getWarrant()->getType() === Warrant::TYPE_SELLERS || empty($property->getBuyerFirstname()))) {
+                $this->addFlash('danger', 'La cible de la facture est incorrecte, "acheteur" ne peut être sélectionné que si le mandat est vendeur et que ses informations sont renseignées sur le profil du bien.');
+            }
+            else {
+                $pendingInvoice->setCategory(Invoice::CATEGORY_CONDOMINIUM_FEES);
+                $pendingInvoice->setLabel('Regul de charges de copropriété');
+                $pendingInvoice->setReason('Regul de charges de copropriété');
+                $pendingInvoice->setMontantht(0);
+                $manager = $this->getDoctrine()->getManager();
+                $manager->persist($pendingInvoice);
+                $manager->flush();
+
+                $this->addFlash('success', 'Facture enregistrée');
+                return $this->redirectToRoute('property_view', ['propertyId' => $property->getId()]);
+            }
+        }
+
+        return $this->render('invoice/regule.html.twig', ['form' => $form->createView(),'prop' => $property]);
     }
 
     /**

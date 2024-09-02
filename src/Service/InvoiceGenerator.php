@@ -166,6 +166,36 @@ class InvoiceGenerator
             throw new Exception($e->getMessage());
         }
     }
+    public function generateManualRegulFile(array $data, array $parameters)
+    {
+        $pdf      = new Html2Pdf('P', 'A4', 'fr');
+        $fileName = "/invoice_{$data['number']}-file1.pdf";
+        try {
+            //$data=$this->convert_from_latin1_to_utf8_recursively2($data);
+
+            $pdf->pdf->SetDisplayMode('fullpage');
+            if(empty($data['recursion']))
+                $data['recursion'] = Invoice::RECURSION_MONTHLY;
+                //$data['reason'] = utf8_decode($data['reason']);
+                //$data['label'] = utf8_decode($data['label']);
+                //$data['property']['address'] = utf8_decode($data['property']['address']);
+            
+					if($data['montantttc']==-1){
+						return -1;
+					}
+                    $fileName = "/invoice_{$data['number']}R-file1.pdf";
+                    $pdf->writeHTML($this->twig->render('invoices/invoice_regule.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
+                    
+
+            
+
+            $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+            return $this->path . $fileName;
+        } catch (Html2PdfException $e) {
+            $pdf->clean();
+            throw new Exception($e->getMessage());
+        }
+    }
     
     
 
