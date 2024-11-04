@@ -24,7 +24,7 @@ class InvoiceRepository extends ServiceEntityRepository
     }
     function get_category($val){
         if($val=="Tous"){
-            return 5;
+            return 6;
         }
         else if($val=="Rente"){
             return 0;
@@ -37,6 +37,9 @@ class InvoiceRepository extends ServiceEntityRepository
         }
         else if($val=="Avoir"){
             return 4;
+        }
+        else if($val=="Regule Manuelle"){
+            return 5;
         }
     }
 
@@ -72,7 +75,7 @@ class InvoiceRepository extends ServiceEntityRepository
                 ->setParameter('month', '%"month_n":"'.$data['month_concerned'].'%');
         }
 
-        if(!empty($data['Category']) && $this->get_category($data['Category'])!=5) {
+        if(!empty($data['Category']) && $this->get_category($data['Category'])!=6) {
             $query->andWhere('i.category = :category')->setParameter('category', $this->get_category($data['Category']));
         }
 
@@ -195,7 +198,7 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-    public function  findAvoirsTogenerate(int $max)
+    /*public function  findAvoirsTogenerate(int $max)
     {
         return $this->createQueryBuilder('i')
         ->where('i.number >= :start')
@@ -209,7 +212,24 @@ class InvoiceRepository extends ServiceEntityRepository
             ->setMaxResults($max)
             ->getQuery()
             ->getResult();
-    }
+    }*/
+    public function findAvoirsTogenerate(int $max)
+{
+   // $numbers = [5591, 5592, 5588, 5589, 5590, 5581, 5582, 5584, 5585, 5586, 5587, 5681, 5790, 5791, 5682];
+   
+   $numbers = [5904];
+
+    return $this->createQueryBuilder('i')
+        ->where('i.number IN (:numbers)')
+        ->andWhere('(i.date_generation_avoir IS NULL OR i.date_generation_avoir > :today)')
+        ->andWhere('i.type = :t')
+        ->setParameter('numbers', $numbers)
+        ->setParameter('today', new \DateTime('tomorrow'))
+        ->setParameter('t', 1)
+        ->setMaxResults($max)
+        ->getQuery()
+        ->getResult();
+}
     public function  findSimilarInvoice(String $numero)
     {
         return $this->createQueryBuilder('i')
@@ -219,6 +239,18 @@ class InvoiceRepository extends ServiceEntityRepository
         ->setParameter('num', 5002)
         ->setParameter('cat', 4)
         ->setParameter('data', '%'.$numero.'%')
+        ->orderBy('i.id', 'DESC')
+        ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+    }
+    public function  getLastPropertyInvoice(int $pid)
+    {
+        return $this->createQueryBuilder('i')
+        ->where('i.property = :pid')
+        ->andWhere('i.category = :cat')
+        ->setParameter('cat', 0)
+        ->setParameter('pid', $pid)
         ->orderBy('i.id', 'DESC')
         ->setMaxResults(1)
             ->getQuery()

@@ -54,7 +54,7 @@
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr style="width: 100%;">
                         <td style="border-bottom: solid 1px black; border-collapse: collapse; width: 50%;">Numéro du bien: <b>{{ data.property.id }}</b></td>
-                        <td style="border-bottom: solid 1px black; border-collapse: collapse; width: 50%;">{% if data.target == 1 %}Numéro de client: <b>{{ data.warrant.id }}</b>{% endif %}</td>
+                        <td style="border-bottom: solid 1px black; border-collapse: collapse; width: 50%;">Numéro de client: <b>{{ data.warrant.id }}</b></td>
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -68,7 +68,7 @@
                             {% endif %}<br />
                             pour la période du {{ data.period }} <br />concernant le bien situé:<br /><br />
                             {{ data.property.firstname }} {{ data.property.lastname }}{% if not data.property.firstname2 is empty %} - {{ data.property.firstname2 }} {% if not data.property.lastname2 is empty %}{{ data.property.lastname2 }}{% else %}{{ data.property.lastname }}{% endif %}{% endif %}<br />
-                            {{ data.property.address }}<br />
+                            <div style="width: 80%;">{{ data.property.address }}</div>
                             {{ data.property.postalcode }} {{ data.property.city }}<br /><br />
                             {% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}Dans l'attente de votre prochain règlement,<br />{% endif %}
                             Nous restons à votre disposition.<br /><br />

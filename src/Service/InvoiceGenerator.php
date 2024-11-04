@@ -73,7 +73,9 @@ class InvoiceGenerator
         $pdf      = new Html2Pdf('P', 'A4', 'fr');
         $fileName = "/invoice_{$data['number']}-file1.pdf";
         try {
-            $data=$this->convert_from_latin1_to_utf8_recursively2($data);
+            if($data['recursion']!=Invoice::RECURSION_OTP) {//pour regler le rpobleme des acents dans les factures manuelles
+                //$data=$this->convert_from_latin1_to_utf8_recursively2($data);
+            }
 
             $pdf->pdf->SetDisplayMode('fullpage');
             if(empty($data['recursion']))
@@ -118,7 +120,7 @@ class InvoiceGenerator
     }
     public function generateFile2(array $data, array $parameters)
     {
-        $data=$this->convert_from_latin1_to_utf8_recursively2($data);
+        //$data=$this->convert_from_latin1_to_utf8_recursively2($data);
 
         $pdf2      = new Html2Pdf('P', 'A4', 'fr');
         $fileName = "/invoice_{$data['number']}-file2.pdf";
@@ -180,11 +182,11 @@ class InvoiceGenerator
                 //$data['label'] = utf8_decode($data['label']);
                 //$data['property']['address'] = utf8_decode($data['property']['address']);
             
-					if($data['montantttc']==-1){
-						return -1;
-					}
-                    $fileName = "/invoice_{$data['number']}R-file1.pdf";
-                    $pdf->writeHTML($this->twig->render('invoices/invoice_regule.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
+            if($data['montantttc']==-1){
+                return -1;
+            }
+            $fileName = "/invoice_{$data['number']}R-file1.pdf";
+            $pdf->writeHTML($this->twig->render('invoices/invoice_regule.html.twig', ['pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
                     
 
             
@@ -203,7 +205,7 @@ class InvoiceGenerator
     {
         $pdf      = new Html2Pdf('P', 'A4', 'fr');
         $fileName = "/avoir_{$data['number']}-file1.pdf";
-        $data=$this->convert_from_latin1_to_utf8_recursively2($data);
+        //$data=$this->convert_from_latin1_to_utf8_recursively2($data);
         try {
             $pdf->pdf->SetDisplayMode('fullpage');
             if(empty($data['recursion']))
@@ -248,7 +250,7 @@ class InvoiceGenerator
     {
         $pdf2      = new Html2Pdf('P', 'A4', 'fr');
         $fileName = "/avoir_{$data['number']}-file2.pdf";
-        $data=$this->convert_from_latin1_to_utf8_recursively2($data);
+        //$data=$this->convert_from_latin1_to_utf8_recursively2($data);
         try {
             $pdf2->pdf->SetDisplayMode('fullpage');
             if(empty($data['recursion']))

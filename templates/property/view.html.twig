@@ -543,11 +543,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    DEBIRENTIER
-                                </h2>
-                            </div>
+                            
                             <div class="form-group row">
                                 <div class="col-lg-12">
                                     <label for="form-debirentier_different" class="col-4 col-form-label">
@@ -570,9 +566,14 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="">
+                                <h2 class="separateur-horizontal">                                                
+                                    DEBIRENTIER 1
+                                </h2>
+                            </div>
                             <div id="partie-debirentier" class="form-group row">
                                 <div class="col-lg-6">
-                                    <label for="form-nom_debirentier" class="col-4 col-form-label">Nom ou Raison sociale<span class="m--font-danger">*</span></label>
+                                    <label for="form-nom_debirentier" class="col-12 col-form-label">Nom ou Raison sociale</label>
                                     <div class="col-12">
                                         {{ form_row(form.nom_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-nom_debirentier', 'label': false}) }}
                                     </div>
@@ -585,43 +586,104 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
-                                    <label for="form-addresse_debirentier" class="col-4 col-form-label">Adresse <span class="m--font-danger">*</span></label>
+                                    <label for="form-addresse_debirentier" class="col-4 col-form-label">Adresse </label>
                                     <div class="col-12">
                                         {{ form_row(form.addresse_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_debirentier', 'label': false}) }}
 
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <label for="form-code_postal_debirentier" class="col-4 col-form-label">Code postal <span class="m--font-danger">*</span></label>
+                                    <label for="form-code_postal_debirentier" class="col-4 col-form-label">Code postal </label>
                                     <div class="col-6">
                                         {{ form_row(form.code_postal_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_debirentier', 'label': false}) }}
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <label for="form-pays_debirentier" class="col-4 col-form-label">Pays<span class="m--font-danger">*</span></label>
+                                    <label for="form-pays_debirentier" class="col-4 col-form-label">Pays</label>
                                     <div class="col-6">
                                         {{ form_row(form.pays_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-pays_debirentier', 'label': false}) }}
 
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <label for="form-ville_debirentier" class="col-4 col-form-label">Ville<span class="m--font-danger">*</span></label>
+                                    <label for="form-ville_debirentier" class="col-4 col-form-label">Ville</label>
                                     <div class="col-6">
                                         {{ form_row(form.ville_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_debirentier', 'label': false}) }}
 
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <label for="form-telephone_debirentier" class="col-4 col-form-label">Téléphone<span class="m--font-danger">*</span></label>
+                                    <label for="form-telephone_debirentier" class="col-4 col-form-label">Téléphone</label>
                                     <div class="col-6">
                                         {{ form_row(form.telephone_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-telephone_debirentier', 'label': false}) }}
 
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <label for="form-email_debirentier" class="col-4 col-form-label">Adresse email<span class="m--font-danger">*</span></label>
+                                    <label for="form-email_debirentier" class="col-4 col-form-label">Adresse email</label>
                                     <div class="col-6">
                                         {{ form_row(form.email_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-email_debirentier', 'label': false}) }}
+
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="">
+                                <h2 class="separateur-horizontal">                                                
+                                    DEBIRENTIER 2
+                                </h2>
+                            </div>
+                            <div id="partie-debirentier2" class="form-group row">
+                                <div class="col-lg-6">
+                                    <label for="form-nom_debirentier2" class="col-12 col-form-label">Nom ou Raison sociale 2</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.nom_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-nom_debirentier2', 'label': false}) }}
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="form-prenom_debirentier2" class="col-4 col-form-label">Prénom 2</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.prenom_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-prenom_debirentier2', 'label': false}) }}
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <label for="form-addresse_debirentier2" class="col-4 col-form-label">Adresse 2</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.addresse_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_debirentier2', 'label': false}) }}
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="form-code_postal_debirentier2" class="col-4 col-form-label">Code postal 2</label>
+                                    <div class="col-6">
+                                        {{ form_row(form.code_postal_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_debirentier2', 'label': false}) }}
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="form-pays_debirentier2" class="col-4 col-form-label">Pays 2</label>
+                                    <div class="col-6">
+                                        {{ form_row(form.pays_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-pays_debirentier2', 'label': false}) }}
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="form-ville_debirentier2" class="col-4 col-form-label">Ville 2</label>
+                                    <div class="col-6">
+                                        {{ form_row(form.ville_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_debirentier2', 'label': false}) }}
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="form-telephone_debirentier2" class="col-4 col-form-label">Téléphone 2</label>
+                                    <div class="col-6">
+                                        {{ form_row(form.telephone_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-telephone_debirentier2', 'label': false}) }}
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="form-email_debirentier2" class="col-4 col-form-label">Adresse email 2</label>
+                                    <div class="col-6">
+                                        {{ form_row(form.email_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-email_debirentier2', 'label': false}) }}
 
                                     </div>
                                 </div>
@@ -644,7 +706,19 @@
                             
                         
                             <div class="form-group row">
-                            <div class="col-6">
+                                <div class="col-6">
+                                    <label for="form-no_indexation" class="col-4 col-form-label">Désactiver l'indexation</label>
+                                    <div class="col-6">
+                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                            <label>
+                                                {{ form_widget(form_payment.no_indexation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-no_indexation', 'label': false}) }}
+
+                                                <span></span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
                                     <label for="form-billingDisabled" class="col-4 col-form-label">Désactiver la facturation</label>
                                     <div class="col-6">
                                         <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
@@ -711,14 +785,11 @@
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    
-                                </div>
-                                <div class="col-6">
-                                    <label for="form-hide_export_otp" class="col-4 col-form-label">Masquer les honoraires de l'export</label>
+                                    <label for="form-hide_honorary_export" class="col-4 col-form-label">Masquer les honoraires de l'export</label>
                                     <div class="col-6">
                                         <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
                                             <label>
-                                                {{ form_widget(form_payment.hide_honorary_export, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_export_otp', 'label': false}) }}
+                                                {{ form_widget(form_payment.hide_honorary_export, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_honorary_export', 'label': false}) }}
                                                 <span></span>
                                             </label>
                                         </span>
@@ -1322,7 +1393,7 @@
                                             <td>{{ generated_file.name }}</td>
                                             <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') and generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}</td>
                                             <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
-                                            <td><a href="{{ path('file_download2', {'fileId': generated_file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
+                                            <td><a href="{{ path('file_download', {'fileId': generated_file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
                                             <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': generated_file.driveId}) }}" data-name="{{ generated_file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
                                         </tr>
                                     {% endif %}
@@ -1538,52 +1609,61 @@ function load_payment_datas(){
                 $("#form-bank_rum").prop('disabled', true);
             }
             $('#form-indexation_OG2I').is(":checked")? $('#ogi2').show() : $('#ogi2').hide();
-            
-
-            if($('#form-indexation_OG2I').is(":checked") ){
-                $("#property_payment_form_mois_indice_ref_og2_i_day").val("1").change();
-                console.log("bien avec og2i")
-                $('#ogi2').show()
-                //-rdb
-                taux_m_u=$("#form-initial_index_object").find(":selected").val()
-                ii=$('#form-valeur_indice_ref_og2_i_object').find(":selected").val()
-                ia=$('#form-initialAmount').val()
-                get_og2irdb(ia,ii,taux_m_u);
-                //--nv mt
-                
-                setTimeout(function(){ 
-                        rdb=parseFloat($('#montant_rente').html().split(" ")[0])
-                        vir=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
-                        p=($('#form-plafonnement_index_og2_i').val())?$('#form-plafonnement_index_og2_i').val():2;
-                        viog2ir=$("#form-valeur_indice_ref_og2_i_object").find(":selected").val()
-                        get_nv_montant_rente_og2i(viog2ir,vir,rdb,p)
-                    }, 2000);
-                // honn
-                setTimeout(function(){ 
-                         if($('#nv_montant_rente').html()!="0.00€"){
-                            taux=$("#form-honorary_rates_object").find(":selected").val()
-                            rdb=parseFloat($('#nv_montant_rente').html().split(" ")[0])
-                            get_honoraires(taux,rdb);
-                        }
-                    }, 3000);
+            if($('#form-no_indexation').is(":checked") ){
+                //pas d'indexation
+                $('#nv_montant_rente').html($('#form-initialAmount').val())
+                rdb=parseFloat($('#nv_montant_rente').html().split(" ")[0])
+                taux=$("#form-honorary_rates_object").find(":selected").val()
+                get_honoraires(taux,rdb);
             }else{
-                console.log("bien sans og2i")
-                
-                ia=$('#form-initialAmount').val()
-                ri=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
-                ii=$('#form-initial_index_object').find(":selected").val()
-                if(ia>0 && ri>0 && ii>0){
-                    get_nv_montant_rente(ri,ii,ia)
+                //indexation, donc calcul
+                if($('#form-indexation_OG2I').is(":checked") ){
+                    $("#property_payment_form_mois_indice_ref_og2_i_day").val("1").change();
+                    console.log("bien avec og2i")
+                    $('#ogi2').show()
+                    //-rdb
+                    taux_m_u=$("#form-initial_index_object").find(":selected").val()
+                    ii=$('#form-valeur_indice_ref_og2_i_object').find(":selected").val()
+                    ia=$('#form-initialAmount').val()
+                    get_og2irdb(ia,ii,taux_m_u);
+                    //--nv mt
+                    
                     setTimeout(function(){ 
-                         if($('#nv_montant_rente').html()!="0.00€"){
-                            taux=$("#form-honorary_rates_object").find(":selected").val()
-                            rdb=parseFloat($('#nv_montant_rente').html().split(" ")[0])
-                            get_honoraires(taux,rdb);
-                        }
-                    }, 2000);
-                   
+                            rdb=parseFloat($('#montant_rente').html().split(" ")[0])
+                            vir=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
+                            p=($('#form-plafonnement_index_og2_i').val())?$('#form-plafonnement_index_og2_i').val():2;
+                            viog2ir=$("#form-valeur_indice_ref_og2_i_object").find(":selected").val()
+                            get_nv_montant_rente_og2i(viog2ir,vir,rdb,p)
+                        }, 2000);
+                    // honn
+                    setTimeout(function(){ 
+                            if($('#nv_montant_rente').html()!="0.00€"){
+                                taux=$("#form-honorary_rates_object").find(":selected").val()
+                                rdb=parseFloat($('#nv_montant_rente').html().split(" ")[0])
+                                get_honoraires(taux,rdb);
+                            }
+                        }, 3000);
+                }else{
+                    console.log("bien sans og2i")
+                    
+                    ia=$('#form-initialAmount').val()
+                    ri=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
+                    ii=$('#form-initial_index_object').find(":selected").val()
+                    if(ia>0 && ri>0 && ii>0){
+                        get_nv_montant_rente(ri,ii,ia)
+                        setTimeout(function(){ 
+                            if($('#nv_montant_rente').html()!="0.00€"){
+                                taux=$("#form-honorary_rates_object").find(":selected").val()
+                                rdb=parseFloat($('#nv_montant_rente').html().split(" ")[0])
+                                get_honoraires(taux,rdb);
+                            }
+                        }, 2000);
+                    
+                    }
                 }
             }
+
+            
             
 }
  $("#form-plafonnement_index_og2_i").on("input", function() {
@@ -1914,7 +1994,6 @@ function load_payment_datas(){
 
        $('#property_payment_form_mois_indice_initial_day').val("1").change();
         $('#adresse_crédirentier').hide();
-        $('#partie-debirentier').hide();
         $('#form-indexation_OG2I').click(function() {
             $('#ogi2')[this.checked ? "show" : "hide"]();
             $("#property_payment_form_mois_indice_ref_og2_i_day").val("1").change();
@@ -1931,9 +2010,10 @@ load_payment_datas()
             $('#avec_indexation')[this.checked ? "show" : "hide"]();
             load_payment_datas()
         });
+        /*
         $('#form-debirentier_different').click(function() {
             $('#partie-debirentier')[this.checked ? "show" : "hide"]();
-        });
+        });*/
         $('#form-show_duh').click(function() {
             $('#adresse_crédirentier')[this.checked ? "show" : "hide"]();
             $('#form-assurance_habitation').prop('checked', false);
@@ -1946,7 +2026,6 @@ load_payment_datas()
             $('#date_assurance_habitation').hide()
         });
 
-        $('#form-debirentier_different').is(":checked")? $('#partie-debirentier').show() : $('#partie-debirentier').hide();
         function get_invoices(){
             /*
             annee_vente
@@ -2119,7 +2198,10 @@ load_payment_datas()
                 $('#mail-content').html('Chargement ...').load("{{ path('mail_content') }}?id=" + $(this).attr('data-id'));
             });
         });
-        
+
+        $('#form-no_indexation').click(function() {
+            load_payment_datas()
+        });
     </script>
     
 {% endblock %}

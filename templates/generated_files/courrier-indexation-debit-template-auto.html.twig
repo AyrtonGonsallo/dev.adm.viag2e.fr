@@ -82,8 +82,8 @@
 
     <b>Le nouveau montant de la rente viagère sera ainsi porté à {{data.rente}} €</b> pour le virement 
     de la rente du mois de {{data.date_virement}}:<br /><br />
-    Rente initiale ({{data.ia}} €) x Nouvel indice de {{data.date_indice_actuel|convert_encoding('UTF-8', 'ISO-8859-1')}} ({{data.montant_indice_actuel}}) / Indice de base de 
-    {{data.date_indice_base|convert_encoding('UTF-8', 'ISO-8859-1')}} ({{data.montant_indice_base}}). <br /><br />
+    Rente initiale ({{data.ia}} €) x Nouvel indice de {{data.date_indice_actuel}} ({{data.montant_indice_actuel}}) / Indice de base de 
+    {{data.date_indice_base}} ({{data.montant_indice_base}}). <br /><br />
     {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_BUYERS') and not data.property.getDebirentierDifferent()  %}
         <b>Les honoraires de gestion passent eux à {{data.honoraires}} € TTC. </b><br /><br />
     {% endif %}

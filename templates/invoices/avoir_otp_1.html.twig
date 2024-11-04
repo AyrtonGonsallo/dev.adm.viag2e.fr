@@ -18,7 +18,7 @@
                 {{ parameters.site }}
             </td>
             <td style="width: 50%; padding-top: 25px;">
-                <span style="font-size: 15pt"><b>{% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}AVIS D'ECHEANCE{% else %}QUITTANCE{% endif %} {{ data.number }}</b></span><br />
+                <span style="font-size: 15pt"><b>AVOIR {{ data.number }}</b></span><br />
                 {% if data.period is not empty %}Période de {{ data.period }}<br />{% endif %}
                 <small>{{ parameters.city|title }}, le {{ data.date.current_day }}</small>
                 <br /><br /><br />
@@ -31,8 +31,8 @@
                     
                 {% elseif data.target == constant('App\\Entity\\PendingInvoice::TARGET_PROPERTY') %}
                     {{ data.property.lastname }} {{ data.property.firstname }}<br />
-                    {{ data.property.address }}<br />
-                    {{ data.property.postalcode }} {{ data.property.city }}
+                    {{ data.property.address | raw }}<br />
+                    
                 {% elseif data.target == 4 %}
                     {{ data.debirentier.prenom_debirentier }} {{ data.debirentier.nom_debirentier }}<br />
                     {{ data.debirentier.addresse_debirentier }}<br />
@@ -62,14 +62,14 @@
                             Madame, Monsieur,<br /><br />
                             Nous vous prions de trouver ci-joint votre
                             {% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}
-                                appel de fonds relatif à<br /> {{ data.reason }}
+                                avoir relatif à la facture <br />{{ numero}} 
                             {% else %}
                                 quittance
                             {% endif %}<br />
                             pour la période du {{ data.period }} <br />concernant le bien situé:<br /><br />
                             {{ data.property.firstname }} {{ data.property.lastname }}{% if not data.property.firstname2 is empty %} - {{ data.property.firstname2 }} {% if not data.property.lastname2 is empty %}{{ data.property.lastname2 }}{% else %}{{ data.property.lastname }}{% endif %}{% endif %}<br />
-                            {{ data.property.address }}<br />
-                            {{ data.property.postalcode }} {{ data.property.city }}<br /><br />
+                            {{ data.property.address | raw  }}<br />
+                            <br />
                             {% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}Dans l'attente de votre prochain règlement,<br />{% endif %}
                             Nous restons à votre disposition.<br /><br />
                             Bien cordialement.<br /><br />

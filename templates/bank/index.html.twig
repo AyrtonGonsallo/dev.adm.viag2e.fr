@@ -37,9 +37,9 @@
             <div class="m-portlet__body">
                 <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
                     <div class="row align-items-center">
-                        <div class="col-xl-8 order-2 order-xl-1">
+                        <div class="col-xl-6 order-2 order-xl-1">
                             <div class="form-group m-form__group row align-items-center">
-                                <div class="col-md-4">
+                                <div class="col-md-5">
                                     <div class="m-form__group m-form__group--inline">
                                         <div class="m-form__label">
                                             <label class="m-label m-label--single" for="m_form_type">Type:</label>
@@ -54,7 +54,7 @@
                                     </div>
                                     <div class="d-md-none m--margin-bottom-10"></div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="m-input-icon m-input-icon--left">
                                         <input type="text" class="form-control m-input" placeholder="Recherche..." id="generalSearch">
                                         <span class="m-input-icon__icon m-input-icon__icon--left">
@@ -64,7 +64,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xl-4 order-1 order-xl-2 m--align-right">
+                        <div class="col-xl-3 order-1 order-xl-2 m--align-right">
+                            <button type="button" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill" data-toggle="modal" data-target="#m_modal_generate_fa" id="btn-modal-generate-fa">
+                                        <span>
+                                            <i class="la la-code"></i>
+                                            <span>Génération manuelle FA</span>
+                                        </span>
+                            </button>
+                            <div class="m-separator m-separator--dashed d-xl-none"></div>
+                        </div>
+                        <div class="col-xl-3 order-1 order-xl-2 m--align-right">
                             <button type="button" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill" data-toggle="modal" data-target="#m_modal_generate" id="btn-modal-generate">
                                         <span>
                                             <i class="la la-code"></i>
@@ -126,6 +135,31 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="m_modal_generate_fa" tabindex="-1" role="dialog" aria-labelledby="generate" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Génération manuelle FA</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ path('bank_generate_fa') }}" method="post" id="generate-form-fa">
+                        <label class="col-xl-12 col-lg-12 col-form-label" for="form-dates">Dates:</label>
+                        <div class="col-xl-12 col-lg-12">
+                            <input type="text" class="form-control m-input" id="form-dates" name="range" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="generate-button-fa">Générer</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
@@ -139,6 +173,9 @@
 
         $('#generate-button').click(function () {
             $('#generate-form').submit();
+        });
+        $('#generate-button-fa').click(function () {
+            $('#generate-form-fa').submit();
         });
     </script>
 {% endblock %}

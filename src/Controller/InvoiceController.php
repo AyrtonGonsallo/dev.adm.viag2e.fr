@@ -8,6 +8,7 @@ use App\Entity\PendingInvoice;
 use App\Entity\Property;
 use App\Entity\Warrant;
 use App\Form\InvoiceOTPType;
+use App\Form\InvoiceGarbageType;
 use App\Form\InvoiceReguleType;
 use App\Service\DriveManager;
 use DateTime;
@@ -135,6 +136,7 @@ class InvoiceController extends AbstractController
             elseif($invoice->getCategory() == Invoice::CATEGORY_CONDOMINIUM_FEES) {
                 $totals['condominiumFees']  += $data['property']['condominiumFees'];
             }
+            
             elseif($invoice->getCategory() == Invoice::CATEGORY_GARBAGE) {
                 $totals['garbage']  += $data['amount'];
             }
@@ -480,7 +482,7 @@ class InvoiceController extends AbstractController
 
         $pendingInvoice = new PendingInvoice();
         $pendingInvoice->setProperty($property);
-        $form = $this->createForm(InvoiceOTPType::class, $pendingInvoice, [
+        $form = $this->createForm(InvoiceGarbageType::class, $pendingInvoice, [
             'amount'      => $property->getGarbageTax(),
             'label'       => 'Taxe d\'enlèvement des ordures ménagères',
             'property'    => $property,
@@ -498,7 +500,7 @@ class InvoiceController extends AbstractController
                 $pendingInvoice->setCategory(Invoice::CATEGORY_GARBAGE);
                 $pendingInvoice->setLabel('Taxe d\'enlèvement des ordures ménagères');
                 $pendingInvoice->setReason('la taxe d\'enlèvement des ordures ménagères');
-
+                $pendingInvoice->setMontantht(0);
                 $manager = $this->getDoctrine()->getManager();
                 $manager->persist($pendingInvoice);
                 $manager->flush();
@@ -508,7 +510,7 @@ class InvoiceController extends AbstractController
             }
         }
 
-        return $this->render('invoice/otp.html.twig', ['form' => $form->createView(),'prop' => $property]);
+        return $this->render('invoice/garbage.html.twig', ['form' => $form->createView(),'prop' => $property]);
     }
 
 
@@ -534,9 +536,9 @@ class InvoiceController extends AbstractController
         $pendingInvoice->setProperty($property);
         $form = $this->createForm(InvoiceReguleType::class, $pendingInvoice, [
             'amount'      => $property->getGarbageTax(),
-            'label'       => 'Regul de charges de copropriété',
+            'label'       => 'Régularisation des charges de copropriété',
             'property'    => $property,
-            'reason'      => 'Regul de charges de copropriété',
+            'reason'      => '',
             'locked'      => false,
             'prop_locked' => true,
         ]);
@@ -547,9 +549,9 @@ class InvoiceController extends AbstractController
                 $this->addFlash('danger', 'La cible de la facture est incorrecte, "acheteur" ne peut être sélectionné que si le mandat est vendeur et que ses informations sont renseignées sur le profil du bien.');
             }
             else {
-                $pendingInvoice->setCategory(Invoice::CATEGORY_CONDOMINIUM_FEES);
-                $pendingInvoice->setLabel('Regul de charges de copropriété');
-                $pendingInvoice->setReason('Regul de charges de copropriété');
+                $pendingInvoice->setCategory(Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES);
+                $pendingInvoice->setLabel('Régularisation des charges de copropriété');
+                $pendingInvoice->setReason('Régularisation des charges de copropriété');
                 $pendingInvoice->setMontantht(0);
                 $manager = $this->getDoctrine()->getManager();
                 $manager->persist($pendingInvoice);
@@ -853,6 +855,9 @@ class InvoiceController extends AbstractController
         }
         elseif ($invoice->getCategory() === Invoice::CATEGORY_GARBAGE || $invoice->getCategory() === Invoice::CATEGORY_MANUAL) {
             return number_format($invoice->getData()['amount'],2, '.', ' ');
+        }
+        elseif($invoice->getCategory() == Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES) {
+            return number_format($invoice->getData()['montantttc'],2, '.', ' ');
         }
         elseif ($invoice->getCategory() === Invoice::CATEGORY_AVOIR) {
             if(array_key_exists('annuity',$invoice->getData()['property']))

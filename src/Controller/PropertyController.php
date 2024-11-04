@@ -728,7 +728,7 @@ class PropertyController extends AbstractController
         $options="<option value=''></option>";
         $i=0;
         foreach ($rhs as  $rh) {
-            $options.='<option selected value="'.$rh->getId().'">'.$rh->getValue().' '.$rh->getType().' mois de '.strftime('%B %Y',$rh->getDate()->getTimestamp()).'</option>';
+            $options.='<option selected value="'.$rh->getId().'">'.$rh->getValue().' '.$rh->getType().' mois de '.utf8_encode(strftime('%B %Y',$rh->getDate()->getTimestamp())) .'</option>';
             $i++;
             if($i==1){continue;}
         }
@@ -755,7 +755,15 @@ class PropertyController extends AbstractController
         }else{
             $indice_m_u = (object) array('value' => 0,'id'=>0);
         }
-        return new JsonResponse(['data' => $rhs,'options'=> $options,"valeur_indice_de_référence"=> $indice_m_u->getValue(),"valeur_indice_de_référence_id"=> $indice_m_u->getId(),]);
+        return new JsonResponse(
+            [
+                'data' => $rhs,
+                'options'=> $options,
+                "valeur_indice_de_référence"=> $indice_m_u->getValue(),
+                "valeur_indice_de_référence_id"=> $indice_m_u->getId()
+                ,
+            ]
+        );
     }
     /**
      *@Route(name="get_currents_ipcs",path="/get_currents_ipcs/{type}")
@@ -783,6 +791,18 @@ class PropertyController extends AbstractController
         $query = $qb->getQuery();
         // Execute Query
         $rhs = $query->getResult();
+        if(!$rhs){
+            //si pas d'indice pour ce mois prendre le dernier renseigné
+            $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
+            ->select("rh")
+            ->from('App\Entity\RevaluationHistory', 'rh')
+            ->where('rh.type LIKE :key')
+            ->setParameter('key', $type)
+                ->orderBy('rh.date', 'DESC');
+            $query = $qb->getQuery();
+            // Execute Query
+            $rhs = $query->getResult();
+        }
         $options=$rhs[0];
         
         return new JsonResponse(['data' => $rhs,'options'=> $options]);
@@ -878,7 +898,7 @@ class PropertyController extends AbstractController
         $options="<option value=''></option>";
         $i=0;
         foreach ($rhs as  $rh) {
-            $options.='<option selected value="'.$rh->getId().'">'.$rh->getValue().' mois de '.strftime('%B %Y',$rh->getDate()->getTimestamp()).'</option>';
+            $options.='<option selected value="'.$rh->getId().'">'.$rh->getValue().' mois de '.utf8_encode(strftime('%B %Y',$rh->getDate()->getTimestamp())).'</option>';
             $i++;
             if($i==1){continue;}
         }

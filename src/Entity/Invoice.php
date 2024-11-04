@@ -17,6 +17,7 @@ class Invoice implements JsonSerializable
     public const CATEGORY_GARBAGE = 2; // Ordures
     public const CATEGORY_MANUAL = 3; // Manuel
     public const CATEGORY_AVOIR = 4; // inverse d'une facture / remboursement / avoirs
+    public const CATEGORY_REGULE_CONDOMINIUM_FEES = 5; // Co-pro
 
     public const RECURSION_MONTHLY   = 1; // Mensuel
     public const RECURSION_OTP       = 2; // Exceptionnel
@@ -253,7 +254,7 @@ class Invoice implements JsonSerializable
 
     public function setData(?array $data): self
     {
-        $this->data = $this->convert_from_latin1_to_utf8_recursively($data);
+        $this->data =($data);
 
         return $this;
     }
@@ -289,6 +290,9 @@ class Invoice implements JsonSerializable
                 return 'Rente';
             case self::CATEGORY_CONDOMINIUM_FEES:
                 return 'Frais de co-pro';
+            case self::CATEGORY_REGULE_CONDOMINIUM_FEES:
+                return 'Régule manuelle';
+                
             case self::CATEGORY_GARBAGE:
                 return 'Ordures ménagères';
             case self::CATEGORY_AVOIR:
@@ -301,7 +305,15 @@ class Invoice implements JsonSerializable
 
     public function getTypeString(): string
     {
-        return ($this->getType() == self::TYPE_NOTICE_EXPIRY) ? 'Avis d\'échéance' : 'Quittance';
+        $type=null;
+        if($this->getType() == self::TYPE_NOTICE_EXPIRY){
+            $type='Avis d\'échéance';
+        }else if($this->getType() == self::TYPE_RECEIPT){
+            $type='Quittance';
+        }else if($this->getType() == self::TYPE_AVOIR){
+            $type='Avoir';
+        }
+        return $type;
     }
 
     public function getStatus(): ?int
@@ -446,7 +458,10 @@ class Invoice implements JsonSerializable
         if($this->getCategory() === self::CATEGORY_MANUAL) {
             return $this->getTypeString() . " ".utf8_decode($this->getData()['period'])." .".$this->getProperty()->getTitle();
         }else if($this->getCategory() === self::CATEGORY_CONDOMINIUM_FEES){
-            return "Regul de charges de copropriété";
+            return "Avance de charges de copropriété";
+        }
+        else if($this->getCategory() === self::CATEGORY_REGULE_CONDOMINIUM_FEES){
+            return "Régularisation des charges de copropriété";
         }
         return $this->getTypeString() . " {$this->getData()['date']['month']} {$this->getData()['date']['year']} " . $this->getProperty()->getTitle();
     }

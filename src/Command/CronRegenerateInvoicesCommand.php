@@ -56,7 +56,7 @@ class CronRegenerateInvoicesCommand extends Command
 
     private $pdf_dir;
     private $pdf_logo;
-
+    private $invoice_number;
     private $mail_from;
 
     private $date;
@@ -75,7 +75,7 @@ class CronRegenerateInvoicesCommand extends Command
         $this->mailer = $mailer;
         $this->params = $params;
         $this->twig = $this->container->get('twig');
-
+        $this->invoice_number = 5812;
         $this->pdf_dir = $this->params->get('pdf_tmp_dir');
         $this->pdf_logo = $this->params->get('pdf_logo_path');
 
@@ -159,8 +159,56 @@ class CronRegenerateInvoicesCommand extends Command
             
           }
       
+          function processNumber(int $number)
+          {
+              static $assignedNumbers = []; // Keeps track of numbers and their corresponding results
+              static $nextNumber = 5800; // Starting value for the first number
+          
+              // Check if the number has already been assigned a value
+              if (isset($assignedNumbers[$number])) {
+                  return $assignedNumbers[$number];
+              }
+          
+              // Assign the current $nextNumber to the input $number
+              $assignedNumbers[$number] = $nextNumber;
+          
+              // Increment $nextNumber for the next new number
+              $nextNumber++;
+          
+              // Return the assigned number
+              return $assignedNumbers[$number];
+          }
+          
+        
 
-        if (date('d') == 18) {
+          
+        if (date('d') == 21) {
+        
+            
+
+
+            $io->comment('Creating avoirs');
+            $quittances = $this->manager
+                ->getRepository(Invoice::class)
+                ->findAvoirsTogenerate(50);
+                $number=5812;
+            foreach ($quittances as $quittance) {
+                
+                $data=$quittance->getData();
+                // $data["number_int"]=$number;
+                $property=$quittance->getProperty();
+                $this->generateAvoir($io, $data, $parameters, $property,$quittance,$number);
+                
+                $number+=1;
+            }
+                
+            
+        
+
+/*
+code de janvier 2024
+
+ if (date('d') == 17) {
         
             
 
@@ -200,9 +248,6 @@ class CronRegenerateInvoicesCommand extends Command
                 }
                 
             }
-        
-
-/*
             $io->comment('Recreating invoices');
             $invoices = $this->manager
                 ->getRepository(Invoice::class)
@@ -284,9 +329,9 @@ class CronRegenerateInvoicesCommand extends Command
     public function generateAvoir(SymfonyStyle &$io, array $data, array $parameters, Property $property,Invoice $invoice,int $number)
     {
         try {   
-			
+			$number=processNumber($data["number_int"]);
           $type=$invoice->getFile()?"rente":"honoraire";
-        $io->note("generation d'avoir sur la facture ".$data["number_int"]." du fichier de type ".$type." avec le numéro ".$number);
+        $io->note("generation d'avoir avec le numero ".$number." sur la facture ".$data["number_int"]." du fichier de type ".$type." avec le numéro ".$number);
         
         $invoice2 = new Invoice();
         $invoice2->setCategory(Invoice::CATEGORY_AVOIR);
@@ -514,6 +559,7 @@ class CronRegenerateInvoicesCommand extends Command
                         $invoice->setStatus(Invoice::STATUS_UNSENT);
                     }
             }
+           
     }
             //@unlink($this->pdf_dir . $fileName);
          catch (Exception $e) {

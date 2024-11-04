@@ -102,6 +102,15 @@ class PropertyFormType extends AbstractType
             ->add('telephone_debirentier', TextType::class, ['required' => false])
             ->add('email_debirentier', TextType::class, ['required' => false]);
 
+            $builder->add('nom_debirentier2', TextType::class, ['required' => false])
+            ->add('prenom_debirentier2', TextType::class, ['required' => false])
+            ->add('addresse_debirentier2', TextType::class, ['required' => false])
+            ->add('code_postal_debirentier2', TextType::class, ['required' => false])
+            ->add('pays_debirentier2', TextType::class, ['required' => false])
+            ->add('ville_debirentier2', TextType::class, ['required' => false])
+            ->add('telephone_debirentier2', TextType::class, ['required' => false])
+            ->add('email_debirentier2', TextType::class, ['required' => false]);
+
         /*$builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
             $property = $event->getData();
             $form = $event->getForm();

@@ -364,11 +364,13 @@
                                                 <h3 class="m-form__heading-title">Informations</h3>
                                             </div>
                                              <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-noindex">Désactiver l'indexation:</label>
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-no_indexation">Désactiver l'indexation:</label>
                                                 <div class="col-xl-9 col-lg-9">
+                                                   
                                                     <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
                                                         <label>
-                                                            <input type="checkbox" id="form-noindex" class="form-control m-input" name="noindex">
+                                                            {{ form_widget(form.no_indexation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-no_indexation', 'label': false}) }}
+
                                                             <span></span>
                                                         </label>
                                                     </span>
@@ -685,10 +687,7 @@
     {{ encore_entry_script_tags('warrant') }}
     <script type="text/javascript">
     
-    $('#form-noindex').click(function() {
-    $('#billingBox')[this.checked ? "hide" : "show"]();
-    $('#form-billingDisabled').prop('checked', this.checked);
-});
+
 $('#propertycreate_form_mois_indice_initial_day').val("1").change();
     $('#propertycreate_form_mois_indice_initial_year').on('change', function() {
         function get_label(id){

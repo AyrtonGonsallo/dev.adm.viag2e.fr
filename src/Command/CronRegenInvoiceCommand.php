@@ -121,7 +121,25 @@ class CronRegenInvoiceCommand extends Command
                 @unlink($file);
             }
         }
+        function formatter_adresse($sequence){
 
+            $banII_regexp ="/[0-9][0-9][0-9][0-9][0-9].*/";
+            preg_match_all($banII_regexp, $sequence, $matches, PREG_OFFSET_CAPTURE);
+            if($matches[0]){
+                $position=$matches[0][0][1];
+                $texte=$matches[0][0][0];
+                //echo "<p>Position: ".$position;
+                //echo "<br>";
+                //echo "Texte: ".$texte."</p>";
+                //echo "<br>";
+                //echo "Résultats: <br>".substr($sequence, 0, $position)."<br>".$texte."</p>";
+                $res=substr($sequence, 0, $position)."<br>".$texte;
+                return $res;
+            }else{
+                return $sequence;
+            }
+            
+          }
         $parameters = [
             'tva'        => $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'tva'])->getValue(),
             'footer'     => $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_footer'])->getValue(),
@@ -133,7 +151,7 @@ class CronRegenInvoiceCommand extends Command
             'site'       => $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_site'])->getValue(),
         ];
 
-        $d = new DateTime('First day of last month');
+        $d = new DateTime('First day of next month');
 
         $this->date = [
             'current_day'   => utf8_encode(strftime('%A %e %B %Y')),
@@ -251,7 +269,7 @@ class CronRegenInvoiceCommand extends Command
                             'lastname'   => $property->getLastname1(),
                             'firstname2' => $property->getFirstname2(),
                             'lastname2'  => $property->getLastname2(),
-                            'address'    => $property->getAddress(),
+                            'address'    => formatter_adresse($property->getGoodAddress()),
                             'postalcode' => $property->getPostalCode(),
                             'city'       => $property->getCity(),
                             'is_og2i'       => $property->getClauseOG2I(),
@@ -321,9 +339,7 @@ class CronRegenInvoiceCommand extends Command
                         }
                     
 
-                    if (!$this->isDryRun()) {
-                        $property->setLastInvoice(new DateTime());
-                    }
+                   
                     $this->manager->flush();
                 }
                 else {
@@ -344,7 +360,7 @@ class CronRegenInvoiceCommand extends Command
                             'lastname'   => $property->getLastname1(),
                             'firstname2' => $property->getFirstname2(),
                             'lastname2'  => $property->getLastname2(),
-                            'address'    => $property->getAddress(),
+                            'address'    => formatter_adresse($property->getGoodAddress()),
                             'postalcode' => $property->getPostalCode(),
                             'is_og2i'       => $property->getClauseOG2I(),
                             'city'       => $property->getCity(),
@@ -382,9 +398,7 @@ class CronRegenInvoiceCommand extends Command
 
                     $this->generateInvoice($io, $data, $parameters, $property);
 
-                    if (!$this->isDryRun()) {
-                        $property->setLastInvoice(new DateTime());
-                    }
+                   
                     $this->manager->flush();
 
                     $io->note("Invoice ({$data['type']}) generated for id {$property->getId()}");

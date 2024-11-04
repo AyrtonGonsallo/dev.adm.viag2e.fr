@@ -599,6 +599,10 @@ class Property
     /**
      * @ORM\Column(type="boolean")
      */
+    private $no_indexation;	
+    /**
+     * @ORM\Column(type="boolean")
+     */
     private $indexation_OG2I;	
     /**
      * @ORM\Column(type="boolean")
@@ -682,6 +686,40 @@ class Property
      * @ORM\Column(type="string", length=255)
      */
     private $email_debirentier;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nom_debirentier2;
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $prenom_debirentier2;
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $addresse_debirentier2;
+   
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $code_postal_debirentier2;
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $ville_debirentier2;
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $pays_debirentier2;
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $telephone_debirentier2;
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $email_debirentier2;
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\PendingInvoice", mappedBy="property")
      */
@@ -1715,6 +1753,102 @@ class Property
         return $this;
     }
 
+    public function getNomDebirentier2(): ?string
+    {
+        return $this->nom_debirentier2;
+    }
+
+    public function setNomDebirentier2(?string $text): self
+    {
+        $this->nom_debirentier2 = $text;
+
+        return $this;
+    }
+    //----------
+    public function getPrenomDebirentier2(): ?string
+    {
+        return $this->prenom_debirentier2;
+    }
+
+    public function setPrenomDebirentier2(?string $text): self
+    {
+        $this->prenom_debirentier2 = $text;
+
+        return $this;
+    }
+    //----------
+    public function getAddresseDebirentier2(): ?string
+    {
+        return $this->addresse_debirentier2;
+    }
+
+    public function setAddresseDebirentier2(?string $text): self
+    {
+        $this->addresse_debirentier2 = $text;
+
+        return $this;
+    }
+    //----------
+    public function getCodePostalDebirentier2(): ?string
+    {
+        return $this->code_postal_debirentier2;
+    }
+
+    public function setCodePostalDebirentier2(?string $text): self
+    {
+        $this->code_postal_debirentier2 = $text;
+
+        return $this;
+    }
+    //----------
+    public function getVilleDebirentier2(): ?string
+    {
+        return $this->ville_debirentier2;
+    }
+
+    public function setVilleDebirentier2(?string $text): self
+    {
+        $this->ville_debirentier2 = $text;
+
+        return $this;
+    }
+    //----------
+    public function getPaysDebirentier2(): ?string
+    {
+        return $this->pays_debirentier2;
+    }
+
+    public function setPaysDebirentier2(?string $text): self
+    {
+        $this->pays_debirentier2 = $text;
+
+        return $this;
+    }
+    //----------
+    public function getTelephoneDebirentier2(): ?string
+    {
+        return $this->telephone_debirentier2;
+    }
+
+    public function setTelephoneDebirentier2(?string $text): self
+    {
+        $this->telephone_debirentier2 = $text;
+
+        return $this;
+    }
+    //----------
+    public function getEmailDebirentier2(): ?string
+    {
+        return $this->email_debirentier2;
+    }
+
+    public function setEmailDebirentier2(?string $text): self
+    {
+        $this->email_debirentier2 = $text;
+
+        return $this;
+    }
+
 
     public function getBuyerBankIcs(): ?string
     {
@@ -1862,6 +1996,16 @@ class Property
     public function setShowDuh(bool $show_duh): self
     {
         $this->show_duh = $show_duh;
+
+        return $this;
+    }
+    public function getNoIndexation(): ?bool
+    {
+        return $this->no_indexation;
+    }
+    public function setNoIndexation(bool $no_indexation): self
+    {
+        $this->no_indexation = $no_indexation;
 
         return $this;
     }

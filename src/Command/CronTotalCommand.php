@@ -167,12 +167,12 @@ class CronTotalCommand extends Command
         $this->addInvoices($io, $factureMensuelles);
       */
         
-        if (date('d') >= 21) {
+        if (date('d') >= 17) {
             
             
             $io->comment('Processing total invoices');
 			// Obtenez la date du 20 du mois actuel
-            $dateLimite = date('Y-m-20');
+            $dateLimite = date('Y-m-16');
 
             // Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
             $queryBuilder = $this->manager->createQueryBuilder();

@@ -920,7 +920,7 @@ class GeneratedFilesController extends AbstractController
                 $date_revision = $data["date_revision"];
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                 $now_date=new DateTime();
-                $date_fdnm = new DateTime('First day of next month');
+                $date_fdnm = new DateTime('First day of this month');
                 $fileName = "Courrier d’indexation -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 $now_date=new DateTime();
                 if(!$property->initial_index_object){

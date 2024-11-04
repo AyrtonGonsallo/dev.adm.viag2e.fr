@@ -228,3 +228,18 @@ update `property` set date_maj_indice_ref="2024-03-04" where id=81 and revaluati
 
 31,43,63,82,103,119,124,126
 63,103,119,124,126
+
+
+mettre en prod les lignes 1026, 352 et 373 de croninvoicescommand
+
+
+factures a annuler 
+herbet 122
+5681,5790 generer avoir et renvoyer avec nouveau numero 
+duchemin 124
+5791,5682 generer avoir et renvoyer avec nouveau numero 
+manuelles non payées
+5591,5592,5588,5589,5590,5581,5582,5584,5585,5586,5587
+accents bien duchemin
+UPDATE `property` SET `address` = '2 allée Guillaume Apollinaire Résidence Les Coteaux de Montchapet' WHERE `property`.`id` = 124;
+UPDATE `property` SET `good_address` = '2 allée Guillaume Apollinaire Résidence Les Coteaux de Montchapet 21000 DIJON' WHERE `property`.`id` = 124;

@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
-class InvoiceReguleType extends AbstractType
+class InvoiceGarbageType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -25,7 +25,7 @@ class InvoiceReguleType extends AbstractType
             ->add('target', ChoiceType::class, ['choices' => ['Acheteur (Mandat acquéreurs)' => 1,'Acheteur (Mandat vendeurs)' => 3,'Crédirentier' => 2,'Débirentier' => 4,'Mandant' => 1,  ], 'choice_translation_domain' => false])
             ->add('label', TextType::class, ['attr' => ['disabled' => $options['locked'], 'placeholder' => 'Texte affiché à côté du montant (ex: Rente Viagère)', 'value' => $options['label']], 'translation_domain' => false])
 			->add('email', EmailType::class, array('attr' => array('placeholder' => 'E-mail...'),'required' => false))
-            ->add('montantttc',   NumberType::class, ['attr' => ['placeholder' => 0.0,  ],'required' => true,'empty_data' => '-1','translation_domain' => false])
+            ->add('amount', NumberType::class, ['attr' => ['placeholder' => 0.0,  ],'required' => false,'empty_data' => '-1','translation_domain' => false])
             
             ->add('period', TextType::class, ['attr' => ['placeholder' => 'Période de ...'], 'translation_domain' => false])
             ->add('reason', TextType::class, ['attr' => ['disabled' => $options['locked'], 'placeholder' => '[...]votre appel de fonds relatif à ...', 'value' => $options['reason']], 'translation_domain' => false])

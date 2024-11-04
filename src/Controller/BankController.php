@@ -90,4 +90,64 @@ class BankController extends AbstractController
 
         return $this->redirectToRoute('file_export_download', ['fileId' => $export->getDriveId()]);
     }
+
+
+    /**
+     * @Route("/bank/generate_fa", name="bank_generate_fa", methods={"POST"})
+     *
+     * @param Request $request
+     * @return Response
+     *
+     * @throws \Exception
+     */
+    public function generateFABankFile(Request $request, DriveManager $drive)
+    {
+        $range = $request->get('range');
+
+        if (empty($range)) {
+            throw new BadRequestHttpException('Missing parameter');
+        }
+
+        $dates = explode(' - ', $range);
+        if (count($dates) != 2) {
+            throw new NotFoundHttpException('Invalid range');
+        }
+
+        $start = DateTime::createFromFormat('d/m/Y', $dates[0]);
+        $end = DateTime::createFromFormat('d/m/Y', $dates[1]);
+
+        if ($start === false || $end === false) {
+            throw new NotFoundHttpException('Invalid range');
+        }
+
+        $bank = new Bank($this->container);
+        $export = new BankExport();
+
+        $xml = $bank->generate_fa($start, $end, $export->getMessageId());
+
+        $export->setDate(new DateTime());
+        $export->setPeriod($range);
+        $export->setType(BankExport::TYPE_MANUAL);
+        $manager = $this->getDoctrine()->getManager();
+        $manager->persist($export);
+
+
+        if($this->getParameter('kernel.environment') != 'prod' || true) { // Tmp GDrive fix
+            $export->setDriveId('notstored');
+            $manager->flush();
+
+            $response = new Response($xml);
+            $disposition = HeaderUtils::makeDisposition(
+                HeaderUtils::DISPOSITION_ATTACHMENT,
+                'export_'. date('d-m-Y') .'.xml'
+            );
+            $response->headers->set('Content-Disposition', $disposition);
+            return $response;
+        }
+
+        $export->setDriveId($drive->addExport($export->getName(), $xml));
+        $manager->flush();
+
+        return $this->redirectToRoute('file_export_download', ['fileId' => $export->getDriveId()]);
+    }
 }
