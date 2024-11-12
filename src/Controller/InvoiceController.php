@@ -189,8 +189,10 @@ class InvoiceController extends AbstractController
                         $sheet->getStyle('I' . $y)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
                         $sheet->getStyle('J' . $y)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
 
-                        $sheet->setCellValue('H' . $y, 'Avance trimestrielle des charges locatives de la copropriété ' . ucwords($data['date']['trimester']['text']. ' ' .$data['date']['trimester']['year']));
-
+                        $trimesterText = isset($data['date']['trimester']['text']) ? $data['date']['trimester']['text'] : '';
+                        $trimesterYear = isset($data['date']['trimester']['year']) ? $data['date']['trimester']['year'] : '';
+                        
+                        $sheet->setCellValue('H' . $y, 'Avance trimestrielle des charges locatives de la copropriété ' . ucwords($trimesterText . ' ' . $trimesterYear));
                         if ($type == self::TYPE_CREDIT) {
                             $sheet->setCellValue('J' . $y, $data['property']['condominiumFees']);
                         } else {
@@ -211,6 +213,20 @@ class InvoiceController extends AbstractController
                             $sheet->setCellValue('I' . $y, $data['amount']);
                         }
                     }
+                    elseif($invoice->getCategory() === Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES) {
+                        $sheet->setCellValue('G' . $y, ($data['target'] == 1) ? $invoice->getProperty()->getWarrant()->getLastname() . ' ' . $invoice->getProperty()->getWarrant()->getFirstname() : $invoice->getProperty()->getLastname1() . ' ' . $invoice->getProperty()->getFirstname1());
+    
+                        $sheet->getStyle('I' . $y)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
+                        $sheet->getStyle('J' . $y)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
+    
+                        $sheet->setCellValue('H' . $y, 'Régularisation des charges de copropriété ' . (!empty($data['period']) ? ucwords($data['period']) : null));
+                         $mont = isset($data['montantttc']) ? $data['montantttc'] : 0;
+                        if ($type == self::TYPE_CREDIT) {
+                            $sheet->setCellValue('J' . $y, $mont);
+                        } else {
+                            $sheet->setCellValue('I' . $y, $mont);
+                        }
+                    }
                     elseif($invoice->getCategory() === Invoice::CATEGORY_MANUAL) {
                         $sheet->setCellValue('G' . $y, ($data['target'] == 1) ? $invoice->getProperty()->getWarrant()->getLastname() . ' ' . $invoice->getProperty()->getWarrant()->getFirstname() : $invoice->getProperty()->getLastname1() . ' ' . $invoice->getProperty()->getFirstname1());
 
@@ -220,11 +236,12 @@ class InvoiceController extends AbstractController
                         $sheet->setCellValue('H' . $y, 'Facture manuelle ' . (!empty($data['period']) ? ucwords($data['period']) : null));
 
                         if ($label == self::LABEL_ANNUITY) {
-                            $sheet->setCellValue('H' . $y, $data['label'] . ' ' . ucwords($data['date']['month']));
+                            $amount=($data['amount']>1)?$data['amount']:$data['montantht']*1.2;
+                            $sheet->setCellValue('H' . $y, utf8_decode($data['label'])  . ' ' . ucwords($data['date']['month']));
                             if ($type == self::TYPE_CREDIT) {
-                                $sheet->setCellValue('J' . $y, $data['amount']);
+                                $sheet->setCellValue('J' . $y, $amount);
                             } else {
-                                $sheet->setCellValue('I' . $y, $data['amount']);
+                                $sheet->setCellValue('I' . $y, $amount);
                             }
                         } elseif($data['honoraryRates'] > -1) {
                             $sheet->setCellValue('H' . $y, 'Honoraires ' . ucwords($data['date']['month']));
@@ -276,8 +293,10 @@ class InvoiceController extends AbstractController
                     $sheet->getStyle('I' . $y)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
                     $sheet->getStyle('J' . $y)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
 
-                    $sheet->setCellValue('H' . $y, 'Avance trimestrielle des charges locatives de la copropriété ' . ucwords($data['date']['trimester']['text']. ' ' .$data['date']['trimester']['year']));
-
+                    $trimesterText = isset($data['date']['trimester']['text']) ? $data['date']['trimester']['text'] : '';
+                    $trimesterYear = isset($data['date']['trimester']['year']) ? $data['date']['trimester']['year'] : '';
+                    
+                    $sheet->setCellValue('H' . $y, 'Avance trimestrielle des charges locatives de la copropriété ' . ucwords($trimesterText . ' ' . $trimesterYear));
                     if ($type == self::TYPE_CREDIT) {
                         $sheet->setCellValue('J' . $y, $data['property']['condominiumFees']);
                     } else {
@@ -298,6 +317,21 @@ class InvoiceController extends AbstractController
                         $sheet->setCellValue('I' . $y, $data['amount']);
                     }
                 }
+                elseif($invoice->getCategory() === Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES) {
+                    $sheet->setCellValue('G' . $y, ($data['target'] == 1) ? $invoice->getProperty()->getWarrant()->getLastname() . ' ' . $invoice->getProperty()->getWarrant()->getFirstname() : $invoice->getProperty()->getLastname1() . ' ' . $invoice->getProperty()->getFirstname1());
+
+                    $sheet->getStyle('I' . $y)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
+                    $sheet->getStyle('J' . $y)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
+
+                    $sheet->setCellValue('H' . $y, 'Régularisation des charges de copropriété ' . (!empty($data['period']) ? ucwords($data['period']) : null));
+
+                         $mont = isset($data['montantttc']) ? $data['montantttc'] : 0;
+                        if ($type == self::TYPE_CREDIT) {
+                            $sheet->setCellValue('J' . $y, $mont);
+                        } else {
+                            $sheet->setCellValue('I' . $y, $mont);
+                        }
+                }
                 elseif($invoice->getCategory() === Invoice::CATEGORY_MANUAL) {
                     $sheet->setCellValue('G' . $y, ($data['target'] == 1) ? $invoice->getProperty()->getWarrant()->getLastname() . ' ' . $invoice->getProperty()->getWarrant()->getFirstname() : $invoice->getProperty()->getLastname1() . ' ' . $invoice->getProperty()->getFirstname1());
 
@@ -306,11 +340,12 @@ class InvoiceController extends AbstractController
 
                     $sheet->setCellValue('H' . $y, 'Facture manuelle ' . (!empty($data['period']) ? ucwords($data['period']) : null));
 
-                    $sheet->setCellValue('H' . $y, $data['label'] . ' ' . ucwords($data['date']['month']));
+                    $sheet->setCellValue('H' . $y, utf8_decode($data['label'])  . ' ' . ucwords($data['date']['month']));
+                   $amount=($data['amount']>1)?$data['amount']:$data['montantht']*1.2;
                     if ($type == self::TYPE_CREDIT) {
-                        $sheet->setCellValue('J' . $y, $data['amount']);
+                        $sheet->setCellValue('J' . $y, $amount);
                     } else {
-                        $sheet->setCellValue('I' . $y, $data['amount']);
+                        $sheet->setCellValue('I' . $y, $amount);
                     }
                 }
 
@@ -551,7 +586,7 @@ class InvoiceController extends AbstractController
             else {
                 $pendingInvoice->setCategory(Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES);
                 $pendingInvoice->setLabel('Régularisation des charges de copropriété');
-                $pendingInvoice->setReason('Régularisation des charges de copropriété');
+                $pendingInvoice->setReason('la régularisation des charges de copropriété');
                 $pendingInvoice->setMontantht(0);
                 $manager = $this->getDoctrine()->getManager();
                 $manager->persist($pendingInvoice);
@@ -688,7 +723,20 @@ class InvoiceController extends AbstractController
                 else if($invoice->getData()['date']["month_n"]>0){
                     $date.='T1';
                 }
-            }else{
+            }else if($invoice->getCategoryString()=='Régule manuelle'){
+                $date1=$invoice->getData()['period'];
+                $formattedDate = str_replace(['du ', ' au '], ['', ' - '], $date1);
+                $date= $formattedDate;
+            }
+            else if($invoice->getCategoryString()=='Manuelle'){
+                $date1=$invoice->getData()['period'];
+                $formattedDate = str_replace(['du ', ' au '], ['', ' - '], $date1);
+                $date= $formattedDate;
+            }
+            else if($invoice->getCategoryString()=='Avoir'){
+                $date=$invoice->getData()['date']["month_n"].'/'.$invoice->getData()['date']["year"];
+            }
+            else{
                 $date=$invoice->getDate()->format('m/Y');
             }
 

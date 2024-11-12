@@ -42,7 +42,7 @@ class CronResendInvoicesCommand extends Command
 {
     use LockableTrait;
 
-    private const PROCESS_MAX = 50;
+    private const PROCESS_MAX = 300;
     protected static $defaultName = 'cron:resend-invoices';
 
     private $container;
@@ -174,10 +174,12 @@ class CronResendInvoicesCommand extends Command
         if (date('d') <= 20) {
             
 
-            $io->comment('Processing invoices');
+            $io->comment('Renvoi des mails');
+            $idmin = $io->ask('id min : ');
+            $idmax = $io->ask('id max : ');
             $properties = $this->manager
                 ->getRepository(Property::class)
-                ->findInvoicesToDo(self::PROCESS_MAX);
+                ->findInvoicesToSend($idmin,$idmax);
 
             // $last_month = new DateTime('last day of last month');
             // fin charges de copro
@@ -197,13 +199,21 @@ class CronResendInvoicesCommand extends Command
                     $io->note("Skipping property {$property->getId()}, annuities disabled");
                     continue;
                 }
+                
+                $invoice_r = $this->manager->getRepository(Invoice::class)
+                ->getLastPropertyRente($property->getId())[0];
+                $data = $invoice_r->getData();
 
-                $invoice = $this->manager->getRepository(Invoice::class)
-                ->getLastPropertyInvoice($property->getId())[0];
-                
-                $data = $invoice->getData();
-                
-                $this->resendInvoice($io, $data, $parameters, $property, $invoice);
+                $io->note("Rente ".$invoice_r->getId());
+                $this->resendInvoice($io, $data, $parameters, $property, $invoice_r);
+              
+
+                $invoice_h = $this->manager->getRepository(Invoice::class)
+                ->getLastPropertyHonoraires($property->getId())[0];
+                $data = $invoice_h->getData();
+
+                $io->note("Honoraires ".$invoice_h->getId());
+                $this->resendInvoice($io, $data, $parameters, $property, $invoice_h);
                 
                 $done++;
             }
@@ -225,18 +235,9 @@ class CronResendInvoicesCommand extends Command
                 $io->note("quaterly files trying to be created ");
 
             }  
-            $filePath = $filePath = $invoice->getFile() ?  $this->drive->getFile($invoice->getFile()) : -1;
-            if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
-                $filePath2= -1;
-            }else{
-                $filePath2= $filePath = $invoice->getFile2() ? $this->drive->getFile($invoice->getFile2()) : -1;
-            }
-            if ($this->isDryRun()) {
-                return;
-            }
+            $filePath = $invoice->getFile() ?  $this->drive->getFile($invoice->getFile()) : -1;
+            $filePath2= $invoice->getFile2() ? $this->drive->getFile($invoice->getFile2()) : -1;
             
-           
-           
             
 
             $cond_h_n=($filePath2 != -1)?true:false; //honoraires non nuls ?
@@ -244,11 +245,13 @@ class CronResendInvoicesCommand extends Command
            
             if($cond_r_n){
                 $file = $invoice->getFile();
+                $io->note("envoi de la rente ");
             }
             
 			//second fichier
             if($cond_h_n){
                 $file2 = $invoice->getFile2();
+                $io->note("envoi des honoraires ");
                 
             }
 			
@@ -282,7 +285,7 @@ class CronResendInvoicesCommand extends Command
                         $message = (new Swift_Message($invoice->getMailSubject()))
                             ->setFrom($this->mail_from)
                             //->setBcc($this->mail_from)
-                            ->setBcc("roquetigrinho@gmail.com")
+                            ->setBcc(["roquetigrinho@gmail.com",$this->mail_from])
                             //->setTo("roquetigrinho@gmail.com")
                             ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                             ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
@@ -291,7 +294,8 @@ class CronResendInvoicesCommand extends Command
                         $message = (new Swift_Message($invoice->getMailSubject()))
                             ->setFrom($this->mail_from)
                             //->setBcc($this->mail_from)
-                            ->setBcc("roquetigrinho@gmail.com")
+                            ->setBcc(["roquetigrinho@gmail.com",$this->mail_from])   
+
                             //->setTo("roquetigrinho@gmail.com")
                             ->setTo($invoice->getProperty()->getMail1())
                             ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
@@ -310,7 +314,7 @@ class CronResendInvoicesCommand extends Command
                             $message1 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 //->setBcc($this->mail_from)
-                                ->setBcc("roquetigrinho@gmail.com")
+                                ->setBcc(["roquetigrinho@gmail.com",$this->mail_from])
                                 //->setTo("roquetigrinho@gmail.com")
                                 ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
@@ -332,11 +336,11 @@ class CronResendInvoicesCommand extends Command
                                 ->setFrom($this->mail_from);
                                 if($mailTarget2_r){
                                     //$message2->setBcc($mailTarget2_r);
-                                    $message2->setBcc("roquetigrinho@gmail.com")
+                                    $message2->setBcc(["roquetigrinho@gmail.com",$this->mail_from]);
                                 }
                                 $message2//->setBcc($this->mail_from)
                                 ->setTo($mailTarget_r)
-                                ->setBcc("roquetigrinho@gmail.com")
+                                ->setBcc(["roquetigrinho@gmail.com",$this->mail_from])
                                 //->setTo("roquetigrinho@gmail.com")
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath));
@@ -350,7 +354,7 @@ class CronResendInvoicesCommand extends Command
                             $message = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
                                 //->setBcc($this->mail_from)
-                                ->setBcc("roquetigrinho@gmail.com")
+                                ->setBcc(["roquetigrinho@gmail.com",$this->mail_from])
                                 //->setTo("roquetigrinho@gmail.com")
                                 ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');

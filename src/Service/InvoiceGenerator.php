@@ -76,6 +76,9 @@ class InvoiceGenerator
             if($data['recursion']!=Invoice::RECURSION_OTP) {//pour regler le rpobleme des acents dans les factures manuelles
                 //$data=$this->convert_from_latin1_to_utf8_recursively2($data);
             }
+            if($data['type']==Invoice::TYPE_RECEIPT) {//pour regler le rpobleme des acents dans les factures manuelles
+                $data=$this->convert_from_latin1_to_utf8_recursively2($data);
+            }
 
             $pdf->pdf->SetDisplayMode('fullpage');
             if(empty($data['recursion']))
@@ -131,7 +134,9 @@ class InvoiceGenerator
                 //$data['reason'] = utf8_decode($data['reason']);
                 //$data['label'] = utf8_decode($data['label']);
                 //$data['property']['address'] = utf8_decode($data['property']['address']);
-                
+            if($data['type']==Invoice::TYPE_RECEIPT) {//pour regler le rpobleme des acents dans les factures manuelles
+                $data=$this->convert_from_latin1_to_utf8_recursively2($data);
+            }
             switch ($data['recursion']) {
                 case Invoice::RECURSION_OTP:
 					if($data['montantht']==-1){

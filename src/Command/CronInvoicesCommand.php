@@ -101,7 +101,7 @@ class CronInvoicesCommand extends Command
 
         $start = microtime(true);
 
-        $this->noMail = false;
+        $this->noMail = true;
         if ($this->areMailsDisabled()) {
             $io->note('Mails are disabled');
         }
@@ -133,7 +133,7 @@ class CronInvoicesCommand extends Command
             'site'       => $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_site'])->getValue(),
         ];
 
-        $d = new DateTime('First day of this month');
+        $d = new DateTime('First day of next month');
 
         $this->date = [
             'current_day'   => utf8_encode(strftime('%A %e %B %Y')),
@@ -467,7 +467,7 @@ class CronInvoicesCommand extends Command
             }
             
           }
-        if (date('d') >= 20) {
+        if (date('d') <= 20) {
             // Quarterly invoices ce sont les charges de copro
             if(in_array(date('m'), [12, 3, 6, 9])) { //$d->format('m')
                 $date=new DateTime('last day of last month');
@@ -798,7 +798,6 @@ class CronInvoicesCommand extends Command
 
             $data = $invoice->getData();
             $data['date']['current_day'] = (strftime('%A %e %B %Y'));
-            $data['date']['month'] = (strftime('%B'));
             $data['type'] = Invoice::TYPE_RECEIPT;
             $data['number'] = Invoice::formatNumber($data['number_int'], Invoice::TYPE_RECEIPT);
 
@@ -828,7 +827,7 @@ class CronInvoicesCommand extends Command
                 $data["debirentier"]=$debirentier;
                 $data["debirentier_different"]= $property->getDebirentierDifferent();
             }
-            if($invoice->getCategory() == Invoice::CATEGORY_MANUAL){
+            if($invoice->getCategory() == Invoice::CATEGORY_MANUAL || $invoice->getCategory() == Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES){
                 $this->generateInvoiceManual($io, $data, $parameters, $invoice->getProperty(), $invoice->getCategory());
             }else{
                 $this->generateInvoice($io, $data, $parameters, $invoice->getProperty(), $invoice->getCategory());
@@ -866,7 +865,8 @@ class CronInvoicesCommand extends Command
             $filePath = $this->generator->generateFile($data, $parameters);
             if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                 $filePath2= -1;
-            }else{
+            }
+            else{
                 $filePath2= $this->generator->generateFile2($data, $parameters);
 
             }
@@ -1256,6 +1256,14 @@ class CronInvoicesCommand extends Command
             }  
             $fichier_de_rente=( $data["amount"]>0);
             $fichier_d_honoraire=( $data["montantht"]>0);
+            if($category ==Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES){
+                $fichier_de_rente=( $data["montantttc"]>0);
+                $fichier_d_honoraire=null;
+                $data["amount"]=$data["montantttc"];
+            }else{
+                $fichier_de_rente=( $data["amount"]>0);
+                $fichier_d_honoraire=( $data["montantht"]>0);
+            }
             $type = "";
             if($fichier_d_honoraire){
                 $type = "honoraire";
@@ -1452,7 +1460,7 @@ class CronInvoicesCommand extends Command
 						->setBcc($this->mail_from)
 						->setTo("roquetigrinho@gmail.com");
                         if($data['montantttc']>0){
-                            $message->setBody($this->twig->render('invoices/emails/notice_regule.twig', ['type' => "avis d'échéance de la régularisation de vos charges de copropriété", 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+                            $message->setBody($this->twig->render('invoices/emails/notice_regule.twig', ['type' => "avis d'échéance concernant la régularisation de vos charges de copropriété", 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
 
                         }else{
                             $message->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');

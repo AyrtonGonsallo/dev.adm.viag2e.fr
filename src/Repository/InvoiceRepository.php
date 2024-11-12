@@ -143,7 +143,7 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
+/*
     public function findReceiptsToDo(int $max)
     {
         return $this->createQueryBuilder('i')
@@ -157,7 +157,8 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-/*
+            */
+
     public function findReceiptsToDo(int $max)
     {
         return $this->createQueryBuilder('i')
@@ -167,7 +168,7 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-*/
+
     public function  findInvoicesToRegenerate(int $max)
     {
         return $this->createQueryBuilder('i')
@@ -244,12 +245,30 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-    public function  getLastPropertyInvoice(int $pid)
+    public function  getLastPropertyRente(int $pid)
     {
         return $this->createQueryBuilder('i')
         ->where('i.property = :pid')
         ->andWhere('i.category = :cat')
+        ->andWhere('i.type = :tp')
+        ->andWhere('i.file IS NOT NULL')
         ->setParameter('cat', 0)
+        ->setParameter('tp', 1)
+        ->setParameter('pid', $pid)
+        ->orderBy('i.id', 'DESC')
+        ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+    }
+    public function  getLastPropertyHonoraires(int $pid)
+    {
+        return $this->createQueryBuilder('i')
+        ->where('i.property = :pid')
+        ->andWhere('i.category = :cat')
+        ->andWhere('i.type = :tp')
+        ->andWhere('i.file2 IS NOT NULL')
+        ->setParameter('cat', 0)
+        ->setParameter('tp', 1)
         ->setParameter('pid', $pid)
         ->orderBy('i.id', 'DESC')
         ->setMaxResults(1)

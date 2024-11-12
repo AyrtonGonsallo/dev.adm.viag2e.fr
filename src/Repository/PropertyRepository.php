@@ -36,7 +36,24 @@ class PropertyRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
+    public function findInvoicesToSend(int $idinf,int $idsupp)
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.last_invoice < :date')
+            //->where('p.last_invoice < :date OR p.last_receipt < p.last_invoice')
+            ->andWhere('p.start_date_management < :last_month')
+            ->andWhere('p.billing_disabled = false')
+            ->andWhere('p.active = true')
+            ->andWhere('p.id >= :idinf')
+            ->andWhere('p.id <= :idsup')
+            ->setParameter('idinf', $idinf)
+            ->setParameter('idsup', $idsupp)
+            ->setParameter('date', new DateTime('last day of last month'))
+            ->setParameter('last_month', new DateTime('last day of next month'))
+            ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
     public function findInvoiceToDo(int $id)
     {
         return $this->createQueryBuilder('p')
