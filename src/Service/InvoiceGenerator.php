@@ -42,9 +42,10 @@ class InvoiceGenerator
     {
       
        // $dat = json_decode($dat, true);
-        if (is_string($dat)) {
-            return utf8_decode($dat);
-         } elseif (is_array($dat)) {
+       if (is_string($dat)) {
+        $dat = str_replace('Ã¨', 'è', $dat);
+        return $dat;
+     } elseif (is_array($dat)) {
             $ret = [];
             foreach ($dat as $i => $d) $ret[ $i ] = self::convert_from_latin1_to_utf8_recursively2($d);
             return $ret;
@@ -179,7 +180,7 @@ class InvoiceGenerator
         $fileName = "/invoice_{$data['number']}-file1.pdf";
         try {
             //$data=$this->convert_from_latin1_to_utf8_recursively2($data);
-
+            
             $pdf->pdf->SetDisplayMode('fullpage');
             if(empty($data['recursion']))
                 $data['recursion'] = Invoice::RECURSION_MONTHLY;

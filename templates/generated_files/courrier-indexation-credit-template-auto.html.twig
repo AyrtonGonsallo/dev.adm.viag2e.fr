@@ -41,7 +41,7 @@
             </td>
         </tr>
         <tr style=" border: solid 1px black;">
-            <td style="text-align: left; width: 40%; display: flex; align-items: start; border:none">
+            <td style="font-size: 12pt;text-align: left; width: 40%; display: flex; align-items: start; border:none">
                     <br />
                     <br />
                     <br />
@@ -93,8 +93,8 @@
     {% for i in 0..5 %}
         &nbsp;
     {% endfor %}
-    Pour rappel, l’indice de base est celui du mois de {{data.date_indice_base|convert_encoding('UTF-8', 'ISO-8859-1')}} (valeur : {{data.montant_indice_base}}) et le 
-    nouvel indice du mois de {{data.date_indice_actuel|convert_encoding('UTF-8', 'ISO-8859-1')}} est de {{data.montant_indice_actuel}}.
+    Pour rappel, l’indice de base est celui du mois de {{data.date_indice_base}} (valeur : {{data.montant_indice_base}}) et le 
+    nouvel indice du mois de {{data.date_indice_actuel}} est de {{data.montant_indice_actuel}}.
   <br /><br />
     {% for i in 0..5 %}
         &nbsp;

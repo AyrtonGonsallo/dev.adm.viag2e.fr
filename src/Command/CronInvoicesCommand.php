@@ -101,7 +101,7 @@ class CronInvoicesCommand extends Command
 
         $start = microtime(true);
 
-        $this->noMail = true;
+        $this->noMail =  $input->getOption('no-mail');
         if ($this->areMailsDisabled()) {
             $io->note('Mails are disabled');
         }
@@ -136,10 +136,10 @@ class CronInvoicesCommand extends Command
         $d = new DateTime('First day of next month');
 
         $this->date = [
-            'current_day'   => utf8_encode(strftime('%A %e %B %Y')),
+            'current_day'   => (strftime('%A %e %B %Y')),
             'current_month' => date('m'),
             'max_days'      => cal_days_in_month(CAL_GREGORIAN, $d->format('m'), $d->format('Y')),
-            'month'         => utf8_encode(strftime('%B', $d->getTimestamp())),
+            'month'         => (strftime('%B', $d->getTimestamp())),
             'month_n'       => $d->format('m'),
             'year'          => $d->format('Y'),
         ];
@@ -293,7 +293,7 @@ class CronInvoicesCommand extends Command
 
             $io->note("OTP invoice ({$data['type']}) generated for id {$pendingInvoice->getProperty()->getId()}");
         }
-        if (date('d') >= 19) {
+        if (date('d') <= 19) {
             function get_label($i){
                 if($i==1){
                     return 'Urbains';
@@ -345,6 +345,7 @@ class CronInvoicesCommand extends Command
                         $filePathCredirentier = $this->generator->generateCourrierIndexationCredirentierAutomatique($property, $parameters);
                         if($property->getWarrant()->getType() === Warrant::TYPE_SELLERS){
 							$mail_debirentier=$property->getBuyerMail1();
+                            $mail_debirentier2="";
                             $mail_credirentier=$property->getMail1();
                             $mail_credirentier2=$property->getMail2();
 						}else{
@@ -434,12 +435,12 @@ class CronInvoicesCommand extends Command
                                 $message3->setBody($this->twig->render('generated_files/emails/notice_indexation.twig', ['date' => $mail_date ]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePathmandant));
 
-                                }  
+                                
                                 if (!$this->areMailsDisabled() && $this->mailer->send($message3)) {
                                     $io->note("mail courrier indexation mandant envoyé");
                                 } else {
                                     $io->note("mail courrier indexation mandant non envoyé");
-                                }
+                                }}  
                     }
 
                 
@@ -857,6 +858,7 @@ class CronInvoicesCommand extends Command
     public function generateInvoice(SymfonyStyle &$io, array $data, array $parameters, Property $property, int $category = Invoice::CATEGORY_ANNUITY)
     {
         try {   
+            $this->noMail =  true;
 			//$data['date']["month"]=utf8_decode($data['date']["month"]);
             if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                 $io->note("quaterly files trying to be created ");
@@ -1272,7 +1274,13 @@ class CronInvoicesCommand extends Command
             }
             $io->note("invoice manuel, fichier de type ".$type);
             if(($fichier_de_rente)){
-                $filePath = $this->generator->generateFile($data, $parameters);
+                if($data['montantttc']>0){
+                    $filePath = $this->generator->generateManualRegulFile($data, $parameters);
+                }else{
+                    $filePath = $this->generator->generateFile($data, $parameters);                
+                }
+                
+
             }else{
                 $filePath = -1;
             }
@@ -1337,8 +1345,13 @@ class CronInvoicesCommand extends Command
             $cond_r_n=($fichier_de_rente)?true:false; //rente non nulle ?
            $message = (new Swift_Message($invoice->getMailSubject()))
            ->setFrom($this->mail_from)
-           ->setBcc($this->mail_from)
-           ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+           ->setBcc($this->mail_from);
+           if($data['montantttc']>0){
+                $message->setBody($this->twig->render('invoices/emails/notice_regule.twig', ['type' => "quittance concernant la régularisation de vos charges de copropriété", 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+            }else{
+                $message->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+            }
+           
             if($data["target"]==1){//mandant
                 $mailTarget=$invoice->getProperty()->getWarrant()->getMail1();
             }else if($data["target"]==2){//proprietaire du bien

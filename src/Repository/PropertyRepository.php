@@ -48,7 +48,7 @@ class PropertyRepository extends ServiceEntityRepository
             ->andWhere('p.id <= :idsup')
             ->setParameter('idinf', $idinf)
             ->setParameter('idsup', $idsupp)
-            ->setParameter('date', new DateTime('last day of last month'))
+            ->setParameter('date', new DateTime('last day of this month'))
             ->setParameter('last_month', new DateTime('last day of next month'))
             ->orderBy('p.id', 'ASC')
             ->getQuery()

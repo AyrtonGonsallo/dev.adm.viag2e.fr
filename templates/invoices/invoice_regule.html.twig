@@ -64,7 +64,7 @@
                             {% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}
                                 appel de fonds relatif à<br /> {{ data.reason }}
                             {% else %}
-                                quittance
+                                quittance relative à<br /> {{ data.reason }}
                             {% endif %}<br />
                             pour la période du {{ data.period }} <br />concernant le bien situé:<br /><br />
                             {{ data.property.firstname }} {{ data.property.lastname }}{% if not data.property.firstname2 is empty %} - {{ data.property.firstname2 }} {% if not data.property.lastname2 is empty %}{{ data.property.lastname2 }}{% else %}{{ data.property.lastname }}{% endif %}{% endif %}<br />

@@ -101,7 +101,7 @@ class CronRegenInvoiceCommand extends Command
 
         $start = microtime(true);
 
-        $this->noMail = false;
+        $this->noMail =  $input->getOption('no-mail');
         if ($this->areMailsDisabled()) {
             $io->note('Mails are disabled');
         }

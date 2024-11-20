@@ -69,10 +69,10 @@ class PropertyPaymentFormType extends AbstractType
                 'required' => false,
                 'class' => RevaluationHistory::class,
                 'query_builder' => function (EntityRepository $er)  use($options){
-                    if($options['data']->initial_index_object){
+                    if($options['data']->getIntitulesIndicesInitial()){
                         return $er->createQueryBuilder('rh')
-                        ->where('rh.id = :id')
-                        ->setParameter('id', $options['data']->initial_index_object)
+                        ->where('rh.type LIKE :key1')
+                        ->setParameter('key1', $this->extraireMotPertinent($options['data']->getIntitulesIndicesInitial()))
                             ->orderBy('rh.id', 'DESC');
                     }else{
                         return $er->createQueryBuilder('rh')
@@ -165,5 +165,20 @@ class PropertyPaymentFormType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Property::class,
         ]);
+    }
+
+    public function extraireMotPertinent($texte) {
+        // Vérifiez si le texte contient 'urbains' et retournez ce mot si trouvé
+        if ($texte == 1) {
+            return 'Urbains';
+        }
+        
+        // Sinon, vérifiez si le texte contient 'ménages' et retournez ce mot
+        if ($texte == 2) {
+            return 'Ménages';
+        }
+        
+        // Si aucun des mots n'est trouvé, retourner une chaîne vide
+        return 'afdff';
     }
 }

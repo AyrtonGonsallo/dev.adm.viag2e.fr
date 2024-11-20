@@ -728,7 +728,7 @@ class PropertyController extends AbstractController
         $options="<option value=''></option>";
         $i=0;
         foreach ($rhs as  $rh) {
-            $options.='<option selected value="'.$rh->getId().'">'.$rh->getValue().' '.$rh->getType().' mois de '.utf8_encode(strftime('%B %Y',$rh->getDate()->getTimestamp())) .'</option>';
+            $options.='<option selected value="'.$rh->getId().'">'.$rh->getValue().' '.$rh->getType().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp())) .'</option>';
             $i++;
             if($i==1){continue;}
         }
@@ -898,7 +898,7 @@ class PropertyController extends AbstractController
         $options="<option value=''></option>";
         $i=0;
         foreach ($rhs as  $rh) {
-            $options.='<option selected value="'.$rh->getId().'">'.$rh->getValue().' mois de '.utf8_encode(strftime('%B %Y',$rh->getDate()->getTimestamp())).'</option>';
+            $options.='<option selected value="'.$rh->getId().'">'.$rh->getValue().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp())).'</option>';
             $i++;
             if($i==1){continue;}
         }

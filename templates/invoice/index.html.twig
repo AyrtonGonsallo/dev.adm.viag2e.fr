@@ -29,6 +29,29 @@
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
                         <h3 class="m-portlet__head-text">
+                            Envoi des factures
+                        </h3>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="m-portlet__body" id="box_reponse_envoi">
+                <div id="box_reponse_envoi">
+                    Position: <span id="last_sending_email_position">{{ last_sending_email_position }}</span><br>
+                    Date du dernier envoi: <span id="last_sending_email_date">{{ last_sending_email_date }}</span><br>
+                    <button class="btn btn-custom " id="send_bunch_of_mails" type="button">Envoyer</button>
+                    <div id="reponse_envoi" class="m-content"></div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
                             Liste des factures | <button class="btn btn-custom nmr-5 nml-10" id="all-invoices" type="button">Toutes</button><button class="btn btn-custom2" id="pending-invoices" type="button">En attente de paiement</button>
                         </h3>
                     </div>
@@ -201,6 +224,44 @@
     {# encore_entry_script_tags('html-table.invoices') #}
     <script type="text/javascript">
         $(function() {
+            // Vérification de l'état du bouton en fonction de la valeur de `sending_email_active`
+            // Injecter la valeur de `sending_email_active` en tant que chaîne 'true' ou 'false'
+            var sendingEmailActive = "{{ sending_email_active ? 'true' : 'false' }}"; 
+            var position = {{ last_sending_email_position }};  // Utiliser json_encode pour gérer les valeurs numériques et les strings correctement
+
+            // Si l'email est inactif, désactiver le bouton
+            if (sendingEmailActive === 'false') {
+                $('#send_bunch_of_mails').prop('disabled', true).css('opacity', '0.5');
+            }
+
+            // Gérer le clic sur le bouton pour envoyer les emails
+            $('#send_bunch_of_mails').click(function () {
+                $(this).prop('disabled', true).css('opacity', '0.5');  // Désactive le bouton lors du clic
+
+                // Construction de l'URL avec la position injectée
+                let route = "{{ path('send_bunch_of_mails', {'position': 0}) }}".replace("0", position);
+
+                // Requête AJAX
+                $.ajax({
+                    type: 'POST',
+                    dataType: "json",
+                    url: route,
+                    data: null,
+                    success: function(data) {
+                        console.log('received:', data);
+                        $('#reponse_envoi').html(data.results); 
+                         // Affiche les résultats de l'email envoyé
+                        $('#last_sending_email_position').html(data.pos_fin)
+                        $('#last_sending_email_date').html(data.date)
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);  // Logue l'erreur s'il y a un problème avec la requête AJAX
+                    }
+                });
+            });
+
+
+
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
             const parameter = urlParams.get('sorts')

@@ -7,6 +7,7 @@ use App\Entity\Invoice;
 use App\Entity\PendingInvoice;
 use App\Entity\Property;
 use App\Entity\Warrant;
+use App\Entity\Parameter;
 use App\Form\InvoiceOTPType;
 use App\Form\InvoiceGarbageType;
 use App\Form\InvoiceReguleType;
@@ -609,7 +610,7 @@ class InvoiceController extends AbstractController
     public function index(Request $request)
     {
         $range = $request->get('range');
-
+        setlocale(LC_TIME, 'fr_FR.UTF-8');
         $start = new DateTime('-2 months');
         $end = new DateTime();
 
@@ -623,10 +624,20 @@ class InvoiceController extends AbstractController
             $start = new DateTime('first day of 2 months ago');
             $end = new DateTime();
         }
-
+        $last_sending_email_position=$this->getDoctrine()
+        ->getRepository(Parameter::class)
+        ->findOneBySomeField("last_sending_email_position");
+        $last_sending_email_date=$this->getDoctrine()
+        ->getRepository(Parameter::class)
+        ->findOneBySomeField("last_sending_email_date");
+        
         return $this->render('invoice/index.html.twig', [
             'range_start' => $start->format('d/m/Y'),
             'range_end' => $end->format('d/m/Y'),
+            'last_sending_email_position' => $last_sending_email_position->getValue(),
+            'last_sending_email_date' => strftime('%A %d %B %Y %H:%M:%S', strtotime($last_sending_email_date->getValue())),
+            'sending_email_active' => (time() - strtotime($last_sending_email_date->getValue())) > 900 // 900 secondes = 15 minutes
+
         ]);
     }
 
@@ -905,6 +916,9 @@ class InvoiceController extends AbstractController
             return number_format($invoice->getData()['amount'],2, '.', ' ');
         }
         elseif($invoice->getCategory() == Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES) {
+            if(!array_key_exists('montantttc',$invoice->getData())){
+                return 0;
+            }
             return number_format($invoice->getData()['montantttc'],2, '.', ' ');
         }
         elseif ($invoice->getCategory() === Invoice::CATEGORY_AVOIR) {
@@ -1346,7 +1360,251 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
 
 
 
+    
+/**
+     *@Route(name="send_bunch_of_mails",path="/send_bunch_of_mails/{position}")
+     *
+     * @param Request $request
+     * @param DriveManager $driveManager
+     * @return Response
+     * @throws Exception
+     */
+    public function send_bunch_of_mails(Request $request,DriveManager $driveManager)
+    {
+        $position_deb=$request->get('position');
+        $position_fin=$position_deb+20;
+        $results="Envoi des factures des biens de {$position_deb} à {$position_fin}.<br>";
 
+        $manager = $this->getDoctrine()->getManager();
+        $properties = $manager
+                ->getRepository(Property::class)
+                ->findInvoicesToSend($position_deb,$position_fin);
+        $results.="Total de biens: ".sizeof($properties).".<br>";
+        foreach ($properties as $property) {
+        
+            if (!$property->getWarrant()->isActive()) {
+                continue;
+            }
+
+            if ($property->hasAnnuitiesDisabled()) {
+                 $results.="Skipping property {$property->getId()}, annuities disabled";
+                continue;
+            }
+            $results.="Bien {$property->getId()} : {$property->getTitle()}<br>";
+            $invoice_r = $manager->getRepository(Invoice::class)
+                ->getLastPropertyRente($property->getId())[0];
+                $data = $invoice_r->getData();
+
+             $results.="Rente numéro ".$invoice_r->getNumber()." ";
+            $res_r=$this->resendInvoice( $data,$driveManager,  $property, $invoice_r);
+            
+
+            $invoice_h = $manager->getRepository(Invoice::class)
+            ->getLastPropertyHonoraires($property->getId())[0];
+            $data = $invoice_h->getData();
+
+             $results.="Honoraires numéro ".$invoice_h->getNumber()."<br>";
+            $res_h=$this->resendInvoice( $data,$driveManager,   $property, $invoice_h);
+
+            
+            $results.="{$res_r}<br>";
+            $results.="{$res_h}<br>";
+            $results.="---------------------<br>";
+        }
+        
+        // Récupérer le dernier paramètre d'envoi de position et mettre à jour sa valeur
+        $last_sending_email_position = $this->getDoctrine()
+        ->getRepository(Parameter::class)
+        ->findOneBySomeField("last_sending_email_position");
+        $last_sending_email_position->setValue((string) $position_fin);  // Assurez-vous que $position_fin est une chaîne
+        $manager->persist($last_sending_email_position);
+
+        // Récupérer et mettre à jour la date d'envoi de l'email en la passant sous forme de chaîne
+        $last_sending_email_date = $this->getDoctrine()
+        ->getRepository(Parameter::class)
+        ->findOneBySomeField("last_sending_email_date");
+
+        $now = new \DateTime();
+        $formattedDate = $now->format('Y-m-d H:i:s');  // Format de la date en chaîne (ex: 2024-11-19 14:45:30)
+        $last_sending_email_date->setValue($formattedDate);  // Passer la date sous forme de chaîne
+        $manager->persist($last_sending_email_date);
+
+        // Enregistrer les changements dans la base de données
+        $manager->flush();
+
+        return new JsonResponse(["results"=> $results,"total"=>sizeof($properties),"pos_fin"=> $position_fin,"date"=>strftime('%A %d %B %Y %H:%M:%S', strtotime($formattedDate))] );
+    }
+
+
+
+    public function resendInvoice(array $data,DriveManager $driveManager, Property $property, Invoice $invoice, int $category = Invoice::CATEGORY_ANNUITY)
+    {
+        $resultat = ''; // Variable to capture messages
+        try {
+           
+    
+            $filePath = $invoice->getFile() ? $driveManager->getFile($invoice->getFile()) : -1;
+            $filePath2 = $invoice->getFile2() ? $driveManager->getFile($invoice->getFile2()) : -1;
+    
+            $cond_h_n = ($filePath2 != -1); // honoraires non nuls
+            $cond_r_n = ($filePath != -1); // rente non nulle
+    
+            if ($cond_r_n) {
+                $resultat .= "envoi de la rente<br>";
+            }
+    
+            if ($cond_h_n) {
+                $resultat .= "envoi des honoraires<br>";
+            }
+    
+            if (!$cond_h_n && !$cond_r_n) {
+                if ($data['recursion'] == Invoice::RECURSION_QUARTERLY) {
+                    $resultat .= "no file found<br>";
+                }
+            }
+    
+            if (!$cond_r_n && $cond_h_n) {
+                if ($data['recursion'] == Invoice::RECURSION_QUARTERLY) {
+                    $resultat .= "Only honoraires found<br>";
+                }
+            }
+    
+            if (!$cond_h_n && $cond_r_n) {
+                if ($data['recursion'] == Invoice::RECURSION_QUARTERLY) {
+                    $resultat .= "Only rente found<br>";
+                }
+            }
+    
+            if ($cond_h_n && $cond_r_n) {
+                if ($data['recursion'] == Invoice::RECURSION_QUARTERLY) {
+                    $resultat .= "Both rente and honoraires found<br>";
+                }
+            }
+    
+            if ((!empty($data['separation_type']) && ($data['separation_type'] == Property::BUYERS_ANNUITY) && !empty($property->getBuyerMail1())) || !empty($property->getWarrant()->getMail1())) {
+                if ($data['recursion'] == Invoice::RECURSION_QUARTERLY) {
+                    if ($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS) {
+                        $message = (new Swift_Message($invoice->getMailSubject()))
+                            ->setFrom($this->getParameter('mail_from'))
+                            ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                            ->setTo($invoice->getProperty()->getWarrant()->getMail1())
+                            ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                            ->attach(Swift_Attachment::fromPath($filePath));
+                    } else {
+                        $message = (new Swift_Message($invoice->getMailSubject()))
+                            ->setFrom($this->getParameter('mail_from'))
+                            ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                            ->setTo($invoice->getProperty()->getMail1())
+                            ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                            ->attach(Swift_Attachment::fromPath($filePath));
+                        if (!empty($invoice->getProperty()->getMail2())) {
+                            $message->setCc($invoice->getProperty()->getMail2());
+                        }
+                    }
+                } else {
+                    if ($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS) {
+                        $resultat .= $invoice->getProperty()->getId() . " mandat vendeur<br>";
+                        if ($cond_h_n) {
+                            $message1 = (new Swift_Message($invoice->getMailSubject()))
+                                ->setFrom($this->getParameter('mail_from'))
+                                ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                                ->setTo($invoice->getProperty()->getWarrant()->getMail1())
+                                ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                                ->attach(Swift_Attachment::fromPath($filePath2));
+                        }
+    
+                        $mailTarget2_r = null;
+                        if ($cond_r_n) {
+                            if ($invoice->getProperty()->getDebirentierDifferent()) {
+                                $mailTarget_r = $invoice->getProperty()->getEmailDebirentier();
+                                $mailTarget2_r = $invoice->getProperty()->getEmailDebirentier2();
+                                $nomTarget_r = $invoice->getProperty()->getNomDebirentier() . ' ' . $invoice->getProperty()->getPrenomDebirentier();
+                            } else {
+                                $mailTarget_r = $invoice->getProperty()->getWarrant()->getMail1();
+                                $nomTarget_r = $invoice->getProperty()->getWarrant()->getFirstname() . ' ' . $invoice->getProperty()->getWarrant()->getLastname();
+                            }
+    
+                            $message2 = (new Swift_Message($invoice->getMailSubject()))
+                                ->setFrom($this->getParameter('mail_from'));
+                            if ($mailTarget2_r) {
+                                $message2->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')]);
+                            }
+                            $message2->setTo($mailTarget_r)
+                                ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                                ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
+                                ->attach(Swift_Attachment::fromPath($filePath));
+                        }
+                    } else {
+                        $resultat .= $invoice->getProperty()->getId() . " mandat acquereur<br>";
+    
+                        $message = (new Swift_Message($invoice->getMailSubject()))
+                            ->setFrom($this->getParameter('mail_from'))
+                            ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                            ->setTo($invoice->getProperty()->getWarrant()->getMail1())
+                            ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+                        if ($cond_r_n) {
+                            $message->attach(Swift_Attachment::fromPath($filePath));
+                        }
+                        if ($cond_h_n) {
+                            $message->attach(Swift_Attachment::fromPath($filePath2));
+                        }
+                    }
+                }
+    
+                if ($data['recursion'] != Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS) {
+                    if ($cond_h_n) {
+                        if (!empty($invoice->getMailCc())) {
+                            $message1->setCc($invoice->getMailCc());
+                        }
+    
+                        if (!$this->areMailsDisabled() && $this->mailer->send($message1)) {
+                            $resultat .= "mail mandat vendeur envoyé avec les honoraires aux mandants " . $invoice->getProperty()->getWarrant()->getMail1() . " et " . $invoice->getMailCc() . "<br>";
+                        } else {
+                            $resultat .= "mail mandat vendeur non envoyé<br>";
+                        }
+                    }
+    
+                    if ($cond_r_n) {
+                        if (!$this->areMailsDisabled() && $this->mailer->send($message2)) {
+                            $resultat .= "mail mandat vendeur envoyé avec la rente au buyer /acquereur/acheteur " . $invoice->getProperty()->getBuyerMail1() . "<br>";
+                        } else {
+                            $resultat .= "mail mandat vendeur non envoyé<br>";
+                        }
+                    }
+                } else if ($data['recursion'] != Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() != Warrant::TYPE_SELLERS) {
+                    if ($cond_h_n || $cond_r_n) {
+                        if (!empty($invoice->getMailCc())) {
+                            $message->setCc($invoice->getMailCc());
+                        }
+    
+                        if (!$this->areMailsDisabled() && $this->mailer->send($message)) {
+                            $resultat .= "mail envoyé<br>";
+                        } else {
+                            $resultat .= "mail non envoyé<br>";
+                        }
+                    }
+                } else if ($data['recursion'] == Invoice::RECURSION_QUARTERLY) {
+                    if (!empty($invoice->getMailCc())) {
+                        $message->setCc($invoice->getMailCc());
+                    }
+    
+                    if (!$this->areMailsDisabled() && $this->mailer->send($message)) {
+                        $resultat .= "mail envoyé<br>";
+                    } else {
+                        $resultat .= "mail non envoyé<br>";
+                    }
+                }
+            } else {
+                $resultat .= "Invalid conditions<br>";
+            }
+    
+        } catch (\Exception $e) {
+            $resultat .= "Exception caught: " . $e->getMessage();
+        }
+    
+        return $resultat; // Return the captured result
+    }
+    
 
 
 }
