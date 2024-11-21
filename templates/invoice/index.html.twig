@@ -39,8 +39,12 @@
                 <div id="box_reponse_envoi">
                     Position: <span id="last_sending_email_position">{{ last_sending_email_position }}</span><br>
                     Date du dernier envoi: <span id="last_sending_email_date">{{ last_sending_email_date }}</span><br>
+                    Prochain envoi: <span id="next_sending_email_delay">{{ next_sending_email_delay }}</span><br>
+                    Débogage: <input type='checkbox' id='debug-mode'><br>
                     <button class="btn btn-custom " id="send_bunch_of_mails" type="button">Envoyer</button>
+                    <div id="results-container"></div>
                     <div id="reponse_envoi" class="m-content"></div>
+                    
                 </div>
             </div>
         </div>
@@ -224,6 +228,7 @@
     {# encore_entry_script_tags('html-table.invoices') #}
     <script type="text/javascript">
         $(function() {
+            $('#reponse_envoi').hide();
             // Vérification de l'état du bouton en fonction de la valeur de `sending_email_active`
             // Injecter la valeur de `sending_email_active` en tant que chaîne 'true' ou 'false'
             var sendingEmailActive = "{{ sending_email_active ? 'true' : 'false' }}"; 
@@ -253,6 +258,70 @@
                          // Affiche les résultats de l'email envoyé
                         $('#last_sending_email_position').html(data.pos_fin)
                         $('#last_sending_email_date').html(data.date)
+                        $('#next_sending_email_delay').html(data.next_sending_email_delay)
+                        
+                        
+                        let biens = data.results2;
+                        let $container = $("#results-container");
+
+                        // Appliquer un style initial à la div conteneur
+                        $container.css({
+                            opacity: 1, // La div reste toujours visible
+                            transform: "scale(1)", // Taille normale
+                            margin: "10px 0 10px 0",
+                            padding: "10px",
+                            width: "fit-content",
+                            backgroundColor: "rgb(37, 171, 43)",
+                            fontSize: "13px",
+                            color: "white",
+                            borderRadius: "5px",
+                            boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                            textAlign: "center"
+                        });
+
+                        // Animation en boucle pour chaque bien
+                        let index = 0;
+                        function showNextBien() {
+                            if (index < biens.length) {
+                                // Mettre à jour le texte
+                                $container
+                                    .css({ opacity: 0 }) // Rendre le texte invisible avant de le changer
+                                    .text(
+                                        'Les factures du ' +
+                                            biens[index] +
+                                            ' ont été envoyées. (' +
+                                            (index + 1) +
+                                            '/' +
+                                            biens.length +
+                                            ')'
+                                    )
+                                    .animate(
+                                        { opacity: 1 }, // Faire apparaître le texte
+                                        {
+                                            duration: 500, // Durée de l'animation d'apparition
+                                            complete: function () {
+                                                // Attendre avant de passer au prochain texte
+                                                setTimeout(() => {
+                                                    index++;
+                                                    showNextBien(); // Passer à l'élément suivant
+                                                }, 3000); // Temps d'affichage pour chaque élément
+                                            }
+                                        }
+                                    );
+                            }
+                        }
+
+                        // Démarrer l'animation
+                        showNextBien();
+
+
+                        
+
+
+                        if ($('#debug-mode').is(':checked')) {
+                            $('#reponse_envoi').show(); // Afficher l'élément
+                        } 
+                        
                     },
                     error: function(xhr, status, error) {
                         console.error('Error:', error);  // Logue l'erreur s'il y a un problème avec la requête AJAX
