@@ -1337,7 +1337,7 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
      * @return Response
      * @throws Exception
      */
-    public function send_bunch_of_mails(Request $request,DriveManager $driveManager,Swift_Mailer $mailer)
+    public function send_bunch_of_mails(Request $request,DriveManager $driveManager)
     {
         $position_deb=$request->get('position');
         $position_fin=$position_deb+10;
@@ -1363,19 +1363,17 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
             $invoice_r = $manager->getRepository(Invoice::class)
                 ->getLastPropertyRente($property->getId())[0];
                 $data = $invoice_r->getData();
-			$filePath_r = $invoice_r->getFile() ? $this->driveManager->getFilePath($invoice_r->getFile()) : -1;
-            
+
              $results.="Rente numéro ".$invoice_r->getNumber()." ";
-            $res_r=$this->resendInvoice( $data, $filePath_r, $property, $invoice_r, $mailer);
+            $res_r=$this->resendInvoice( $data,$driveManager,  $property, $invoice_r);
             
 
             $invoice_h = $manager->getRepository(Invoice::class)
             ->getLastPropertyHonoraires($property->getId())[0];
             $data = $invoice_h->getData();
-			$filePath_h = $invoice_h->getFile2() ? $this->driveManager->getFilePath($invoice_h->getFile2()) : -1;
             $results2[] = "bien nº{$property->getId()} de {$property->getTitle()}";
              $results.="Honoraires numéro ".$invoice_h->getNumber()."<br>";
-            $res_h=$this->resendInvoice( $data, $filePath_h, $property, $invoice_h, $mailer);
+            $res_h=$this->resendInvoice( $data,$driveManager,   $property, $invoice_h);
 
             
             $results.="{$res_r}<br>";
@@ -1387,8 +1385,8 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
         $last_sending_email_position = $this->getDoctrine()
         ->getRepository(Parameter::class)
         ->findOneBySomeField("last_sending_email_position");
-        $last_sending_email_position->setValue((string) $position_fin+1);  // Assurez-vous que $position_fin est une chaîne
-        $manager->persist($last_sending_email_position);
+        $last_sending_email_position->setValue((string) $position_fin);  // Assurez-vous que $position_fin est une chaîne
+        $manager->persist($last_sending_email_position+1);
 
         // Récupérer et mettre à jour la date d'envoi de l'email en la passant sous forme de chaîne
         $last_sending_email_date = $this->getDoctrine()
@@ -1402,7 +1400,7 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
 
         // Enregistrer les changements dans la base de données
         $manager->flush();
-        $next_sending_email_delay=floor((strtotime($last_sending_email_date->getValue()) + 15 * 60 - time()) / 60);
+        $next_sending_email_delay=floor((strtotime($last_sending_email_date->getValue()) + 10 * 60 - time()) / 60);
         $next_sending_email_delay=($next_sending_email_delay>0)?(" dans ".$next_sending_email_delay." minutes"):"maintenant";
         return new JsonResponse(["results"=> $results,"results2"=> $results2,"total"=>sizeof($properties),"pos_fin"=> $position_fin,"date"=>strftime('%A %d %B %Y %H:%M:%S', strtotime($formattedDate)),'next_sending_email_delay' =>$next_sending_email_delay ] );
     }
@@ -1410,16 +1408,16 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
 
 
 
-public function resendInvoice(array $data,String $filepathfinal, Property $property, Invoice $invoice, Swift_Mailer $mailer)
+public function resendInvoice(array $data,DriveManager $driveManager, Property $property, Invoice $invoice, int $category = Invoice::CATEGORY_ANNUITY)
     {
         $resultat =""; // Variable to capture messages
         try {
     		$data=$invoice->getData();
 			
-			$resultat .= $filepathfinal."<br>";
             
-            $filePath = $invoice->getFile() ? $filepathfinal : -1;
-            $filePath2 = $invoice->getFile2() ? $filepathfinal : -1;
+            
+            $filePath = $invoice->getFile() ? $driveManager->getFilePath($invoice->getFile()) : -1;
+            $filePath2 = $invoice->getFile2() ? $driveManager->getFilePath($invoice->getFile2()) : -1;
     
             $cond_h_n = ($filePath2 != -1); // honoraires non nuls
             $cond_r_n = ($filePath != -1); // rente non nulle
@@ -1575,6 +1573,9 @@ $data['recursion'] == Invoice::RECURSION_QUARTERLY) {
                         $resultat .= "mail non envoyé<br>";
                     }
                 }
+                $invoice->setStatus(Invoice::STATUS_SENT);
+                $manager = $this->getDoctrine()->getManager();
+                $manager->persist($invoice);
             } else {
                 $resultat .= "Invalid conditions<br>";
             }

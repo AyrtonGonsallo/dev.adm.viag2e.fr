@@ -259,6 +259,27 @@ class DriveManager
         }
     }
 
+    public function getFilePath(File $file): ?string
+    {
+		if(!$this->_connected) {
+            $this->connect();
+        }
+        try {
+            $driveFile = $this->_drive->files->get($file->getDriveId(), ['alt' => 'media']);
+
+            $path = $this->_params->get('tmp_files_dir').'/'.$file->getName().$file->getExtension();
+
+            $fileSystem = new Filesystem();
+            //$fileSystem->remove([$path]);
+            $fileSystem->dumpFile($path, $driveFile->getBody()->getContents());
+
+           
+            return $path;
+        } catch (Google_Service_Exception $ex) {
+            return null;
+        }
+    }
+    
     public function listFiles()
     {
         if($this->_isdev) {
