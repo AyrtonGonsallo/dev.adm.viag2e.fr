@@ -1385,8 +1385,8 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
         $last_sending_email_position = $this->getDoctrine()
         ->getRepository(Parameter::class)
         ->findOneBySomeField("last_sending_email_position");
-        $last_sending_email_position->setValue((string) $position_fin);  // Assurez-vous que $position_fin est une chaîne
-        $manager->persist($last_sending_email_position+1);
+        $last_sending_email_position->setValue((string) $position_fin+1);  // Assurez-vous que $position_fin est une chaîne
+        $manager->persist($last_sending_email_position);
 
         // Récupérer et mettre à jour la date d'envoi de l'email en la passant sous forme de chaîne
         $last_sending_email_date = $this->getDoctrine()

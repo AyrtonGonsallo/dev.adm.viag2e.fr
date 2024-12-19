@@ -164,8 +164,19 @@ pour faire les tests sur les charges de copro
             ->getResult();
     }
 
+    function get_indexation_date_pattern($month)
+    {
+        if(intval($month+1)==13){
+            $res="%-1";
+        }else{
+            $res="%-".(intval(date("m")+1)."%");
+        }
+        return $res;
+          
+    }
     public function findIndicestoUpdate($max)
     {
+        $datePattern = $this->get_indexation_date_pattern(date("m"));
         return $this->createQueryBuilder('p')
             ->where('p.date_maj_indice_ref <= :date')
 			->andWhere('p.initial_index_object IS NOT NULL')
@@ -176,7 +187,7 @@ pour faire les tests sur les charges de copro
            // ->andWhere('p.annuities_disabled = false')
            
             ->setParameter('date', new DateTime("-15 days"))
-            ->setParameter('pattern_indexation', "%-".(intval(date("m")+1)."%"))
+            ->setParameter('pattern_indexation', $datePattern)
             ->orderBy('p.id', 'ASC')
             ->setMaxResults($max)
             ->getQuery()

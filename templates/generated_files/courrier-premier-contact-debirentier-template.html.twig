@@ -1,0 +1,145 @@
+<style type="text/css">
+    table { vertical-align: top; }
+    tr { vertical-align: top; }
+    td { vertical-align: top; }
+    th {
+        background-color: #a1a1a1;
+        border-top: 2px solid #000;
+    }
+    th, td {
+        border: inherit;
+    }
+    
+</style>
+
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt;">
+    <bookmark title="Facture" level="0"></bookmark>
+    <table cellspacing="0" style="font-size: 10pt; margin-right: 4%; margin-left: 4%; width: 92%; text-align: center;">
+        <tr style="border: solid 1px black;">
+            <td style="text-align: left; width: 40%; border: none;">
+                <img style="position: absolute; top: 10px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+            </td>
+            <td style="width: 60%; border: none;">
+                <span style="font-size: 13pt; color: #b6bec5;">
+                    <b style="color: #b6bec5;">SPÉCIALISTE TRANSACTIONS VIAGÈRES<br />EXPERTISE ET ACCOMPAGNEMENT</b>
+                </span><br />
+            </td>
+        </tr>
+        <tr style="border: solid 1px black;">
+            <td style="text-align: left; width: 40%; display: flex; align-items: start; border: none;">
+                Vincent GIBELIN - Directeur <br />
+                58, rue Fondaudège <br />
+                33000 BORDEAUX <br />
+                Tel : 05.56.21.91.44 - 06.67.11.61.8 <br />
+                Email : gestion@univers-viager.fr <br />
+                Site internet : www.univers-viager.fr <br />
+            </td>
+            <td style="width: 60%; border: none;">
+                {{ parameters.city|title }}, le {{ data.current_day }}<br /><br />
+            </td>
+        </tr>
+        <tr style="border: solid 1px black;">
+            <td style="text-align: left; width: 40%; display: flex; align-items: start; border: none;">
+                <br /><br /><br /><br />
+                {% for i in 0..5 %}&nbsp;{% endfor %}
+                {{ data.form.formule }},
+            </td>
+            <td style="width: 60%; border: none;">
+                <b style="text-align: center;">
+                    <br />
+                    {% if data.target == 'Crédirentier' %} {{ data.property.getFirstname1() }} {% elseif data.target == 'Débirentier' %}
+                    {% if data.property.getDebirentierDifferent() %} {{ data.property.getPrenomDebirentier() }} {% else %}
+                    {{ data.property.getWarrant().getFirstname() }} {% endif %} {% else %}
+                    {{ data.property.getWarrant().getFirstname() }} {% endif %}
+                    {% if data.target == 'Crédirentier' %} {{ data.property.getLastname1() }} {% elseif data.target == 'Débirentier' %}
+                    {% if data.property.getDebirentierDifferent() %} {{ data.property.getNomDebirentier() }} {% else %}
+                    {{ data.property.getWarrant().getLastname() }} {% endif %} {% else %}
+                    {{ data.property.getWarrant().getLastname() }} {% endif %}&nbsp;
+                    <br />
+                    {% if data.target == 'Crédirentier' %} {{ data.property.getAddress() }} {% elseif data.target == 'Débirentier' %}
+                    {% if data.property.getDebirentierDifferent() %} {{ data.property.getAddresseDebirentier() }} {% else %}
+                    {{ data.property.getWarrant().getAddress() }} {% endif %} {% else %}
+                    {{ data.property.getWarrant().getAddress() }} {% endif %}
+                    <br />
+                    {% if data.target == 'Crédirentier' %} {{ data.property.getPostalCode() }} {% elseif data.target == 'Débirentier' %}
+                    {% if data.property.getDebirentierDifferent() %} {{ data.property.getCodePostalDebirentier() }} {% else %}
+                    {{ data.property.getWarrant().getPostalCode() }} {% endif %} {% else %}
+                    {{ data.property.getWarrant().getPostalCode() }} {% endif %}
+                    {% if data.target == 'Crédirentier' %} {{ data.property.getCity() }} {% elseif data.target == 'Débirentier' %}
+                    {% if data.property.getDebirentierDifferent() %} {{ data.property.getVilleDebirentier() }} {% else %}
+                    {{ data.property.getWarrant().getCity() }} {% endif %} {% else %}
+                    {{ data.property.getWarrant().getCity() }} {% endif %}<br />
+                </b>
+            </td>
+        </tr>
+    </table>
+
+    <div style="margin-right: 4%; margin-left: 4%;">
+        <br /><br /><br />
+        {% for i in 0..5 %}&nbsp;{% endfor %}
+        Vous avez vendu votre bien situé au {{ data.adresse_bien}} selon acte passé chez {{ data.form.nom_notaire}} notaire à {{ data.form.addresse_notaire}} en date du {{ data.date_signature_acte}}, au profit de {{data.form.au_profit_de}}.
+        <br /><br />
+        {% for i in 0..5 %}&nbsp;{% endfor %}
+        Ce dernier nous a mandaté pour assurer la gestion de son viager.
+        <br /><br />
+        <u>Voici les missions qui nous ont été confiées :</u><br>
+        - Appeler et encaisser toutes sommes représentatives des rentes viagères relatives au bien géré sur le compte bancaire du MANDATAIRE et les reverser au CRÉDIRENTIER à la périodicité convenue dans l’acte authentique de vente. Assurer le suivi des règlements.<br>
+        - Produire une attestation annuelle des rentes perçues ou versées à déclarer à l’administration fiscale.<br>
+        - Procéder à la révision annuelle de la rente viagère (indexation).<br>
+        {% if data.form.bien_en_copro %}
+        - Dans le cas d’un bien en copropriété, procéder à l’encaissement et au décaissement des avances de charges trimestrielles dues par le CRÉDIRENTIER selon la répartition convenue entre les parties dans l’acte authentique de vente et procéder à réception du décompte annuel de charges transmis par le DÉBIRENTIER à la régularisation annuelle entre les parties.<br>
+       {% endif %}
+        - En cas d’abandon de jouissance du bien de la part du CRÉDIRENTIER, modifier le montant de la rente selon les clauses prévues dans l’acte authentique de vente.<br>
+        - Vérifier annuellement la conformité et validité des assurances obligatoires pour le CRÉDIRENTIER / DÉBIRENTIER.<br>
+        - Informer les parties de la répartition des charges relatives aux travaux selon les conventions passées dans l’acte à 1ère demande.<br>
+        - Demander une attestation annuelle de l’entretien des éléments d’équipements tels que chaudière, climatisation, pompe à chaleur, ramonage de la cheminée, etc...<br>
+        <br /><br />
+    </div>
+    {% if data.form.demander_pieces %}
+        <div style="margin-right: 4%; margin-left: 4%;">
+        
+            {% for i in 0..5 %}&nbsp;{% endfor %}
+            En ce qui vous concerne, nous sommes donc votre interlocuteur privilégié.<br />
+            A ce titre, nous vous demandons, pour la bonne gestion de ce dossier, de bien vouloir nous faire parvenir :
+            <br>
+            {% if data.form.demander_rib %}- Votre RIB pour procéder au virement de votre rente viagère<br>{% endif %}
+            {% if data.form.demander_attestation_habitation %}- Votre attestation d’assurance habitation<br>{% endif %}
+            {% if data.form.demander_attestation_entretien %}- Votre attestation d’entretien chaudière, clim, pompe à chaleur<br>{% endif %}
+            {% if data.form.demander_facture_ramonage %}- La facture de ramonage de votre cheminée/poêle<br>{% endif %}
+            <br />
+            
+        </div>
+        <div style="margin-right: 4%; margin-left: 4%;">
+            A réception, nous vous ferons parvenir une autorisation de prélèvement à nous retourner signée, celle-ci nous servira à :
+            <br>
+            {% if data.form.bien_en_copro %}- prélever chaque trimestre votre quote-part des charges de copropriété<br>{% endif %}
+            {% if data.form.bien_en_copro %}- prélever chaque année le restant dû, si existant, après régul des charges de copropriété<br>{% endif %}
+            - prélever chaque année la taxe des ordures ménagères<br>
+            
+        </div>
+    {% endif %}
+    <div style="margin-right: 4%; margin-left: 4%;">
+        {% for i in 0..5 %}&nbsp;{% endfor %}
+        Nous restons, bien entendu, à votre disposition pour tous renseignements complémentaires et vous prions de croire en l’expression de nos sincères salutations.
+        
+        <br /> <br /> <br /><br /> <br />
+        {% for i in 0..280 %}
+            &nbsp;
+        {% endfor %}
+        Vincent GIBELIN,
+    </div>
+</page>
+
+<page_footer>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 10px;">
+        <tr>
+            <td style="width: 100%; border: none;">
+                UNIVERS VIAGER - Siège social : 58 Rue Fondaudège 33000 BORDEAUX, SARL au capital de 5 000 €<br />
+                TVA FR27523654408 - Immatriculée au RCS Bordeaux N°523 654 408<br />
+                Garantie financière GALIAN 89 rue de la Boétie 75008 PARIS Montant : 120 000 €<br />
+                Carte Professionnelle Transaction et Gestion immobilière n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br />
+                « Notre agence ne détient aucun fonds pour le compte de ses clients »
+            </td>
+        </tr>
+    </table>
+</page_footer>

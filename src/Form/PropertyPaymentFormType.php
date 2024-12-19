@@ -39,9 +39,9 @@ class PropertyPaymentFormType extends AbstractType
             'query_builder' => function (EntityRepository $er) use($options){
                 if($options['data']->valeur_indice_ref_og2_i_object){
                     return $er->createQueryBuilder('rh')
-                ->where('rh.id = :id')
-                ->setParameter('id', $options['data']->valeur_indice_ref_og2_i_object)
-                    ->orderBy('rh.id', 'DESC');
+                    ->where('rh.type LIKE :key')
+                    ->setParameter('key', "OGI")
+                        ->orderBy('rh.id', 'DESC');
                 }else{
                     return $er->createQueryBuilder('rh')
                     ->where('rh.type LIKE :key')

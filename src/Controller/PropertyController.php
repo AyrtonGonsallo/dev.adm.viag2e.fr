@@ -301,6 +301,7 @@ class PropertyController extends AbstractController
                     // each field has an array of errors
                     if(strlen($formField->getErrors())>=3){
                         $errors .= 'Champ: '.$fieldName.'- Erreur: '.$formField->getErrors().'<br/>';
+                        $errors .= 'Si vous essayez de changer un indice dans une liste: choisissez la valeur vide, enregistrez et au rechargement de la page vous pourriez choisir votre valeur.<br/>';
                     }
                 }
                 $this->addFlash('error', 'Problème lors de l\'enregistrement <br/>'.$errors);
@@ -587,7 +588,7 @@ class PropertyController extends AbstractController
                 ->setParameter('key', 'OGI')
                 ->setParameter('end', $endDate_og2i)
                 ->setParameter('endmonth',  "%-%".$month_og2i."-%")
-                    ->orderBy('rh.date', 'ASC');
+                    ->orderBy('rh.date', 'DESC');
                 $query = $qb->getQuery();
                 // Execute Query
             }

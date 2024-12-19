@@ -229,7 +229,7 @@ class GeneratedFilesController extends AbstractController
                         'property'           => $property,
                     ];
                     $pdf->writeHTML($this->twig->render('generated_files/mandat-sepa-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -332,7 +332,7 @@ class GeneratedFilesController extends AbstractController
                         'property'           => $property,
                     ];
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-mandat-sepa-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -575,7 +575,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-regularisation-copro-06-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -725,7 +725,11 @@ class GeneratedFilesController extends AbstractController
 
                 $plaff=$property->plafonnement_index_og2_i;
                 $plaff_v=(1+($plaff/100))*$rdb;
-                if($res<$plaff_v){
+                if(!$plaff || $plaff<=0){
+                    $rente=round($res,2);
+                    $is_plaff=false;
+                }
+                else if($res<$plaff_v){
                     $rente=round($res,2);
                     $is_plaff=false;
                 }else{
@@ -800,7 +804,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-og2i-annee1-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -887,7 +891,7 @@ class GeneratedFilesController extends AbstractController
             'choices'  => [
                 'Cher Monsieur' => "Cher Monsieur",
                 'Chère Madame' => "Chère Madame",
-                'Chère Madame, Cher Monsieur '=> "Chère Madame, Cher Monsieur",
+                'Chère Monsieur, Cher Madame'=> "Chère Monsieur, Cher Madame",
             ],
             
         ])
@@ -1023,7 +1027,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -1176,7 +1180,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-abandon-duh-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -1231,7 +1235,174 @@ class GeneratedFilesController extends AbstractController
      */
     public function generate_courrier_premier_contact(Request $request, DriveManager $driveManager)
     {
-        return $this->redirectToRoute('dashboard');
+        /** @var Property $property */
+        $property = $this->getDoctrine()
+            ->getRepository(Property::class)
+            ->find($request->get('propertyId'));
+        $parameters = [
+            'tva'        => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'tva'])->getValue(),
+            'footer'     => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_footer'])->getValue(),
+            'address'    => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_address'])->getValue(),
+            'postalcode' => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_postalcode'])->getValue(),
+            'city'       => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_city'])->getValue(),
+            'phone'      => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_phone'])->getValue(),
+            'mail'       => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_mail'])->getValue(),
+            'site'       => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_site'])->getValue(),
+        ];
+        if(empty($property)) {
+            $this->addFlash('danger', 'Bien introuvable');
+            return $this->redirectToRoute('dashboard');
+        }
+        function get_label($i){
+            if($i==1){
+                return 'Urbains';
+            }else if($i==2){
+                return 'Ménages';
+            }else{
+                return 'Ménages';
+            }
+
+        }
+        $defaultData = ['message' => 'Type your message here'];
+        $jour_revaluation=explode("-", $property->getRevaluationDate())[0];
+        $mois_revaluation=explode("-", $property->getRevaluationDate())[1];
+        $form = $this->createFormBuilder($defaultData)
+        ->add('destinataire', ChoiceType::class, [
+            'choices'  => [
+                'Crédirentier' => "Crédirentier",
+                'Débirentier' => "Débirentier",
+            ],
+        ])
+        ->add('formule', ChoiceType::class, [
+            'choices'  => [
+                'Cher Monsieur' => "Cher Monsieur",
+                'Chère Madame' => "Chère Madame",
+                'Cher Monsieur, Chère Madame'=> "Cher Monsieur, Chère Madame",
+            ],
+            
+        ])
+        ->add('civilite', ChoiceType::class, [
+            'choices'  => [
+                'Monsieur' => "Monsieur",
+                'Madame' => "Madame",
+                'Madame, Monsieur' => "Madame, Monsieur",
+            ],
+        ])
+        ->add('date_signature_acte', DateType::class, [ 
+            'format' => 'dd-MMM-yyyy',
+            'years' => range(date('Y'), date('Y') + 20),
+            'data' => new \DateTime(date('Y').'-'.$mois_revaluation.'-01'),
+        ])
+        ->add('nom_notaire', TextType::class, ['required' => true])
+        ->add('addresse_notaire', TextType::class, ['required' => true])
+        ->add('au_profit_de', TextType::class, ['required' => true])
+        ->add('bien_en_copro', CheckboxType::class, ['required' => false])
+        ->add('demander_pieces', CheckboxType::class, ['required' => false])
+        ->add('demander_rib', CheckboxType::class, ['required' => false])
+        ->add('demander_attestation_habitation', CheckboxType::class, ['required' => false])
+        ->add('demander_attestation_entretien', CheckboxType::class, ['required' => false])
+        ->add('demander_facture_ramonage', CheckboxType::class, ['required' => false])
+        ->getForm();
+        
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                // data is an array with "name", "email", and "message" keys
+                $data = $form->getData();
+                $destinataire = $data["destinataire"];
+                $date_signature_acte = $data["date_signature_acte"];
+                $pdf      = new Html2Pdf('P', 'A4', 'fr');
+                $now_date=new DateTime();
+                $date_fdnm = new DateTime('First day of this month');
+                $fileName = "Courrier de premier contact -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
+                $now_date=new DateTime();
+                
+
+                $data = [
+                    'date'       => $now_date,
+                    'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
+                    'annee'       => $now_date->format('Y'),
+                    'date_a_f'       => $now_date->format('d/m/Y'),
+                    'property'   => $property,
+                    'warrant'    => [
+                        'id'         => $property->getWarrant()->getId(),
+                        'type'       => $property->getWarrant()->getType(),
+                        'firstname'  => $property->getWarrant()->getFirstname(),
+                        'lastname'   => $property->getWarrant()->getLastname(),
+                        'address'    => ($property->getWarrant()->hasFactAddress()) ? $property->getWarrant()->getFactAddress() : $property->getWarrant()->getAddress(),
+                        'postalcode' => ($property->getWarrant()->hasFactAddress()) ? $property->getWarrant()->getFactPostalCode() : $property->getWarrant()->getPostalCode(),
+                        'city'       => ($property->getWarrant()->hasFactAddress()) ? $property->getWarrant()->getFactCity() : $property->getWarrant()->getCity(),
+                    ],
+                    "debirentier" => null,
+                    "debirentier_different" => null,
+                    "target" => null,
+                   "adresse_bien"=>($property->getShowDuh())?$property->getAddress():$property->getGoodAddress(),
+                   "date_signature_acte" =>  $date_signature_acte->format('d/m/Y'),
+
+                    "nom_compte" => explode("/", $property->getTitle())[0],
+                    "form" => $form->getData(),
+                   
+                ];
+                if($property->getDebirentierDifferent()){
+                    $debirentier    = [
+                        'nom_debirentier'         => $property->getNomDebirentier(),
+                        'prenom_debirentier'       => $property->getPrenomDebirentier(),
+                        'addresse_debirentier'  => $property->getAddresseDebirentier(),
+                        'code_postal_debirentier'   => $property->getCodePostalDebirentier(),
+                        'ville_debirentier'    => $property->getVilleDebirentier(),
+                    ];
+                    $data["debirentier"]=$debirentier;
+                    $data["debirentier_different"]=$property->getDebirentierDifferent();
+                }
+                
+                try {
+                    $pdf->pdf->SetDisplayMode('fullpage');
+                    if($destinataire=="Débirentier"){
+                        $data["target"]="Débirentier";
+                        //si résultat positif= régul adréssée au débirentier
+                        //Le débirentier = le propriétaire = la société Opale Business 2
+                        //$pendingInvoice->setTarget(PendingInvoice::TARGET_WARRANT);//1
+                        $pdf->writeHTML($this->twig->render('generated_files/courrier-premier-contact-debirentier-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
+                    }else if($destinataire=="Crédirentier"){
+                        $data["target"]="Crédirentier";
+                        //si résultat négatif= régul adressée au crédirentier
+                        //Le crédirentier
+                        //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
+                        $pdf->writeHTML($this->twig->render('generated_files/courrier-premier-contact-credirentier-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
+                    }
+                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    
+                    $file = new File();
+                    $file->setType(File::TYPE_DOCUMENT);
+                    $file->setName($fileName);
+                    $file->setWarrant($property->getWarrant());
+                    $file->setProperty($property);
+                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path.'/'.$fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
+                    $manager = $this->getDoctrine()->getManager();
+                    $manager->persist($file);
+                    $manager->flush();
+
+                    
+
+                    return $this->render('generated_files/courrier-premier-contact.html.twig', [
+                        'property' => $property,
+                        'form' => $form->createView(),
+                        'message' => 'fichier Courrier d’indexation créé avec succès',
+                        'error' => null,
+                    ]);
+
+                } catch (Html2PdfException $e) {
+                    $pdf->clean();
+                    throw new Exception($e->getMessage());
+                }
+            }
+
+        return $this->render('generated_files/courrier-premier-contact.html.twig', [
+            'property' => $property,
+            'form' => $form->createView(),
+            'message' => null,
+            'error' =>null,
+        ]);
     }
 
      /**
@@ -1357,4 +1528,9 @@ class GeneratedFilesController extends AbstractController
         $this->addFlash('danger', 'Fichier introuvable');
         return $this->redirectToRoute('dashboard', [], 302);
     }
+
+
+
+
+    
 }

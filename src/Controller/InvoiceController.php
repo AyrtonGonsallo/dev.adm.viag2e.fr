@@ -1024,7 +1024,7 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                 if($invoice->getCategory() == Invoice::CATEGORY_MANUAL){
                     $message = (new Swift_Message($invoice->getMailSubject()))
                         ->setFrom($this->getParameter('mail_from'))
-                        ->setBcc($this->getParameter('mail_from'))
+                        ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
                         ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
                     if($data["target"]==1){//mandant
                         $mailTarget=$invoice->getProperty()->getWarrant()->getMail1();
@@ -1040,7 +1040,7 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                     else if($data["target"]==4){//debirentier
                         $mailTarget=$invoice->getProperty()->getEmailDebirentier();
                     }
-                    $message ->setTo("roquetigrinho@gmail.com");
+                    $message ->setTo( $mailTarget);
                 
                     if($cond_h_n){
                         $message->attach(Swift_Attachment::fromPath($filePath2));
@@ -1050,25 +1050,51 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                         $message->attach(Swift_Attachment::fromPath($filePath));
                     }
                     
-                }else{
+                }else if($invoice->getCategory() == Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES){
+                    //$mail_to=$data['email']?$data['email']:$invoice->getProperty()->getWarrant()->getMail1();
+                    $mail_to="roquetigrinho@gmail.com";
+                    $message = (new Swift_Message($invoice->getMailSubject()))
+                        ->setFrom($this->getParameter('mail_from'))
+                        //->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')]);
+                        ->setBcc(["roquetigrinho@gmail.com"]);
+                        if($invoice->getType() == Invoice::TYPE_NOTICE_EXPIRY){
+                            $message->setBody($this->twig->render('invoices/emails/notice_regule.twig', ['type' => "avis d'échéance concernant la régularisation de vos charges de copropriété", 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+
+                        }else{
+                            $message->setBody($this->twig->render('invoices/emails/notice_regule.twig', ['type' => "quittance concernant la régularisation de vos charges de copropriété", 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');
+                        }                    
+                        
+                    $message ->setTo( $mail_to);
+                
+                    if($cond_h_n){
+                        $message->attach(Swift_Attachment::fromPath($filePath2));
+                    }
+                    //envoyer la rente au buyer /acquereur/acheteur
+                    if($cond_r_n){
+                        $message->attach(Swift_Attachment::fromPath($filePath));
+                    }
+                    
+                }
+                
+                else{
                     if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                         if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                             $message = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->getParameter('mail_from'))
-                                ->setBcc($this->getParameter('mail_from'))
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                                ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath));
                         }else{
                             $message = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->getParameter('mail_from'))
-                                ->setBcc($this->getParameter('mail_from'))
-                                ->setTo("roquetigrinho@gmail.com")
+                                ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                                ->setTo($invoice->getProperty()->getMail1())
                                 ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath));
                                 
                                 if(!empty($invoice->getProperty()->getMail2())) {
-                                    $message->setCc("roquetigrinho@gmail.com");
+                                    $message->setCc($invoice->getProperty()->getMail2());
                                 }
                         }
                     }
@@ -1079,17 +1105,23 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                             if($cond_h_n){
                                 $message1 = (new Swift_Message($invoice->getMailSubject()))
                                     ->setFrom($this->getParameter('mail_from'))
-                                    ->setBcc($this->getParameter('mail_from'))
-                                    ->setTo("roquetigrinho@gmail.com")
+                                    ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                                    ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                     ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                     ->attach(Swift_Attachment::fromPath($filePath2));
                             }
                             //envoyer la rente au buyer /acquereur/acheteur
                             if($cond_r_n){
+                                $mailTarget_r="";
+                                if($invoice->getProperty()->getDebirentierDifferent()){
+                                    $mailTarget_r=$invoice->getProperty()->getEmailDebirentier();
+                                }else{
+                                    $mailTarget_r=$invoice->getProperty()->getWarrant()->getMail1();
+                                }
                                 $message2 = (new Swift_Message($invoice->getMailSubject()))
                                     ->setFrom($this->getParameter('mail_from'))
-                                    ->setBcc($this->getParameter('mail_from'))
-                                    ->setTo("roquetigrinho@gmail.com")
+                                    ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                                    ->setTo($mailTarget_r)
                                     ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                     ->attach(Swift_Attachment::fromPath($filePath));
                             }
@@ -1098,8 +1130,8 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                             if($cond_h_n){
                                 $message = (new Swift_Message($invoice->getMailSubject()))
                                     ->setFrom($this->getParameter('mail_from'))
-                                    ->setBcc($this->getParameter('mail_from'))
-                                    ->setTo("roquetigrinho@gmail.com")
+                                    ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                                    ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                     ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                     //->attach(Swift_Attachment::fromPath($filePath))
                                     ->attach(Swift_Attachment::fromPath($filePath2));
@@ -1107,8 +1139,8 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
 							else if($cond_r_n){
                                 $message = (new Swift_Message($invoice->getMailSubject()))
                                     ->setFrom($this->getParameter('mail_from'))
-                                    ->setBcc($this->getParameter('mail_from'))
-                                    ->setTo("roquetigrinho@gmail.com")
+                                    ->setBcc(["roquetigrinho@gmail.com", $this->getParameter('mail_from')])
+                                    ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                     ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                     ->attach(Swift_Attachment::fromPath($filePath));
                                     //->attach(Swift_Attachment::fromPath($filePath2));
@@ -1125,12 +1157,18 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                     } else {
                         $invoice->setStatus(Invoice::STATUS_UNSENT);
                     }
+                }else if($invoice->getCategory() == Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES){
+                    if ($this->mailer->send($message)) {
+                        $invoice->setStatus(Invoice::STATUS_SENT);
+                    } else {
+                        $invoice->setStatus(Invoice::STATUS_UNSENT);
+                    }
                 }
                 else{
                     if($data['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                         if($cond_h_n){
                             if(!empty($invoice->getMailCc())) {
-                                $message1->setCc("roquetigrinho@gmail.com");
+                                $message1->setCc($invoice->getMailCc());
                             }
             
                             if ($this->mailer->send($message1)) {
@@ -1149,7 +1187,7 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                     }else if($data['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() != Warrant::TYPE_SELLERS){
                         if($cond_h_n || $cond_r_n){
                             if(!empty($invoice->getMailCc())) {
-                                $message->setCc("roquetigrinho@gmail.com");
+                                $message->setCc($invoice->getMailCc());
                             }
             
                             if ($this->mailer->send($message)) {
@@ -1161,7 +1199,7 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                         
                     }else if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                         if(!empty($invoice->getMailCc())) {
-                            $message->setCc("roquetigrinho@gmail.com");
+                            $message->setCc($invoice->getMailCc());
                         }
         
                         if ($this->mailer->send($message)) {
@@ -1170,9 +1208,12 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                             $invoice->setStatus(Invoice::STATUS_UNSENT);
                         }
                     }
+                    
                 }
                 
-            
+                $manager = $this->getDoctrine()->getManager();
+                $manager->persist($invoice);
+                $manager->flush();
             } else {
                 $this->addFlash('danger', 'Facture introuvable');
             }
@@ -1385,8 +1426,8 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
         $last_sending_email_position = $this->getDoctrine()
         ->getRepository(Parameter::class)
         ->findOneBySomeField("last_sending_email_position");
-        $last_sending_email_position->setValue((string) $position_fin);  // Assurez-vous que $position_fin est une chaîne
-        $manager->persist($last_sending_email_position+1);
+        $last_sending_email_position->setValue((string) $position_fin+1);  // Assurez-vous que $position_fin est une chaîne
+        $manager->persist($last_sending_email_position);
 
         // Récupérer et mettre à jour la date d'envoi de l'email en la passant sous forme de chaîne
         $last_sending_email_date = $this->getDoctrine()

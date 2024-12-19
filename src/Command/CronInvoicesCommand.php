@@ -858,7 +858,10 @@ class CronInvoicesCommand extends Command
     public function generateInvoice(SymfonyStyle &$io, array $data, array $parameters, Property $property, int $category = Invoice::CATEGORY_ANNUITY)
     {
         try {   
-            $this->noMail =  true;
+            if($data['type'] ==Invoice::TYPE_NOTICE_EXPIRY && ($category==Invoice::CATEGORY_ANNUITY || $category==Invoice::CATEGORY_CONDOMINIUM_FEES)){
+                $io->note("pas de mails pour les avis d'échéance");
+                $this->noMail =  true;
+            } 
 			//$data['date']["month"]=utf8_decode($data['date']["month"]);
             if($data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                 $io->note("quaterly files trying to be created ");
@@ -1189,8 +1192,8 @@ class CronInvoicesCommand extends Command
                         $factureMensuelle->setFile($file);
                         $destinataireFacture->addFactureMensuelle($factureMensuelle);
                         $this->manager->persist($factureMensuelle);
-                $this->manager->persist($destinataireFacture);
-                $this->manager->flush();
+                        $this->manager->persist($destinataireFacture);
+                        $this->manager->flush();
                     }
                 if($cond_h_n && $invoice->getType()==Invoice::TYPE_NOTICE_EXPIRY){
                     $dest=$this->manager->getRepository(DestinataireFacture::class)->findOneBy(['name' => $destinataire_name_h]);

@@ -243,3 +243,13 @@ manuelles non payées
 accents bien duchemin
 UPDATE `property` SET `address` = '2 allée Guillaume Apollinaire Résidence Les Coteaux de Montchapet' WHERE `property`.`id` = 124;
 UPDATE `property` SET `good_address` = '2 allée Guillaume Apollinaire Résidence Les Coteaux de Montchapet 21000 DIJON' WHERE `property`.`id` = 124;
+
+voir les copro
+SELECT * FROM `property` WHERE last_quarterly_invoice < "2024-11-30" and condominium_fees > 0 and start_date_management <"2025-01-30" and active = true;
+
+SELECT * FROM `facture_mensuelle` where date>"2024-11-10";
+SELECT * FROM `facture_mensuelle` where date>"2024-10-10" and date<"2024-11-10";
+corriger la copro
+SELECT * FROM `invoice` WHERE number=5696;
+
+SELECT id,title,revaluation_date,date_maj_indice_ref,warrant_id FROM `property` where warrant_id=16 and revaluation_date like "%1-1";

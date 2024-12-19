@@ -1,0 +1,215 @@
+
+{% extends 'layout.html.twig' %}
+{% import "macros/forms.html.twig" as mforms %}
+
+{% block title %}Viag2e | Générer Courrier de premier contact pour le bien #{{ property.id }} ({{ property.title }}){% endblock %}
+
+
+{% block body %}
+    {% if message %}
+            <div class="m-alert m-alert--icon alert alert-success" role="alert">
+                <div class="m-alert__icon">
+                    <i class="la la-check"></i>
+                </div>
+                <div class="m-alert__text">
+                    <strong>{{ message }} </strong> 
+                </div>
+            </div>
+        {% endif %}
+        {% if error %}
+            <div class="-alert m-alert--icon m-alert--outline m-alert--square alert alert-danger" role="alert">
+                <div class="m-alert__icon"><i class="la la-exclamation-circle"></i></div>
+                <div class="m-alert__text">
+                    <strong>{{ error }} </strong> 
+                </div>
+            </div>
+        {% endif %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                         <span class="m-nav__link-text"><a href="{{ path('property_view', {'propertyId': property.id }) }}" class="">Bien #{{ property.id }} ({{ property.title }})</a> / Courrier de premier contact </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Courrier de premier contact
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                {{ form_start(form) }}
+                    <div class="form-group row">
+                        <div class="col-lg-6">
+                            <label for="form-destinataire" class="col-4 col-form-label">Destinataire</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.destinataire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-destinataire', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="form-civilite" class="col-4 col-form-label">Civilité</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.civilite, {'attr': {'class': 'form-control m-input'}, 'id': 'form-civilite', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                     
+                        <div class="col-lg-6">
+                            <label for="form-formule" class="col-4 col-form-label">Formule</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.formule, {'attr': {'class': 'form-control m-input'}, 'id': 'form-formule', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div> 
+                        <div class="col-lg-6">
+                            <label for="form-nom_notaire" class="col-4 col-form-label">Nom du notaire <span class="m--font-danger">*</span></label>
+                            <div class="col-12">
+                                <div class="m-typeahead">
+                                    {{ form_row(form.nom_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-nom_notaire', 'label': false}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="form-addresse_notaire" class="col-4 col-form-label">Adresse du notaire <span class="m--font-danger">*</span></label>
+                            <div class="col-12">
+                                <div class="m-typeahead">
+                                    {{ form_row(form.addresse_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_notaire', 'label': false}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="form-au_profit_de" class="col-4 col-form-label">Au profit de <span class="m--font-danger">*</span></label>
+                            <div class="col-12">
+                                <div class="m-typeahead">
+                                    {{ form_row(form.au_profit_de, {'attr': {'class': 'form-control m-input'}, 'id': 'form-au_profit_de', 'label': false}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="col-12">date de signature de l'acte chez le notaire:</label>
+                            {{ form_row(form.date_signature_acte, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_signature_acte', 'label': false}) }}
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="form-bien_en_copro" class="col-4 col-form-label">Bien en copropriété</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.bien_en_copro, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bien_en_copro', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="form-demander_pieces" class="col-4 col-form-label">demander des pièces</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.demander_pieces, {'attr': {'class': 'form-control m-input'}, 'id': 'form-demander_pieces', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                         <div class="col-lg-6" id="tohide1">
+                            <label for="form-demander_rib" class="col-4 col-form-label">demander le RIB pour procéder au virement de votre rente viagère</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.demander_rib, {'attr': {'class': 'form-control m-input'}, 'id': 'form-demander_rib', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                         
+                         <div class="col-lg-6" id="tohide2">
+                            <label for="form-demander_attestation_habitation" class="col-4 col-form-label">demander l'attestation d’assurance habitation</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.demander_attestation_habitation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-demander_attestation_habitation', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                         <div class="col-lg-6" id="tohide3">
+                            <label for="form-demander_attestation_entretien" class="col-4 col-form-label">demander l'attestation d’entretien chaudière, clim, pompe à chaleur</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.demander_attestation_entretien, {'attr': {'class': 'form-control m-input'}, 'id': 'form-demander_attestation_entretien', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6" id="tohide4">
+                            <label for="form-demander_facture_ramonage" class="col-4 col-form-label">demander la facture de ramonage de votre cheminée/poêle</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.demander_facture_ramonage, {'attr': {'class': 'form-control m-input'}, 'id': 'form-demander_facture_ramonage', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                        <input class="btn btn-outline-success btn-block" type="submit" value="Générer" />
+                    </div>
+                    {{ form_rest(form) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+console.log("load")
+    $('#tohide1').hide()
+    $('#tohide2').hide()
+    $('#tohide3').hide()
+    $('#tohide4').hide()
+     $('#form-demander_pieces').click(function() {
+        $('#tohide1')[this.checked ? "show" : "hide"]();
+        $('#tohide2')[this.checked ? "show" : "hide"]();
+        $('#tohide3')[this.checked ? "show" : "hide"]();
+        $('#tohide4')[this.checked ? "show" : "hide"]();
+    })
+            
+</script>
+{% endblock %}
