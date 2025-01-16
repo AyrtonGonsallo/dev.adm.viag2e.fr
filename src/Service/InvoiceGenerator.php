@@ -343,7 +343,7 @@ class InvoiceGenerator
                 }
 
                 $honorary= ($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100;
-                if($property->honorary_rates_object->getId()==24 && $honorary<$property->honorary_rates_object->getMinimum()){
+                if($property->honorary_rates_object && $honorary<$property->honorary_rates_object->getMinimum()){
                     $honorary=$property->honorary_rates_object->getMinimum();
 
                 }
@@ -453,7 +453,7 @@ class InvoiceGenerator
                 }
 
                 $honorary=(($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100);
-                if($property->honorary_rates_object->getId()==24 && $honorary<$property->honorary_rates_object->getMinimum()){
+                if($property->honorary_rates_object && $honorary<$property->honorary_rates_object->getMinimum()){
                     $honorary=$property->honorary_rates_object->getMinimum();
                 }
 
@@ -565,7 +565,7 @@ class InvoiceGenerator
                 }
 
                 $honorary=(($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100);
-                if($property->honorary_rates_object->getId()==24 && $honorary<$property->honorary_rates_object->getMinimum()){
+                if($property->honorary_rates_object && $honorary<$property->honorary_rates_object->getMinimum()){
                     $honorary=$property->honorary_rates_object->getMinimum();
 
                 }
@@ -693,7 +693,7 @@ class InvoiceGenerator
                     $is_plaff=true;
                 }
                 $honoraires = round($rente*$property->honorary_rates_object->getValeur()/100,2);
-                if($honoraires<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                if($honoraires<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                     $honoraires=$property->honorary_rates_object->getMinimum();  
                 }
 
@@ -826,7 +826,7 @@ class InvoiceGenerator
                     $is_plaff=true;
                 }
                 $honoraires = round($rente*$property->honorary_rates_object->getValeur()/100,2);
-                if($honoraires<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                if($honoraires<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                     $honoraires=$property->honorary_rates_object->getMinimum();  
                 }
 
@@ -961,7 +961,7 @@ class InvoiceGenerator
                     $is_plaff=true;
                 }
                 $honoraires = round($rente*$property->honorary_rates_object->getValeur()/100,2);
-                if($honoraires<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                if($honoraires<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                     $honoraires=$property->honorary_rates_object->getMinimum();  
                 }
 

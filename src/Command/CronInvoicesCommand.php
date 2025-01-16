@@ -635,7 +635,7 @@ class CronInvoicesCommand extends Command
                         $annuity=$plaf;
                     }
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
-                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                         $honoraryRates=$property->honorary_rates_object->getMinimum();
                     }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
@@ -645,7 +645,7 @@ class CronInvoicesCommand extends Command
 					$io->note("annuity=".$property->valeur_indexation_normale."*".$property->getInitialAmount()."/".$property->initial_index_object->getValue());
 
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
-                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                         $honoraryRates=$property->honorary_rates_object->getMinimum();
                     }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
@@ -655,7 +655,7 @@ class CronInvoicesCommand extends Command
 					$io->note("annuity=".$property->getRevaluationIndex()."*".$property->getInitialAmount()."/".$property->getInitialIndex());
 
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
-                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                         $honoraryRates=$property->honorary_rates_object->getMinimum();
                     }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
@@ -759,7 +759,7 @@ class CronInvoicesCommand extends Command
                     $number = $last_number->getValue() + 1;
                     $mht=($property->honorary_rates_object)?(($property->getInitialAmount() * $property->honorary_rates_object->getValeur())/100):0.0;
                     if($property->honorary_rates_object){
-                        if($mht<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                        if($mht<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                             $mht=$property->honorary_rates_object->getMinimum();
                         }
                     }
