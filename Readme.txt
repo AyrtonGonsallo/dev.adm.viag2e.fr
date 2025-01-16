@@ -253,3 +253,7 @@ corriger la copro
 SELECT * FROM `invoice` WHERE number=5696;
 
 SELECT id,title,revaluation_date,date_maj_indice_ref,warrant_id FROM `property` where warrant_id=16 and revaluation_date like "%1-1";
+
+94,95,96,97,98,99,100,101,106,107,109,110,111
+
+SELECT id,title,date_maj_indice_ref FROM `property` where id in(125,132,134,133,122) ORDER BY `id` DESC;

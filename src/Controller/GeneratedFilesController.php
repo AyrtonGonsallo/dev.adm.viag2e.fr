@@ -229,7 +229,7 @@ class GeneratedFilesController extends AbstractController
                         'property'           => $property,
                     ];
                     $pdf->writeHTML($this->twig->render('generated_files/mandat-sepa-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -332,7 +332,7 @@ class GeneratedFilesController extends AbstractController
                         'property'           => $property,
                     ];
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-mandat-sepa-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -575,7 +575,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-regularisation-copro-06-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -725,7 +725,7 @@ class GeneratedFilesController extends AbstractController
 
                 $plaff=$property->plafonnement_index_og2_i;
                 $plaff_v=(1+($plaff/100))*$rdb;
-                if(!$plaff || $plaff<=0){
+				if(!$plaff || $plaff<=0){
                     $rente=round($res,2);
                     $is_plaff=false;
                 }
@@ -804,7 +804,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-og2i-annee1-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -891,7 +891,7 @@ class GeneratedFilesController extends AbstractController
             'choices'  => [
                 'Cher Monsieur' => "Cher Monsieur",
                 'Chère Madame' => "Chère Madame",
-                'Chère Monsieur, Cher Madame'=> "Chère Monsieur, Cher Madame",
+                'Chère Madame, Cher Monsieur '=> "Chère Madame, Cher Monsieur",
             ],
             
         ])
@@ -1027,7 +1027,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -1180,7 +1180,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-abandon-duh-credit-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -1281,6 +1281,13 @@ class GeneratedFilesController extends AbstractController
             ],
             
         ])
+        ->add('designation_notaire', ChoiceType::class, [
+            'choices'  => [
+                'Ce dernier' => "Ce dernier",
+                'Cette dernière' => "Cette dernière",
+            ],
+            
+        ])
         ->add('civilite', ChoiceType::class, [
             'choices'  => [
                 'Monsieur' => "Monsieur",
@@ -1370,7 +1377,7 @@ class GeneratedFilesController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('generated_files/courrier-premier-contact-credirentier-template.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.viag2e.fr/adm.viag2e.fr/var/tmp/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -1528,9 +1535,4 @@ class GeneratedFilesController extends AbstractController
         $this->addFlash('danger', 'Fichier introuvable');
         return $this->redirectToRoute('dashboard', [], 302);
     }
-
-
-
-
-    
 }

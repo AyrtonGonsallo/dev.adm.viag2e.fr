@@ -42,14 +42,7 @@
         </tr>
          <tr>
             <td style="font-size: 10pt;text-align: left; width: 40%; display: flex; align-items: start; border:none">
-                <br /> 
-                <br />
-                <br />
-                <br />
-                {% for i in 0..5 %}
-                    &nbsp;
-                {% endfor %}
-                Bonjour,
+                
             </td>
             <td style="width: 60%; border:none">
            <b style="text-align:center;">
@@ -70,28 +63,50 @@
     <br />
    <br />
    <br />
-    
+   <br />
+ 
+    {% for i in 0..5 %}
+        &nbsp;
+    {% endfor %}
+    Bonjour,
+        <br />
+    <br />
+    <br />
     {% for i in 0..5 %}
             &nbsp;
         {% endfor %}
     La rente viagère de votre crédirentier vient à révision à la date du {{data.fd_next_month_d_m_y}} pour le bien suivant :<br />
     Réf. : <b>{{ data.property.getTitle() }}</b><br />
     {{data.adresse_bien }}<br />
-    <br /><br />
+    <br />
 
+  Le montant actuel de votre rente est de {{data.ia}} €. <br /><br />
+   
+    {% if not data.is_plaff %}
+        Rente de base = Rente actuelle ({{data.ia}} €) x Indice og2i de base de {{data.date_indice_base_og2i}} ({{data.montant_indice_base_og2i}}) / Nouvel indice de {{data.date_indice_base}} ({{data.montant_indice_base}}). <br /><br />
+
+        Nouveau montant = Rente de base ({{data.rdb}} €) x Nouvel indice de {{data.date_indice_actuel_og2i}} ({{data.montant_indice_actuel_og2i}}) / indice de référence de 
+        {{data.date_indice_base_og2i}} ({{data.montant_indice_base_og2i}}). <br /><br />
+    {% endif %}
+    {% if data.is_plaff %}
+        Rente de base ({{data.rdb}} €) x (1+plafonnement ({{data.plaff_val}})/100 ). <br /><br />
+    {% endif %}    
     <b>Le nouveau montant de la rente viagère sera ainsi porté à {{data.rente}} €</b> pour le virement 
-    de la rente du mois de {{data.date_virement}}:<br /><br />
-    Rente initiale ({{data.ia}} €) x Nouvel indice de {{data.date_indice_actuel}} ({{data.montant_indice_actuel}}) / Indice de base de 
-    {{data.date_indice_base}} ({{data.montant_indice_base}}). <br /><br />
+    de la rente du mois de {{data.date_virement}}.<br /><br />
+    
         <b>Les honoraires de gestion passent eux à {{data.honoraires}} € TTC. </b><br /><br />
    
+    
     La prochaine date de révision est fixée pour le mois de {{data.date_revision}}. <br /><br />
+    
     Merci de prendre en compte ces nouveaux montants pour vos prochains virements.  <br /><br />
+    
     Nous restons bien entendu à votre disposition pour tout complément d’information. <br /><br />
+     
     Veuillez agréer, nos sincères salutations.
     <br />
     <br />
-     <br /> <br /> <br />
+     <br /> 
 {% for i in 0..250 %}
     &nbsp;
 {% endfor %}

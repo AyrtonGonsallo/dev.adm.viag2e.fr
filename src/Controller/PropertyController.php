@@ -1025,8 +1025,15 @@ class PropertyController extends AbstractController
         $taux_hon = $this->getDoctrine()
         ->getRepository(Honoraire::class)
         ->find($taux_id);
+        $formule='rdb*taux';
         $res=$taux_hon->getValeur()*$rdb/100;
-        return new JsonResponse(['formule'=> 'rdb*taux','res' => $res,'taux'=>$taux_hon->getValeur(),'rdb'=>$rdb ]);
+        if($res<$taux_hon->getMinimum()){
+            $res=$taux_hon->getMinimum();
+            $formule='rdb*taux (minoré à '.$taux_hon->getMinimum().')';
+        }
+       
+        
+        return new JsonResponse(['formule'=> $formule,'res' => $res,'taux'=>$taux_hon->getValeur(),'rdb'=>$rdb ]);
         
     }
 

@@ -154,10 +154,10 @@ class CronRegenInvoiceCommand extends Command
         $d = new DateTime('First day of next month');
 
         $this->date = [
-            'current_day'   => utf8_encode(strftime('%A %e %B %Y')),
+            'current_day'   => (strftime('%A %e %B %Y')),
             'current_month' => date('m'),
             'max_days'      => cal_days_in_month(CAL_GREGORIAN, $d->format('m'), $d->format('Y')),
-            'month'         => utf8_encode(strftime('%B', $d->getTimestamp())),
+            'month'         => (strftime('%B', $d->getTimestamp())),
             'month_n'       => $d->format('m'),
             'year'          => $d->format('Y'),
         ];
@@ -237,16 +237,25 @@ class CronRegenInvoiceCommand extends Command
                         $annuity=$plaf;
                     }
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity_base * $property->honorary_rates_object->getValeur()/100;
+                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                        $honoraryRates=$property->honorary_rates_object->getMinimum();
+                    }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                     //$honoraryRates    +=$honoraryRatesTax;
                 }else if(!$property->getIndexationOG2I()){
                     $annuity=$property->valeur_indexation_normale / $property->initial_index_object->getValue() * $property->getInitialAmount() ;
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
+                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                        $honoraryRates=$property->honorary_rates_object->getMinimum();
+                    }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                     //$honoraryRates    +=$honoraryRatesTax;
                 }else{
                     $annuity          = ($property->getRevaluationIndex() > 0) ? $property->getRevaluationIndex() / $property->getInitialIndex() * $property->getInitialAmount() : $property->getInitialAmount();
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
+                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                        $honoraryRates=$property->honorary_rates_object->getMinimum();
+                    }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                     //$honoraryRates    +=$honoraryRatesTax;
                 }
@@ -344,6 +353,12 @@ class CronRegenInvoiceCommand extends Command
                 }
                 else {
                     $number = $last_number->getValue() + 1;
+                    $mht=($property->honorary_rates_object)?(($property->getInitialAmount() * $property->honorary_rates_object->getValeur())/100):0.0;
+                    if($property->honorary_rates_object){
+                        if($mht<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
+                            $mht=$property->honorary_rates_object->getMinimum();
+                        }
+                    }
 
                     $data = [
                         'date'       => $this->date,
@@ -352,7 +367,7 @@ class CronRegenInvoiceCommand extends Command
                         'number'     => Invoice::formatNumber($number, Invoice::TYPE_NOTICE_EXPIRY),
                         'number_int' => $number,
                         'amount'=> $property->getInitialAmount(),
-                        'montantht'    => ($property->honorary_rates_object)?(($property->getInitialAmount() * $property->honorary_rates_object->getValeur())/100):0.0,
+                        'montantht'    => $mht,
                         'tva'        => $parameters['tva'],
                         'property'   => [
                             'id'         => $property->getId(),

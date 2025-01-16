@@ -93,6 +93,17 @@
                             </div>
                         </div> 
                         <div class="col-lg-6">
+                            <label for="form-designation_notaire" class="col-4 col-form-label">Désignation notaire</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.designation_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-designation_notaire', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div> 
+                        <div class="col-lg-6">
                             <label for="form-nom_notaire" class="col-4 col-form-label">Nom du notaire <span class="m--font-danger">*</span></label>
                             <div class="col-12">
                                 <div class="m-typeahead">
