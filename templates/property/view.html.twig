@@ -1850,7 +1850,8 @@ function load_payment_datas(){
     $('#property_payment_form_mois_indice_initial_year').on('change', function() {
         function get_label(id){
             if(id==2){return "Ménages";}
-            else if(id==1){return "Urbains"}
+            else if(id==1){return "Urbains";}
+            else if(id==3){return "IRL";}
         }
         id=$('#form-intitules_indices_initial').find(":selected").val();
         setTimeout(function(){ 

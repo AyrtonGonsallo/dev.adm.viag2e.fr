@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Form\RevaluationHistoryFormType;
 use App\Form\RevaluationHistoryFormType_ogi;
 use App\Form\RevaluationHistoryFormType_urbain;
+use App\Form\RevaluationHistoryFormType_irl;
+
 class IpcController extends AbstractController
 {
     /**
@@ -163,6 +165,72 @@ class IpcController extends AbstractController
         ]);
     }
 
+
+    /**
+     * @Route("/ipc/liste-IRL", name="liste_irl")
+     *
+     * @param Request $request
+     * @return Response
+     * @throws Exception
+     */
+    public function view_indices_irl(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $connection = $em->getConnection();
+        $statement = $connection->prepare("SELECT rh.id,rh.value as 'valeur', rh.comment as 'commentaire',rh.date as 'date_rev' FROM revaluation_history rh WHERE rh.type='IRL' Order by rh.id desc;");
+
+        $statement->execute();
+        $indices = $statement->fetchAll();
+       
+
+        if (empty($indices)) {
+            $this->addFlash('danger', 'Aucun indice n\'est enregistré');
+        }
+        /*
+        foreach ($indices as $indice) {
+
+            $form = $this->createForm(HonoraireFormType::class, $indice);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $manager = $this->getDoctrine()->getManager();
+                $indice->setDateMod(new DateTime());
+
+                if ($old_index !== $indice->getRevaluationIndex()) {
+                    $notifications = $manager
+                        ->getRepository(Notification::class)
+                        ->findProperty('revaluation', $indice);
+
+                    foreach ($notifications as $notification) {
+                        $manager->remove($notification);
+                    }
+
+                    $history = new RevaluationHistory();
+                    $history->setValue($old_index);
+                    $history->setProperty($indice);
+
+                    $indice->setLastRevaluation(new DateTime());
+
+                    $manager->persist($history);
+                }
+
+                $manager->flush();
+                $this->addFlash('success', 'Bien édité');
+            }
+
+            $tva = $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'tva']);
+        }*/
+        
+
+        
+
+        return $this->render('ipc/liste-irl.html.twig', [
+            
+            'indices'  => $indices,
+            
+        ]);
+    }
+
 /**
      * @Route("/ipc/liste-urbains", name="liste_urbains")
      *
@@ -259,6 +327,41 @@ class IpcController extends AbstractController
         }
  		
         return $this->render('ipc/ajouter-indice-urbains.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/ipc/add_indice_irl", name="add_indice_irl")
+     *
+     * @return Response
+     */
+    public function add_indice_irl(Request $request)
+    {
+        $manager = $this->getDoctrine()->getManager();
+        $revaluationHistoryIPC_Irl = new RevaluationHistory();
+        //$revaluationHistoryIPC_Irl->setDate(new \DateTime());
+        $revaluationHistoryIPC_Irl->setType("IRL");
+        $form = $this->createForm(RevaluationHistoryFormType_irl::class, $revaluationHistoryIPC_Irl);
+
+        // 2) handle the submit (will only happen on POST)
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+           
+
+            // 4) save the RevaluationHistory!
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($revaluationHistoryIPC_Irl);
+            $entityManager->flush();
+
+            // ... do any other work - like sending them an email, etc
+            // maybe set a "flash" success message for the revaluationHistory
+
+            return $this->redirectToRoute('liste_irl');
+        }
+ 		
+        return $this->render('ipc/ajouter-indice-irl.html.twig', [
             'form' => $form->createView()
         ]);
     }

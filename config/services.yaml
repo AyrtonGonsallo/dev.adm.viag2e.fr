@@ -17,7 +17,10 @@ parameters:
 
     google_credentials: '%kernel.project_dir%/config/packages/google/credentials.json'
     google_token: '%kernel.project_dir%/config/packages/google/token.json'
-    google_folder: '1DoxwBBiD2QuGjAiAt3Mh4IxZekilydnp'
+    google_folder: '1maR2RuhHHBNu_xgXT5A0ePStkuLvnx2J'
+    new_google_credentials: '%kernel.project_dir%/config/packages/google/credentials2.json'
+    new_google_token: '%kernel.project_dir%/config/packages/google/token2.json'
+    new_google_folder: '12CLwTvchn7qSsaqJPue1NbvTibCPpSGG'
 
     mail_from: 'gestion@univers-viager.fr'
 

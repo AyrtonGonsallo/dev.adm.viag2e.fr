@@ -44,10 +44,12 @@ class Property
     ];
     public const intitule_indice_initial_menages_urbains = 1;
     public const intitule_indice_initial_ensemble_des_menages = 2;
+    public const intitule_indice_initial_irl = 3;
   
     public const intitules_indices_initial = [
         self::intitule_indice_initial_ensemble_des_menages => 'Ensemble des ménages',
         self::intitule_indice_initial_menages_urbains => 'Ménages urbains',
+        self::intitule_indice_initial_irl => 'IRL',
         
     ];
     public const BUYERS_HONORARIES = 1;

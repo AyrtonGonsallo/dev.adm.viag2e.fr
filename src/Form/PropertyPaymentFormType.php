@@ -76,9 +76,10 @@ class PropertyPaymentFormType extends AbstractType
                             ->orderBy('rh.id', 'DESC');
                     }else{
                         return $er->createQueryBuilder('rh')
-                        ->where('rh.type LIKE :key1 or rh.type LIKE :key2')
+                        ->where('rh.type LIKE :key1 or rh.type LIKE :key2 or rh.type LIKE :key3')
                         ->setParameter('key1', "Urbains")
                         ->setParameter('key2', "Ménages")
+                        ->setParameter('key3', "IRL")
                             ->orderBy('rh.id', 'DESC');
                     }
                     
@@ -94,10 +95,11 @@ class PropertyPaymentFormType extends AbstractType
                 'query_builder' => function (EntityRepository $er)  use($options){
                     
                         return $er->createQueryBuilder('rh')
-                        ->where('rh.type LIKE :key1 or rh.type LIKE :key2 or rh.type LIKE :key3')
+                        ->where('rh.type LIKE :key1 or rh.type LIKE :key2 or rh.type LIKE :key3 or rh.type LIKE :key4')
                         ->setParameter('key1', "Urbains")
                         ->setParameter('key2', "Ménages")
                         ->setParameter('key3', "OGI")
+                        ->setParameter('key4', "IRL")
                         ->orderBy('rh.type', 'ASC')
                         ->addOrderBy('rh.date', 'DESC');
                     
@@ -174,8 +176,13 @@ class PropertyPaymentFormType extends AbstractType
         }
         
         // Sinon, vérifiez si le texte contient 'ménages' et retournez ce mot
-        if ($texte == 2) {
+        else if ($texte == 2) {
             return 'Ménages';
+        }
+
+        // Sinon, vérifiez si le texte contient 'ménages' et retournez ce mot
+        else if ($texte == 3) {
+            return 'IRL';
         }
         
         // Si aucun des mots n'est trouvé, retourner une chaîne vide
