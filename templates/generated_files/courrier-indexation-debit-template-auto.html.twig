@@ -29,7 +29,7 @@
                 Vincent GIBELIN - Directeur <br />
                 58, rue Fondaudège <br />
                 33000 BORDEAUX <br />
-                Tel : 05.56.21.91.44 - 06.67.11.61.8 <br />
+                Tel : 05.56.21.91.44 - 06.67.11.61.83 <br />
                 Email : gestion@univers-viager.fr <br />
                 Site internet : www.univers-viager.fr <br />
             </td>
@@ -84,7 +84,7 @@
     de la rente du mois de {{data.date_virement}}:<br /><br />
     Rente initiale ({{data.ia}} €) x Nouvel indice de {{data.date_indice_actuel}} ({{data.montant_indice_actuel}}) / Indice de base de 
     {{data.date_indice_base}} ({{data.montant_indice_base}}). <br /><br />
-    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_BUYERS') and not data.property.getDebirentierDifferent()  %}
+    {% if data.property.warrant.type == constant('App\\Entity\\Warrant::TYPE_BUYERS') and not data.property.getDebirentierDifferent() and data.honoraires >0  %}
         <b>Les honoraires de gestion passent eux à {{data.honoraires}} € TTC. </b><br /><br />
     {% endif %}
     La prochaine date de révision est fixée pour le mois de {{data.date_revision}}. <br /><br />

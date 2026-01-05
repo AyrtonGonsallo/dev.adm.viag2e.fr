@@ -114,7 +114,7 @@ class InvoiceGenerator
                     break;
             }
 
-            $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+            $pdf->output($this->path. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {
             $pdf->clean();
@@ -197,7 +197,7 @@ class InvoiceGenerator
 
             
 
-            $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+            $pdf->output($this->path. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {
             $pdf->clean();
@@ -247,7 +247,7 @@ class InvoiceGenerator
                     break;
             }
 
-            $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf'. $fileName, 'F');
+            $pdf->output($this->path. $fileName, 'F');
             return $this->path . $fileName;
         } catch (Html2PdfException $e) {
             $pdf->clean();
@@ -307,12 +307,12 @@ class InvoiceGenerator
                $data = array();
                 $now_date=new DateTime();
                 $now_date2=new DateTime();
-                $next_month_date=$now_date2->modify('+0 month');
+                $next_month_date=$now_date2->modify('+1 month');
                 $date_virement = utf8_encode(strftime("%B %Y", strtotime( $next_month_date->format('d-m-Y') )));
                 $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $next_month_date->format('d-m-Y') ))));
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                
-                $date_fdnm = new DateTime('First day of this month');
+                $date_fdnm = new DateTime('First day of next month');
                 //ne pas toucher meme si ca parait insensé
                 $fileName = "Courrier d’indexation Débirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 
@@ -342,7 +342,7 @@ class InvoiceGenerator
                     $indice_m_u = (object) array('value' => 0,'id'=>0);
                 }
 
-                $honorary= ($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100;
+		$honorary= ($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100;
                 if($property->honorary_rates_object && $honorary<$property->honorary_rates_object->getMinimum()){
                     $honorary=$property->honorary_rates_object->getMinimum();
 
@@ -417,12 +417,12 @@ class InvoiceGenerator
                 $data = array();
                 $now_date=new DateTime();
                 $now_date2=new DateTime();
-                $next_month_date=$now_date2->modify('+0 month');
+                $next_month_date=$now_date2->modify('+1 month');
                 $date_virement = utf8_encode(strftime("%B %Y", strtotime( $next_month_date->format('d-m-Y') )));
                 $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $next_month_date->format('d-m-Y') ))));
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                
-                $date_fdnm = new DateTime('First day of this month');
+                $date_fdnm = new DateTime('First day of next month');
                 //ne pas toucher meme si ca parait insensé
                 $fileName = "Courrier d’indexation Crédirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
 
@@ -452,11 +452,10 @@ class InvoiceGenerator
                     $indice_m_u = (object) array('value' => 0,'id'=>0);
                 }
 
-                $honorary=(($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100);
+		 $honorary=(($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100);
                 if($property->honorary_rates_object && $honorary<$property->honorary_rates_object->getMinimum()){
                     $honorary=$property->honorary_rates_object->getMinimum();
                 }
-
                 $data = [
                     'date'       => $now_date,
                     'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
@@ -530,12 +529,12 @@ class InvoiceGenerator
                 $data = array();
                 $now_date=new DateTime();
                 $now_date2=new DateTime();
-                $next_month_date=$now_date2->modify('+0 month');
+                $next_month_date=$now_date2->modify('+1 month');
                 $date_virement = utf8_encode(strftime("%B %Y", strtotime( $next_month_date->format('d-m-Y') )));
                 $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $next_month_date->format('d-m-Y') ))));
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                
-                $date_fdnm = new DateTime('First day of this month');
+                $date_fdnm = new DateTime('First day of next month');
                 //ne pas toucher meme si ca parait insensé
                 $fileName = "Courrier d’indexation Mandant - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 
@@ -564,7 +563,7 @@ class InvoiceGenerator
                     $indice_m_u = (object) array('value' => 0,'id'=>0);
                 }
 
-                $honorary=(($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100);
+		 $honorary=(($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100);
                 if($property->honorary_rates_object && $honorary<$property->honorary_rates_object->getMinimum()){
                     $honorary=$property->honorary_rates_object->getMinimum();
 
@@ -643,12 +642,12 @@ class InvoiceGenerator
                $data = array();
                 $now_date=new DateTime();
                 $now_date2=new DateTime();
-                $next_month_date=$now_date2->modify('+0 month');
+                $next_month_date=$now_date2->modify('+1 month');
                 $date_virement = utf8_encode(strftime("%B %Y", strtotime( $next_month_date->format('d-m-Y') )));
                 $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $next_month_date->format('d-m-Y') ))));
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                
-                $date_fdnm = new DateTime('First day of this month');
+                $date_fdnm = new DateTime('First day of next month');
                 //ne pas toucher meme si ca parait insensé
                 $fileName = "Courrier d’indexation OG2I Débirentier -".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 
@@ -681,7 +680,11 @@ class InvoiceGenerator
                 $res=($indice_og2i->getValue() *$rdb)/$property->valeur_indice_ref_og2_i_object->getValue();
                 $plaff=$property->plafonnement_index_og2_i;
                 $plaff_v=(1+($plaff/100))*$rdb;
-                if(!$plaff || $plaff<=0){
+
+                if($res<$mi){
+                    $rente = $mi;
+                }
+                else if(!$plaff || $plaff<=0){
                     $rente=round($res,2);
                     $is_plaff=false;
                 }
@@ -693,10 +696,11 @@ class InvoiceGenerator
                     $is_plaff=true;
                 }
                 $honoraires = round($rente*$property->honorary_rates_object->getValeur()/100,2);
+
+		$honoraires = round($rente*$property->honorary_rates_object->getValeur()/100,2);
                 if($honoraires<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                     $honoraires=$property->honorary_rates_object->getMinimum();  
                 }
-
                 $data = [
                     'date'       => $now_date,
                     'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
@@ -775,12 +779,12 @@ class InvoiceGenerator
                 $data = array();
                 $now_date=new DateTime();
                 $now_date2=new DateTime();
-                $next_month_date=$now_date2->modify('+0 month');
+                $next_month_date=$now_date2->modify('+1 month');
                 $date_virement = utf8_encode(strftime("%B %Y", strtotime( $next_month_date->format('d-m-Y') )));
                 $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $next_month_date->format('d-m-Y') ))));
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                
-                $date_fdnm = new DateTime('First day of this month');
+                $date_fdnm = new DateTime('First day of next month');
                 //ne pas toucher meme si ca parait insensé
                 $fileName = "Courrier d’indexation OG2I Crédirentier - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
 
@@ -814,7 +818,11 @@ class InvoiceGenerator
                 $res=($indice_og2i->getValue() *$rdb)/$property->valeur_indice_ref_og2_i_object->getValue();
                 $plaff=$property->plafonnement_index_og2_i;
                 $plaff_v=(1+($plaff/100))*$rdb;
-                if(!$plaff || $plaff<=0){
+
+                if($res<$mi){
+                    $rente = $mi;
+                }
+                else if(!$plaff || $plaff<=0){
                     $rente=round($res,2);
                     $is_plaff=false;
                 }
@@ -829,7 +837,6 @@ class InvoiceGenerator
                 if($honoraires<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                     $honoraires=$property->honorary_rates_object->getMinimum();  
                 }
-
                 $data = [
                     'date'       => $now_date,
                     'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),
@@ -911,12 +918,12 @@ class InvoiceGenerator
                 $data = array();
                 $now_date=new DateTime();
                 $now_date2=new DateTime();
-                $next_month_date=$now_date2->modify('+0 month');
+                $next_month_date=$now_date2->modify('+1 month');
                 $date_virement = utf8_encode(strftime("%B %Y", strtotime( $next_month_date->format('d-m-Y') )));
                 $date_revision = utf8_encode(strftime("%B %Y", strtotime('+1 year',strtotime( $next_month_date->format('d-m-Y') ))));
                 $pdf      = new Html2Pdf('P', 'A4', 'fr');
                
-                $date_fdnm = new DateTime('First day of this month');
+                $date_fdnm = new DateTime('First day of next month');
                 //ne pas toucher meme si ca parait insensé
                 $fileName = "Courrier d’indexation OG2I Mandant - ".$property->getId()."-".$now_date->format('d-m-Y h:i:s').".pdf";
                 
@@ -949,7 +956,11 @@ class InvoiceGenerator
                 $res=($indice_og2i->getValue() *$rdb)/$property->valeur_indice_ref_og2_i_object->getValue();
                 $plaff=$property->plafonnement_index_og2_i;
                 $plaff_v=(1+($plaff/100))*$rdb;
-                if(!$plaff || $plaff<=0){
+
+                if($res<$mi){
+                    $rente = $mi;
+                }
+                else if(!$plaff || $plaff<=0){
                     $rente=round($res,2);
                     $is_plaff=false;
                 }
@@ -960,11 +971,10 @@ class InvoiceGenerator
                     $rente=round($plaff_v,2);
                     $is_plaff=true;
                 }
-                $honoraires = round($rente*$property->honorary_rates_object->getValeur()/100,2);
+                 $honoraires = round($rente*$property->honorary_rates_object->getValeur()/100,2);
                 if($honoraires<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                     $honoraires=$property->honorary_rates_object->getMinimum();  
                 }
-
                 $data = [
                     'date'       => $now_date,
                     'current_day'       => utf8_encode(strftime("%d %B %Y", strtotime( $now_date->format('d-m-Y') ))),

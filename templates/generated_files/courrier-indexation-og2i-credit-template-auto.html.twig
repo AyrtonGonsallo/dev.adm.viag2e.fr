@@ -29,7 +29,7 @@
                 Vincent GIBELIN - Directeur <br />
                 58, rue Fondaudège <br />
                 33000 BORDEAUX <br />
-                Tel : 05.56.21.91.44 - 06.67.11.61.8 <br />
+                Tel : 05.56.21.91.44 - 06.67.11.61.83 <br />
                 Email : gestion@univers-viager.fr <br />
                 Site internet : www.univers-viager.fr <br />
             </td>
@@ -90,13 +90,13 @@
     compter du mois de {{data.date_virement}} : 
   <br />
     
-    Le montant actuel de votre rente est de {{data.ia}} €. <br /><br />
+  
     
     {% if not data.is_plaff %}
     
-         Rente de base = Rente actuelle ({{data.ia}} €) x Indice og2i de base de {{data.date_indice_base_og2i}} ({{data.montant_indice_base_og2i}}) / Nouvel indice de {{data.date_indice_base}} ({{data.montant_indice_base}}). <br /><br />
+        
 
-        Nouveau montant = Rente de base ({{data.rdb}} €) x Nouvel indice de {{data.date_indice_actuel_og2i}} ({{data.montant_indice_actuel_og2i}}) / indice de référence de 
+        Nouveau montant = Rente actuelle ({{data.rdb}} €) x Nouvel indice de {{data.date_indice_actuel_og2i}} ({{data.montant_indice_actuel_og2i}}) / indice de référence de 
          {{data.date_indice_base_og2i}} ({{data.montant_indice_base_og2i}}). <br /><br />
     {% endif %}
     {% if data.is_plaff %}
@@ -106,7 +106,7 @@
     de la rente du mois de {{data.date_virement}}.<br /><br />
     
     
-    {% if (data.property.firstname1 == data.property.warrant.firstname  or  data.property.firstname2 == data.property.warrant.firstname )  %}
+    {% if (data.property.firstname1 == data.property.warrant.firstname  or  data.property.firstname2 == data.property.warrant.firstname )  and  data.honoraires >0  %}
         <br />
         <b>Les honoraires de gestion passent eux à {{data.honoraires}} € TTC. </b><br /><br />
     {% endif %}

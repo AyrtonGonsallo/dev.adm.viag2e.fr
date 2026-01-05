@@ -17,7 +17,7 @@ class Invoice implements JsonSerializable
     public const CATEGORY_GARBAGE = 2; // Ordures
     public const CATEGORY_MANUAL = 3; // Manuel
     public const CATEGORY_AVOIR = 4; // inverse d'une facture / remboursement / avoirs
-    public const CATEGORY_REGULE_CONDOMINIUM_FEES = 5; // Co-pro
+    public const CATEGORY_REGULE_CONDOMINIUM_FEES = 5; // regule
 
     public const RECURSION_MONTHLY   = 1; // Mensuel
     public const RECURSION_OTP       = 2; // Exceptionnel

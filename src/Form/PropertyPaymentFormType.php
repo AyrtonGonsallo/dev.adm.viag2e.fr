@@ -69,19 +69,14 @@ class PropertyPaymentFormType extends AbstractType
                 'required' => false,
                 'class' => RevaluationHistory::class,
                 'query_builder' => function (EntityRepository $er)  use($options){
-                    if($options['data']->getIntitulesIndicesInitial()){
-                        return $er->createQueryBuilder('rh')
-                        ->where('rh.type LIKE :key1')
-                        ->setParameter('key1', $this->extraireMotPertinent($options['data']->getIntitulesIndicesInitial()))
-                            ->orderBy('rh.id', 'DESC');
-                    }else{
+                    
                         return $er->createQueryBuilder('rh')
                         ->where('rh.type LIKE :key1 or rh.type LIKE :key2 or rh.type LIKE :key3')
                         ->setParameter('key1', "Urbains")
                         ->setParameter('key2', "Ménages")
                         ->setParameter('key3', "IRL")
                             ->orderBy('rh.id', 'DESC');
-                    }
+                    
                     
                 },
                 'choice_label' => function (RevaluationHistory $rh): string {

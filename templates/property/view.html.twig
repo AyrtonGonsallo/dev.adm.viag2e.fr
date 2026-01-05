@@ -983,6 +983,7 @@
                                             <div class="col-12">
                                                 <h3>
                                                     <span id="montant_rente">0.00€</span>
+                                                    <span id="montant_rente_sans_arrondis" style="display:none">0.00€</span>
                                                 </h3>
                                             </div>
                                         </div>
@@ -1568,15 +1569,18 @@ function get_nv_montant_rente(ri,ii,ia){
                         res=data['res'].toFixed(2).toString()+" €"
                         console.log(data)
                         $('#montant_rente').html(res)
+                        res_sans_arrondis=data['res'].toString()
+                        $('#montant_rente_sans_arrondis').html(res_sans_arrondis)
                     }
                 });
         }
-        function get_nv_montant_rente_og2i(viog2ir,vir,rdb,p){
-            let route = "{{ path('get_nv_montant_rente', {'p':'p_val','viog2ir':'viog2ir_val','rdb':'rdb_val','vir':'vir_val'}) }}";
+        function get_nv_montant_rente_og2i(viog2ir,vir,rdb,ia,p){
+            let route = "{{ path('get_nv_montant_rente', {'rdb_initial':'rdb_initial_val','p':'p_val','viog2ir':'viog2ir_val','rdb':'rdb_val','vir':'vir_val'}) }}";
                 changePath0 = route.replace('viog2ir_val', viog2ir);
                 changePath1 = changePath0.replace('rdb_val', rdb);
                 changePath2 = changePath1.replace('p_val', p);
-                changePath = changePath2.replace('vir_val', vir);
+                changePath3 = changePath2.replace('rdb_initial_val', ia);
+                changePath = changePath3.replace('vir_val', vir);
                 $.ajax({
                     method: "post",
                     url:changePath,
@@ -1629,11 +1633,12 @@ function load_payment_datas(){
                     //--nv mt
                     
                     setTimeout(function(){ 
-                            rdb=parseFloat($('#montant_rente').html().split(" ")[0])
+                            rdb=parseFloat($('#montant_rente_sans_arrondis').html().split(" ")[0])
                             vir=$('#form-valeur_indice_reference_object').find(":selected").html().split(" ")[0]
                             p=($('#form-plafonnement_index_og2_i').val())?$('#form-plafonnement_index_og2_i').val():2;
                             viog2ir=$("#form-valeur_indice_ref_og2_i_object").find(":selected").val()
-                            get_nv_montant_rente_og2i(viog2ir,vir,rdb,p)
+                            ia=$('#form-initialAmount').val()
+                            get_nv_montant_rente_og2i(viog2ir,vir,rdb,ia,p)
                         }, 2000);
                     // honn
                     setTimeout(function(){ 
@@ -2156,9 +2161,9 @@ load_payment_datas()
                     get_honoraires(taux,rdb);
                 }
             }else{
-                if($('#montant_rente').html()!="0.00€"){
+                if($('#montant_rente_sans_arrondis').html()!="0.00€"){
                     taux=$(this).find(":selected").val()
-                    rdb=parseFloat($('#montant_rente').html().split(" ")[0])
+                    rdb=parseFloat($('#montant_rente_sans_arrondis').html().split(" ")[0])
                     get_honoraires(taux,rdb);
                 }
             }

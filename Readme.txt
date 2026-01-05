@@ -257,3 +257,14 @@ SELECT id,title,revaluation_date,date_maj_indice_ref,warrant_id FROM `property` 
 94,95,96,97,98,99,100,101,106,107,109,110,111
 
 SELECT id,title,date_maj_indice_ref FROM `property` where id in(125,132,134,133,122) ORDER BY `id` DESC;
+
+SELECT * FROM `invoice` where id in (14212,14213,14412,14580,14581,14764,14765,14805,14806,14809,14810,14813,14814,15432,15433);
+SELECT * FROM `invoice` where id in (14212,14213,14412,14580,14581,14764,14765,14805,14806,14809,14810,14813,14814,15432,15433) and date_generation_avoir is null and category=0;
+
+nash
+,chdAaACWvwE
+
+
+UPDATE `property` SET `date_maj_indice_ref` = '2025-10-14 14:33:10' WHERE revaluation_date like "1-1" and date_maj_indice_ref is null;
+SELECT id,title,revaluation_date,date_maj_indice_ref,active FROM `property` WHERE revaluation_date like "1-1";
+verifiez le taux d'honoraire du bien 110 il cause une panne

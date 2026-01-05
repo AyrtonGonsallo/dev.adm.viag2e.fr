@@ -220,7 +220,7 @@ class RecapCommand extends Command
                     'lastname'   => $property->getLastname1(),
                     'firstname2' => $property->getFirstname2(),
                     'lastname2'  => $property->getLastname2(),
-                    'address'    => $property->getAddress(),
+                    'address'    => $property->getGoodAddress(),
                     'postalcode' => $property->getPostalCode(),
                     'city'       => $property->getCity(),
                     'mail'       => $property->getMail1(),

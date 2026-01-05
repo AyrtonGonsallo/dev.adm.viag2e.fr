@@ -151,7 +151,8 @@ class CronRegenInvoiceCommand extends Command
             'site'       => $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_site'])->getValue(),
         ];
 
-        $d = new DateTime('First day of next month');
+        //$d = new DateTime('First day of next month');
+        $d = new DateTime('2024-08-01');
 
         $this->date = [
             'current_day'   => (strftime('%A %e %B %Y')),

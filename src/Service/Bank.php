@@ -276,7 +276,11 @@ class Bank
     {
         switch ($data['recursion']) {
             case Invoice::RECURSION_OTP:
-                return number_format($data['amount'], 2, '.', '');
+                $amount = isset($data['amount']) && $data['amount'] !== null
+                    ? $data['amount']
+                    : (isset($data['montantttc']) ? $data['montantttc'] : 0);
+            
+                return number_format($amount, 2, '.', '');
                 break;
             case Invoice::RECURSION_QUARTERLY:
                 return number_format($data['property']['condominiumFees'], 2, '.', '');

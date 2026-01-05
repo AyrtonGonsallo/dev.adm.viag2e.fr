@@ -978,7 +978,7 @@ class PropertyController extends AbstractController
 
     
 /**
-     * @Route("/get_nv_montant_rente/{viog2ir}/{vir}/{rdb}/{p}", name="get_nv_montant_rente",defaults={"vir"=2023,"p"=2.5,"rdb"=2023,"viog2ir"=10})
+     * @Route("/get_nv_montant_rente/{viog2ir}/{vir}/{rdb}/{rdb_initial}/{p}", name="get_nv_montant_rente",defaults={"vir"=2023,"p"=2.5,"rdb"=2023,"rdb_initial"=2023,"viog2ir"=10})
      *
      * @param Request $request
      * @param DriveManager $driveManager
@@ -987,24 +987,31 @@ class PropertyController extends AbstractController
     public function get_nv_montant_rente(Request $request)
     {
         //0,975*(rdb*vir/viog2ir)
-        $rdb=$request->get('rdb');
-        $plaf=$request->get('p');
+       $rdb=$request->get('rdb');
+        $plaf= floatval($request->get('p'));
         $vir=$request->get('vir');
+        $rdb_initial=floatval($request->get('rdb_initial'));
         $viog2ir_id=$request->get('viog2ir');
+        
         
         $viog2ir_object = $this->getDoctrine()
         ->getRepository(RevaluationHistory::class)
         ->find($viog2ir_id);
         $res=($vir*$rdb)/$viog2ir_object->getValue();
         $plaf_v=(1+($plaf/100))*$rdb;
-        if($res<$plaf_v){
+        if($res<$rdb_initial){
+            $res=$rdb_initial;
+            $formule='(rdb_initial)';
+        }
+        else if($res<$plaf_v){
             $res=$res;
             $formule='(rdb*vir/viog2ir)';
-        }else{
+        }
+        else{
             $res=$plaf_v;
             $formule="(1+(plaf/100))*res";
         }
-        return new JsonResponse(['formule'=>$formule ,'res' => $res,'plaf' => $plaf,'plaf_val' => $plaf_v,'viog2ir'=>$viog2ir_object->getValue(),'vir'=>$vir,'rdb'=>$rdb ]);
+        return new JsonResponse(['formule'=>$formule ,'res' => $res,'plaf' => $plaf,'plaf_val' => $plaf_v,'viog2ir'=>$viog2ir_object->getValue(),'vir'=>$vir,'rdb'=>$rdb,'rdb_initial'=>$rdb_initial ]);
         
     }
 

@@ -75,7 +75,7 @@ class CronRegenerateInvoicesCommand extends Command
         $this->mailer = $mailer;
         $this->params = $params;
         $this->twig = $this->container->get('twig');
-        $this->invoice_number = 5812;
+        $this->invoice_number = 5766;
         $this->pdf_dir = $this->params->get('pdf_tmp_dir');
         $this->pdf_logo = $this->params->get('pdf_logo_path');
 
@@ -162,7 +162,7 @@ class CronRegenerateInvoicesCommand extends Command
           function processNumber(int $number)
           {
               static $assignedNumbers = []; // Keeps track of numbers and their corresponding results
-              static $nextNumber = 5800; // Starting value for the first number
+              static $nextNumber = 6554; // Starting value for the first number
           
               // Check if the number has already been assigned a value
               if (isset($assignedNumbers[$number])) {
@@ -182,16 +182,14 @@ class CronRegenerateInvoicesCommand extends Command
         
 
           
-        if (date('d') == 21) {
+        if (date('d') == 19) {
         
-            
-
 
             $io->comment('Creating avoirs');
             $quittances = $this->manager
                 ->getRepository(Invoice::class)
                 ->findAvoirsTogenerate(50);
-                $number=5812;
+                $number=6554;
             foreach ($quittances as $quittance) {
                 
                 $data=$quittance->getData();
@@ -329,8 +327,8 @@ code de janvier 2024
     public function generateAvoir(SymfonyStyle &$io, array $data, array $parameters, Property $property,Invoice $invoice,int $number)
     {
         try {   
-			$number=processNumber($data["number_int"]);
-          $type=$invoice->getFile()?"rente":"honoraire";
+		$number=processNumber($data["number_int"]);
+        $type=$invoice->getFile()?"rente":"honoraire";
         $io->note("generation d'avoir avec le numero ".$number." sur la facture ".$data["number_int"]." du fichier de type ".$type." avec le numéro ".$number);
         
         $invoice2 = new Invoice();
@@ -387,8 +385,22 @@ code de janvier 2024
        // $invoice2->setData($data);
         $invoice->date_generation_avoir=new DateTime();
        
-        $filePath = $this->generator->generateAvoirFile($data, $parameters);
-        $filePath2= $this->generator->generateAvoirFile2($data, $parameters);
+        
+        if($invoice->getCategory() == Invoice::CATEGORY_ANNUITY) {
+            $filePath = $this->generator->generateAvoirFile($data, $parameters);
+            $filePath2= $this->generator->generateAvoirFile2($data, $parameters);
+        }
+        else if($invoice->getCategory() == Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES) {
+            $io->note("Un seul fichier pour le type ".$invoice->getCategory()." et le montant ".$data['montantttc']);
+            $data['amount']=$data['montantttc'];
+            $filePath = $this->generator->generateAvoirFile($data, $parameters);
+            $filePath2= -1;
+        }
+        else{
+            $filePath = $this->generator->generateAvoirFile($data, $parameters);
+            $filePath2= -1;
+        }
+        
 
         $cond_h_n=($filePath2 != -1)?true:false; //honoraires nuls ?
         $cond_r_n=($filePath != -1)?true:false; //rente nulle ?
@@ -440,7 +452,7 @@ code de janvier 2024
                 if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                     $message = (new Swift_Message('Avoir '.$invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
-                        ->setBcc($this->mail_from)
+                        ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                         ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_avoir.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
@@ -448,7 +460,7 @@ code de janvier 2024
                 }else{
                     $message = (new Swift_Message('Avoir '.$invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
-                        ->setBcc($this->mail_from)
+                        ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                         ->setTo($invoice->getProperty()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_avoir.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
@@ -466,7 +478,7 @@ code de janvier 2024
                         if($cond_h_n){
                             $message1 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
-                                ->setBcc($this->mail_from)
+                                ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                                 ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_avoir.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath2));
@@ -485,7 +497,7 @@ code de janvier 2024
                             }
                             $message2 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
-                                ->setBcc($this->mail_from)
+                                ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                                 ->setTo($mailTarget_r)
                                 ->setBody($this->twig->render('invoices/emails/notice_avoir.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath));
@@ -496,7 +508,7 @@ code de janvier 2024
                         $io->note($invoice->getProperty()->getId()." mandat acquereur");
                         $message = (new Swift_Message('Avoir '.$invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
-                                ->setBcc($this->mail_from)
+                                ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                                 ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_avoir.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ;
@@ -688,7 +700,7 @@ code de janvier 2024
                 if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                     $message = (new Swift_Message($invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
-                        ->setBcc($this->mail_from)
+                        ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                         ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
@@ -696,7 +708,7 @@ code de janvier 2024
                 }else{
                     $message = (new Swift_Message($invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
-                        ->setBcc($this->mail_from)
+                        ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                         ->setTo($invoice->getProperty()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
@@ -714,7 +726,7 @@ code de janvier 2024
                         if($cond_h_n){
                             $message1 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
-                                ->setBcc($this->mail_from)
+                                ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                                 ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath2));
@@ -733,7 +745,7 @@ code de janvier 2024
                             }
                             $message2 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
-                                ->setBcc($this->mail_from)
+                                ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                                 ->setTo($mailTarget_r)
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath));
@@ -744,7 +756,7 @@ code de janvier 2024
                         $io->note($invoice->getProperty()->getId()." mandat acquereur");
                         $message = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
-                                ->setBcc($this->mail_from)
+                                ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                                 ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ;
@@ -925,7 +937,7 @@ code de janvier 2024
                 if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                     $message = (new Swift_Message($invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
-                        ->setBcc($this->mail_from)
+                        ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                         ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
@@ -933,7 +945,7 @@ code de janvier 2024
                 }else{
                     $message = (new Swift_Message($invoice->getMailSubject()))
                         ->setFrom($this->mail_from)
-                        ->setBcc($this->mail_from)
+                        ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                         ->setTo($invoice->getProperty()->getMail1())
                         ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                         ->attach(Swift_Attachment::fromPath($filePath));
@@ -951,7 +963,7 @@ code de janvier 2024
                         if($cond_h_n){
                             $message1 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
-                                ->setBcc($this->mail_from)
+                                ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                                 ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath2));
@@ -970,7 +982,7 @@ code de janvier 2024
                             }
                             $message2 = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
-                                ->setBcc($this->mail_from)
+                                ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                                 ->setTo($mailTarget_r)
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ->attach(Swift_Attachment::fromPath($filePath));
@@ -981,7 +993,7 @@ code de janvier 2024
                         $io->note($invoice->getProperty()->getId()." mandat acquereur");
                         $message = (new Swift_Message($invoice->getMailSubject()))
                                 ->setFrom($this->mail_from)
-                                ->setBcc($this->mail_from)
+                                ->setBcc(["agonsallo@gmail.com", $this->mail_from])
                                 ->setTo($invoice->getProperty()->getWarrant()->getMail1())
                                 ->setBody($this->twig->render('invoices/emails/notice_expiry.twig', ['numero'=> "{$data['old_number']}",'type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html')
                                 ;

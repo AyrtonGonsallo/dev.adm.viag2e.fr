@@ -43,7 +43,7 @@ class CronInvoicesCommand extends Command
     use LockableTrait;
 
 
-    private const PROCESS_MAX = 15;
+    private const PROCESS_MAX = 50;
     protected static $defaultName = 'cron:invoices';
 
     private $container;
@@ -312,7 +312,7 @@ class CronInvoicesCommand extends Command
 
             $io->note("OTP invoice ({$data['type']}) generated for id {$pendingInvoice->getProperty()->getId()}");
         }
-       if (date('d') >= 19) {
+       if (date('d') <= 19) {
             function get_label($i){
                 if($i==1){
                     return 'Urbains';
@@ -486,7 +486,7 @@ class CronInvoicesCommand extends Command
 
         }
 
-        if (date('d') >= 20) {
+        if (date('d') <= 20) {
             // Quarterly invoices ce sont les charges de copro
             if(in_array(date('m'), [12, 3, 6, 9])) { //$d->format('m')
                 $date=new DateTime('last day of last month');
@@ -626,17 +626,20 @@ class CronInvoicesCommand extends Command
 							 $io->note("annuity_base=".$indice_og2i_ma->getValue()."*".$property->getInitialAmount()."/".$property->initial_index_object->getValue());
 					$io->note("annuity=".$annuity_base."*".$property->valeur_indexation_normale."/".$property->valeur_indice_ref_og2_i_object->getValue());
                     $plaf=(1+($property->plafonnement_index_og2_i/100))*$annuity_base;
-                    if(!$property->plafonnement_index_og2_i || $property->plafonnement_index_og2_i<=0){
-                        $annuity= $annuity;
+                    if($annuity_base<$property->getInitialAmount()){
+                        $annuity = $property->getInitialAmount();
+                    }
+                    else if(!$property->plafonnement_index_og2_i || $property->plafonnement_index_og2_i<=0){
+                        $annuity = $annuity;
                     }else if($annuity<$plaf){
-                        $annuity= $annuity;
+                        $annuity = $annuity;
                     }
 					else{
-                        $annuity=$plaf;
+                        $annuity = $plaf;
                     }
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
-                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
-                        $honoraryRates=$property->honorary_rates_object->getMinimum();
+                    if($honoraryRates<30 && $property->honorary_rates_object->getId()==24){
+                        $honoraryRates=30;
                     }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                     //$honoraryRates    +=$honoraryRatesTax;
@@ -645,8 +648,8 @@ class CronInvoicesCommand extends Command
 					$io->note("annuity=".$property->valeur_indexation_normale."*".$property->getInitialAmount()."/".$property->initial_index_object->getValue());
 
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
-                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
-                        $honoraryRates=$property->honorary_rates_object->getMinimum();
+                    if($honoraryRates<30 && $property->honorary_rates_object->getId()==24){
+                        $honoraryRates=30;
                     }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                     //$honoraryRates    +=$honoraryRatesTax;
@@ -655,8 +658,8 @@ class CronInvoicesCommand extends Command
 					$io->note("annuity=".$property->getRevaluationIndex()."*".$property->getInitialAmount()."/".$property->getInitialIndex());
 
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
-                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
-                        $honoraryRates=$property->honorary_rates_object->getMinimum();
+                    if($honoraryRates<30 && $property->honorary_rates_object->getId()==24){
+                        $honoraryRates=30;
                     }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                     //$honoraryRates    +=$honoraryRatesTax;
@@ -759,8 +762,8 @@ class CronInvoicesCommand extends Command
                     $number = $last_number->getValue() + 1;
                     $mht=($property->honorary_rates_object)?(($property->getInitialAmount() * $property->honorary_rates_object->getValeur())/100):0.0;
                     if($property->honorary_rates_object){
-                        if($mht<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
-                            $mht=$property->honorary_rates_object->getMinimum();
+                        if($mht<30 && $property->honorary_rates_object->getId()==24){
+                            $mht=30;
                         }
                     }
                     $data = [
@@ -880,8 +883,12 @@ class CronInvoicesCommand extends Command
                 $invoice->getProperty()->setLastReceipt(new DateTime());
                 $invoice->setStatus(Invoice::STATUS_TREATED);
             }
-            $this->manager->flush();
-
+            $io->note("before");
+            
+$this->manager->flush();
+            
+            
+$io->note("after");
             $io->note("Receipt ({$data['type']}) generated for id {$invoice->getProperty()->getId()}");
         }
 
@@ -1360,7 +1367,7 @@ class CronInvoicesCommand extends Command
                     $file2->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$invoice->getId()} - R file2");
                 }
                 $file2->setWarrant($property->getWarrant());
-                /** @noinspection PhpUnhandledExceptionInspection */
+                
                 $file2->setDriveId($this->drive->addFile($file2->getName(), $filePath2, File::TYPE_INVOICE, $property->getWarrant()->getId()));
                 $this->manager->persist($file2);
             }
@@ -1470,9 +1477,7 @@ class CronInvoicesCommand extends Command
 
 //$invoice->setFile($file);
             $invoice->setNumber($data['number_int']);
-            $io->note("before");
             $invoice->setData($data);
-            $io->note("after");
             if($filePath !=-1){$invoice->setFile($file);}
             if($filePath2 !=-1){$invoice->setFile2($file2);}
             $invoice->setDate(new DateTime());

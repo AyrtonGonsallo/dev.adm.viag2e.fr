@@ -218,7 +218,7 @@ class InvoiceRepository extends ServiceEntityRepository
 {
    // $numbers = [5591, 5592, 5588, 5589, 5590, 5581, 5582, 5584, 5585, 5586, 5587, 5681, 5790, 5791, 5682];
    
-   $numbers = [5904];
+   $numbers = [5576];
 
     return $this->createQueryBuilder('i')
         ->where('i.number IN (:numbers)')
