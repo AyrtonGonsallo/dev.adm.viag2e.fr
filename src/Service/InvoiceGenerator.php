@@ -681,7 +681,7 @@ class InvoiceGenerator
                 $plaff=$property->plafonnement_index_og2_i;
                 $plaff_v=(1+($plaff/100))*$rdb;
 
-                if($res<$mi){
+                if($res<$mi){7
                     $rente = $mi;
                 }
                 else if(!$plaff || $plaff<=0){
