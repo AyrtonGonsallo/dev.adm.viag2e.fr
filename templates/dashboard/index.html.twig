@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <div class="m-content">
+    <div class="m-content d-none-2">
         <div class="row">
             <div class="col-xl-6">
                 <div class="m-portlet m-portlet--full-height ">
@@ -235,6 +235,281 @@
                     </div>
                     <div class="m-portlet__body">
                         <div class="m-widget2">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-6">
+                <div class="m-portlet m-portlet--full-height ">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h3 class="m-portlet__head-text">
+                                    Prochaines indexations
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-widget2">
+                            {% for property in next_revaluations %}
+                                <div class="m-widget2__item m-widget2__item--{{ randomColor() }}">
+                                    <div class="m-widget2__checkbox"></div>
+                                    <div class="m-widget2__desc">
+                                        <a href="{{ path('property_view', {'propertyId': property.id}) }}" class="m-widget2__text">
+                                            {{ property.title }} <i>({{ property.id }})</i> <small>({{ property.warrant.firstname }} {{ property.warrant.lastname }})</small>
+                                        </a><br />
+                                        <span class="m-widget2__user-name">
+                                        <span href="#" class="m-widget2__link">
+                                            Par {{ property.creationUser.firstname }} {{ property.creationUser.lastname }}
+                                        </span>
+                                    </span>
+                                    </div>
+                                    <div class="m-widget2__actions">
+                                        <div class="m-widget2__actions-nav">
+                                            <div class="m-dropdown m-dropdown--inline m-dropdown--arrow m-dropdown--align-right m-dropdown--align-push" m-dropdown-toggle="hover">
+                                                <a href="#" class="m-dropdown__toggle">
+                                                    <i class="la la-ellipsis-h"></i>
+                                                </a>
+                                                <div class="m-dropdown__wrapper">
+                                                    <span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
+                                                    <div class="m-dropdown__inner">
+                                                        <div class="m-dropdown__body">
+                                                            <div class="m-dropdown__content">
+                                                                <ul class="m-nav">
+                                                                    <li class="m-nav__item">
+                                                                        <a href="{{ path('warrant_view', {'type': property.warrant.typeString, 'warrantId': property.warrant.id}) }}" class="m-nav__link">
+                                                                            <i class="m-nav__link-icon flaticon-user"></i>
+                                                                            <span class="m-nav__link-text">Mandat</span>
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="text-center">
+                                    Aucun bien
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-6">
+                <div class="m-portlet m-portlet--full-height ">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h3 class="m-portlet__head-text">
+                                    Fin d'exercice de copropriété
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-widget2">
+                            {% for property in copro_edings %}
+                                <div class="m-widget2__item m-widget2__item--{{ randomColor() }}">
+                                    <div class="m-widget2__checkbox"></div>
+                                    <div class="m-widget2__desc">
+                                        <a href="{{ path('property_view', {'propertyId': property.id}) }}" class="m-widget2__text">
+                                            {{ property.title }} <i>({{ property.id }})</i> <small>({{ property.warrant.firstname }} {{ property.warrant.lastname }})</small>
+                                        </a><br />
+                                        <span class="m-widget2__user-name">
+                                        <span href="#" class="m-widget2__link">
+                                            Par {{ property.creationUser.firstname }} {{ property.creationUser.lastname }}
+                                        </span>
+                                    </span>
+                                    </div>
+                                    <div class="m-widget2__actions">
+                                        <div class="m-widget2__actions-nav">
+                                            <div class="m-dropdown m-dropdown--inline m-dropdown--arrow m-dropdown--align-right m-dropdown--align-push" m-dropdown-toggle="hover">
+                                                <a href="#" class="m-dropdown__toggle">
+                                                    <i class="la la-ellipsis-h"></i>
+                                                </a>
+                                                <div class="m-dropdown__wrapper">
+                                                    <span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
+                                                    <div class="m-dropdown__inner">
+                                                        <div class="m-dropdown__body">
+                                                            <div class="m-dropdown__content">
+                                                                <ul class="m-nav">
+                                                                    <li class="m-nav__item">
+                                                                        <a href="{{ path('warrant_view', {'type': property.warrant.typeString, 'warrantId': property.warrant.id}) }}" class="m-nav__link">
+                                                                            <i class="m-nav__link-icon flaticon-user"></i>
+                                                                            <span class="m-nav__link-text">Mandat</span>
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="text-center">
+                                    Aucun bien
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="m-portlet m-portlet--full-height ">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h3 class="m-portlet__head-text">
+                                    Créer une nouvelle notification
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-widget2">
+                            {{ form_start(notification_form) }}
+                                <div class="form-group row">
+                                    <div class="col-lg-12">
+                                        <label for="form-texte" class="col-12 col-form-label">Texte</label>
+                                        <div class="col-12">
+                                            {{ form_widget(notification_form.texte, {'id': 'form-texte', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <label for="form-date_rappel" class="col-12">date de rappel:</label>
+                                        <div class="col-12">
+                                            {{ form_row(notification_form.date_rappel, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_rappel', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                    <input name="notification_submit"  style="width:300px" class="btn btn-outline-success btn-block" type="submit" value="Ajouter la notification" />
+                                {{ form_rest(notification_form) }}
+                            {{ form_end(notification_form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="m-content">
+        <div class="row">
+            <div class="col-xl-6">
+                <div class="m-portlet m-portlet--full-height ">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h3 class="m-portlet__head-text">
+                                    Actualités
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-widget2">
+
+                            {% for rappel in rappels_valides %}
+                                <div class="rappel-item">
+                                    {{ rappel.id }} – 
+                                    Le {{ rappel.expiryLabel }} : {{ rappel.texte }}
+
+                                    <!-- CHECK -->
+                                    <a href="{{ path('rappel_check', {id: rappel.id}) }}"
+                                    title="Marquer comme fait"
+                                    onclick="return confirm('Marquer ce rappel comme effectué ?');">
+                                        <i class="la la-check text-success"></i>
+                                    </a>
+
+                                    <!-- DELETE -->
+                                    <a href="{{ path('rappel_delete', {id: rappel.id}) }}"
+                                    title="Supprimer"
+                                    onclick="return confirm('Supprimer définitivement ce rappel ?');">
+                                        <i class="la la-trash text-danger"></i>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="text-center">
+                                    Aucun rappel
+                                </div>
+                            {% endfor %}
+
+
+
+
+                            <div id="rappel-form-container"  style="display:none;">
+                                {{ form_start(rappel_form) }}
+                                <div class="form-group row">
+                                    <div class="col-lg-12">
+                                        <label for="form-texte" class="col-12 col-form-label">Texte</label>
+                                        <div class="col-12">
+                                            {{ form_widget(rappel_form.texte, {'attr': {'class': 'form-control m-input'},'id': 'form-texte', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label for="form-type" class="col-12">type:</label>
+                                        <div class="col-12">
+                                            {{ form_row(rappel_form.type, {'attr': {'class': 'form-control m-input'}, 'id': 'form-type', 'label': false}) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12">
+                                        <label for="form-date_rappel_mensuel_trimestre" class="col-12">date de rappel:</label>
+                                        <div class="col-12">
+                                            {{ form_row(rappel_form.date_rappel_mensuel_trimestre, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_rappel_mensuel_trimestre', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label for="form-date_rappel_annuel" class="col-12">date de rappel:</label>
+                                        <div class="col-12">
+                                            {{ form_row(rappel_form.date_rappel_annuel, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_rappel_annuel', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <input name="rappel_submit"  style="width:fit-content" class="btn btn-outline-success btn-block" type="submit" value="Ajouter le rappel" />
+                                {{ form_rest(rappel_form) }}
+                                {{ form_end(rappel_form) }}
+                            </div>
+                            <button id="toggle-rappel-btn" class="btn  btn-block">Ajouter un rappel</button>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-xl-6">
+                <div class="m-portlet m-portlet--full-height ">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h3 class="m-portlet__head-text">                            
+                                    Assurances / entretiens périmés
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-widget2">
                             <h6 style="text-decoration:underline">Assurances habitation :</h6>
                             {% for property in fin_assurances_habitation %}
                                 <div class="m-widget2__item m-widget2__item--{{ randomColor() }}">
@@ -423,33 +698,34 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
+
+
+
             <div class="col-xl-6">
                 <div class="m-portlet m-portlet--full-height ">
                     <div class="m-portlet__head">
                         <div class="m-portlet__head-caption">
                             <div class="m-portlet__head-title">
-                                <h3 class="m-portlet__head-text">
-                                    Prochaines indexations
+                                <h3 class="m-portlet__head-text">                  
+                                    Factures non réglées
                                 </h3>
                             </div>
                         </div>
                     </div>
                     <div class="m-portlet__body">
                         <div class="m-widget2">
-                            {% for property in next_revaluations %}
+                            {% for invoice in invoicesToPay %}
                                 <div class="m-widget2__item m-widget2__item--{{ randomColor() }}">
                                     <div class="m-widget2__checkbox"></div>
                                     <div class="m-widget2__desc">
-                                        <a href="{{ path('property_view', {'propertyId': property.id}) }}" class="m-widget2__text">
-                                            {{ property.title }} <i>({{ property.id }})</i> <small>({{ property.warrant.firstname }} {{ property.warrant.lastname }})</small>
+                                        <a href="{{ path('property_view', {'propertyId': invoice.property.id}) }}" class="m-widget2__text">
+                                            {{ invoice.property.title }} <i>({{ invoice.property.id }})</i> - <span class="{{ invoice.statusClass }}">{{ invoice.statusString }}</span>
                                         </a><br />
                                         <span class="m-widget2__user-name">
-                                        <span href="#" class="m-widget2__link">
-                                            Par {{ property.creationUser.firstname }} {{ property.creationUser.lastname }}
+                                            <span href="#" class="m-widget2__link">
+                                                Le {{ invoice.date|date('d-m-Y') }}
+                                            </span>
                                         </span>
-                                    </span>
                                     </div>
                                     <div class="m-widget2__actions">
                                         <div class="m-widget2__actions-nav">
@@ -464,7 +740,13 @@
                                                             <div class="m-dropdown__content">
                                                                 <ul class="m-nav">
                                                                     <li class="m-nav__item">
-                                                                        <a href="{{ path('warrant_view', {'type': property.warrant.typeString, 'warrantId': property.warrant.id}) }}" class="m-nav__link">
+                                                                        <a href="{{ path('property_view', {'propertyId': invoice.property.id}) }}" class="m-nav__link">
+                                                                            <i class="m-nav__link-icon flaticon-home-2"></i>
+                                                                            <span class="m-nav__link-text">Bien</span>
+                                                                        </a>
+                                                                    </li>
+                                                                    <li class="m-nav__item">
+                                                                        <a href="{{ path('warrant_view', {'type': invoice.property.warrant.typeString, 'warrantId': invoice.property.warrant.id}) }}" class="m-nav__link">
                                                                             <i class="m-nav__link-icon flaticon-user"></i>
                                                                             <span class="m-nav__link-text">Mandat</span>
                                                                         </a>
@@ -480,7 +762,7 @@
                                 </div>
                             {% else %}
                                 <div class="text-center">
-                                    Aucun bien
+                                    Aucune facture
                                 </div>
                             {% endfor %}
                         </div>
@@ -488,20 +770,22 @@
                 </div>
             </div>
 
+
+
             <div class="col-xl-6">
                 <div class="m-portlet m-portlet--full-height ">
                     <div class="m-portlet__head">
                         <div class="m-portlet__head-caption">
                             <div class="m-portlet__head-title">
-                                <h3 class="m-portlet__head-text">
-                                    Fin d'exercice de copropriété
+                                <h3 class="m-portlet__head-text">            
+                                    Mandats à renouveler (1 mois avant péremption)
                                 </h3>
                             </div>
                         </div>
                     </div>
                     <div class="m-portlet__body">
                         <div class="m-widget2">
-                            {% for property in copro_edings %}
+                            {% for property in mandat_a_renouveller %}
                                 <div class="m-widget2__item m-widget2__item--{{ randomColor() }}">
                                     <div class="m-widget2__checkbox"></div>
                                     <div class="m-widget2__desc">
@@ -546,44 +830,6 @@
                                     Aucun bien
                                 </div>
                             {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xl-12">
-                <div class="m-portlet m-portlet--full-height ">
-                    <div class="m-portlet__head">
-                        <div class="m-portlet__head-caption">
-                            <div class="m-portlet__head-title">
-                                <h3 class="m-portlet__head-text">
-                                    Créer une nouvelle notification
-                                </h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="m-portlet__body">
-                        <div class="m-widget2">
-                            {{ form_start(notification_form) }}
-                                <div class="form-group row">
-                                    <div class="col-lg-12">
-                                        <label for="form-texte" class="col-12 col-form-label">Texte</label>
-                                        <div class="col-12">
-                                            {{ form_widget(notification_form.texte, {'id': 'form-texte', 'label': false}) }}
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-8">
-                                        <label for="form-date_rappel" class="col-12">date de rappel:</label>
-                                        <div class="col-12">
-                                            {{ form_row(notification_form.date_rappel, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_rappel', 'label': false}) }}
-                                        </div>
-                                    </div>
-                                    
-                                </div>
-                                    <input style="width:300px" class="btn btn-outline-success btn-block" type="submit" value="Ajouter la notification" />
-                                {{ form_rest(notification_form) }}
-                            {{ form_end(notification_form) }}
                         </div>
                     </div>
                 </div>
@@ -591,4 +837,43 @@
         </div>
 
     </div>
+{% endblock %}
+{% block scripts %}
+<script>
+jQuery(document).ready(function($){
+    // Fonction pour gérer l'affichage selon le type sélectionné
+    function toggleDateFields() {
+        let type = $('#form-type').val();
+        console.log("type",type)
+
+        if(type <=3) { // adapter selon tes valeurs exactes
+            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-8').show();
+            $('#form-date_rappel_annuel').closest('.col-lg-8').hide();
+        } else if(type == 4) {
+            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-8').hide();
+            $('#form-date_rappel_annuel').closest('.col-lg-8').show();
+        } else {
+            // si aucun type choisi, cacher les deux
+            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-8').hide();
+            $('#form-date_rappel_annuel').closest('.col-lg-8').hide();
+        }
+    }
+
+    // Au chargement de la page
+    toggleDateFields();
+
+    // Quand on change le type
+    $('#form-type').on('change', function(){
+        toggleDateFields();
+    });
+
+    // Bouton toggle formulaire
+    $('#toggle-rappel-btn').click(function(){
+        $('#rappel-form-container').slideToggle(200);
+        let btn = $(this);
+        btn.text(btn.text() === 'Ajouter un rappel' ? 'Annuler' : 'Ajouter un rappel');
+    });
+});
+</script>
+
 {% endblock %}

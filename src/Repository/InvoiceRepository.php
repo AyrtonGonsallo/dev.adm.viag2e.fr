@@ -300,6 +300,38 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+
+    public function findInvoicesToPay(int $limit)
+    {
+        $dateLimit = new \DateTime('-3 months');
+
+        return $this->createQueryBuilder('i')
+            // factures des 3 derniers mois
+            ->andWhere('i.date >= :dateLimit')
+
+            // catégories autorisées (0,1,3)
+            ->andWhere('i.category IN (:categories)')
+
+            // type = 1
+            ->andWhere('i.type = :type')
+
+            // status = 2
+            ->andWhere('i.status = :status')
+
+            ->setParameter('dateLimit', $dateLimit)
+            ->setParameter('categories', [0, 1, 3])
+            ->setParameter('type', 1)
+            ->setParameter('status', 2)
+
+            ->orderBy('i.date', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+
+
     public function listByDate(DateTime $start, DateTime $end)
     {
         return $this->createQueryBuilder('i')

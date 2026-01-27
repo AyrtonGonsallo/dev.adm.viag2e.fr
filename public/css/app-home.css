@@ -1,0 +1,21 @@
+.d-none-2 {
+    display: none !important;
+}
+
+#form-date_rappel_mensuel_trimestre #form_date_rappel_mensuel_trimestre_month,#form-date_rappel_mensuel_trimestre #form_date_rappel_mensuel_trimestre_year{
+    display: none !important;
+}
+#form-date_rappel_annuel #form_date_rappel_annuel_year{
+    display: none !important;
+}
+#toggle-rappel-btn {
+    background-color: #5867dd;
+    color: wheat;
+    width: fit-content;
+}
+#rappel-form-container #form-texte {
+    width: 100%;
+}
+#rappel-form-container {
+    margin-bottom: 20px;
+}
