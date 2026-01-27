@@ -21,7 +21,7 @@ class RecapGenerator
 
     public function __construct(ContainerInterface $container, ParameterBagInterface $params)
     {
-        $this->path     = '/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf';
+        $this->path     = $params->get('pdf_tmp_dir').'/recap';
         $this->pdf_logo = $params->get('pdf_logo_path');
         $this->twig     = $container->get('twig');
     }

@@ -95,7 +95,7 @@
    
     Le nouveau montant de la rente viagère sera ainsi porté à {{data.rente}} € pour le virement 
     de la rente du mois de {{data.date_virement}}.
-    {% if (data.property.firstname1 == data.property.warrant.firstname  or  data.property.firstname2 == data.property.warrant.firstname ) and data.honoraires >0  %}
+    {% if (data.honoraires and (data.property.firstname1 == data.property.warrant.firstname  or  data.property.firstname2 == data.property.warrant.firstname) )  %}
         <br />
         <b>Les honoraires de gestion passent eux à {{data.honoraires}} € TTC. </b><br /><br />
     {% endif %}

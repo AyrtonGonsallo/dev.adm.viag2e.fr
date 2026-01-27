@@ -38,7 +38,7 @@ class PropertycreateFormType extends AbstractType
             ->add('city', TextType::class)
             ->add('country', TextType::class)
             ->add('firstname1', TextType::class)
-            ->add('no_indexation', CheckboxType::class, ['required' => false])
+			 ->add('no_indexation', CheckboxType::class, ['required' => false])
             ->add('lastname1', TextType::class)
             ->add('adresse_credirentier1', TextType::class, ['required' => false])
             ->add('code_postal_credirentier1', TextType::class, ['required' => false])

@@ -7,7 +7,6 @@ namespace App\Service;
 use App\Entity\BankExport;
 use App\Entity\File;
 use Exception;
-use DateTime;
 use Google_Client;
 use Google_Exception;
 use Google_Service_Drive;
@@ -35,53 +34,25 @@ class DriveManager
     {
         $this->_params = $params;
 
-        $this->_credentials = $this->_params->get('new_google_credentials');
-        $this->_token       = $this->_params->get('new_google_token');
-       // $this->_credentials = $this->_params->get('google_credentials');
-        //$this->_token       = $this->_params->get('google_token');
         if ($params->get('kernel.environment') != 'prod') {
-            $this->_isdev = false;
+            $this->_isdev = true;
             return;
         }
 
-     
+        $this->_credentials = $this->_params->get('google_credentials');
+        $this->_token       = $this->_params->get('google_token');
     }
 
     public function connect() {
         try {
             $this->_client = $this->getClient();
-            $this->_drive = new Google_Service_Drive($this->_client);
-			/*
-			echo "pre lecture<br>";
-            $results = $this->_drive->files->listFiles([
-                'q'      => "'root' in parents and mimeType = 'application/vnd.google-apps.folder'",
-                'fields' => 'files(id, name)',
-            ]);
-			echo "creation repertoire<br>";
-			$folderMetadata = new Google_Service_Drive_DriveFile([
-				'name' => 'Mon Nouveau Dossier 22',
-				'mimeType' => 'application/vnd.google-apps.folder',
-				'parents'  => ['1maR2RuhHHBNu_xgXT5A0ePStkuLvnx2J'] // Dossier parent
-			]);
-
-			$folder = $this->_drive->files->create($folderMetadata, ['fields' => 'id']);
-			echo "lecture<br>";
-			//var_dump($results->getFiles());
-			echo "Dossier créé avec l'ID : " . $folder->id;
-			
-			echo "<br>";
-			//var_dump($results->getFiles());echo "\n";
-            
-            foreach ($results->getFiles() as $file) {
-                echo "Dossier : " . $file->getName() . " (ID: " . $file->getId() . ")<br>";
-            }*/
         } catch (Google_Exception $e) {
-            exit("p1 ".$e->getMessage());
+            exit("gex: ".$e->getMessage());
         } catch (Exception $e) {
-            exit("p2 ".$e->getMessage());
+            exit("ex: ".$e->getMessage());
         }
 
-        
+        $this->_drive = new Google_Service_Drive($this->_client);
     }
 
     public function addExport(string $fileName, string $file)
@@ -117,18 +88,18 @@ class DriveManager
         if(!$this->_connected) {
             $this->connect();
         }
-        
 
         $driveFile = new Google_Service_Drive_DriveFile();
         $driveFile->setName($fileName);
         $driveFile->setParents([$this->getFoldersId($warrantId)[$type]]);
+
         $f = $this->_drive->files->create($driveFile, [
             'data' => file_get_contents($filePath),
             'mimeType' => mime_content_type($filePath),
             'uploadType' => 'multipart',
             'fields' => 'id'
         ]);
-		
+
         return $f->getId();
     }
 
@@ -139,13 +110,14 @@ class DriveManager
         $driveFile->setMimeType('application/vnd.google-apps.folder');
         $driveFile->setParents($parents);
         $file = $this->_drive->files->create($driveFile, ['fields' => 'id']);
+
         return $file->getId();
     }
 
     public function getExportsFolderId(): string
     {
         $results = $this->_drive->files->listFiles([
-            'q'        => "mimeType='application/vnd.google-apps.folder' and '{$this->_params->get('new_google_folder')}' in parents and name = 'Exports'",
+            'q'        => "mimeType='application/vnd.google-apps.folder' and '{$this->_params->get('google_folder')}' in parents and name = 'Exports'",
             'pageSize' => 1,
             'fields'   => 'files(id)'
         ]);
@@ -154,7 +126,7 @@ class DriveManager
         if (count($results->getFiles()) > 0) {
             $folder = $results->getFiles()[0]->getId();
         } else {
-            $folder = $this->createFolder('Exports', [$this->_params->get('new_google_folder')]);
+            $folder = $this->createFolder('Exports', [$this->_params->get('google_folder')]);
         }
 
         return $folder;
@@ -167,7 +139,7 @@ class DriveManager
         }
 
         $results = $this->_drive->files->listFiles([
-            'q'        => "mimeType='application/vnd.google-apps.folder' and '{$this->_params->get('new_google_folder')}' in parents and name = 'Mandat #$warrantId'",
+            'q'        => "mimeType='application/vnd.google-apps.folder' and '{$this->_params->get('google_folder')}' in parents and name = 'Mandat #$warrantId'",
             'pageSize' => 1,
             'fields'   => 'files(id)'
         ]);
@@ -176,7 +148,7 @@ class DriveManager
         if (count($results->getFiles()) > 0) {
             $folders['warrant'] = $results->getFiles()[0]->getId();
         } else {
-            $folders['warrant'] = $this->createFolder('Mandat #'.$warrantId, [$this->_params->get('new_google_folder')]);
+            $folders['warrant'] = $this->createFolder('Mandat #'.$warrantId, [$this->_params->get('google_folder')]);
         }
 
         $results = $this->_drive->files->listFiles([
@@ -239,32 +211,13 @@ class DriveManager
 
     public function getFile(File $file): ?string
     {
+		
         if($this->_isdev) {
             return null;
         }
 
-
-        //en fonction de la date "2025-02-12 19:19:49"
-        // Date de référence
-        $referenceDate = new DateTime("2025-02-12 19:19:49");
-
-        // Récupération de la date du fichier
-        $fileDate = ($file->getDate());
-
-        if ($fileDate > $referenceDate) {
-            $this->_credentials = $this->_params->get('new_google_credentials');
-            $this->_token       = $this->_params->get('new_google_token');
-            $this->connect();
-            
-        }else{
-            $this->_credentials = $this->_params->get('google_credentials');
-            $this->_token       = $this->_params->get('google_token');
-            $this->connect();
-        }
-
-
         if(!$this->_connected) {
-            $this->connect();//en fonction de la date
+            $this->connect();
         }
 
         try {
@@ -288,24 +241,6 @@ class DriveManager
             return null;
         }
 
-        //en fonction de la date "2025-02-12 19:19:49"
-        // Date de référence
-        $referenceDate = new DateTime("2025-02-12 19:19:49");
-
-        // Récupération de la date du fichier
-        $fileDate = ($file2->getDate());
-
-        if ($fileDate > $referenceDate) {
-            $this->_credentials = $this->_params->get('new_google_credentials');
-            $this->_token       = $this->_params->get('new_google_token');
-            $this->connect();
-            
-        }else{
-            $this->_credentials = $this->_params->get('google_credentials');
-            $this->_token       = $this->_params->get('google_token');
-            $this->connect();
-        }
-
         if(!$this->_connected) {
             $this->connect();
         }
@@ -324,19 +259,20 @@ class DriveManager
             return null;
         }
     }
-public function getFilePath(File $file): ?string
+	
+	public function getFilePath(File $file): ?string
     {
-		/*if(!$this->_connected) {
+		if(!$this->_connected) {
             $this->connect();
-        }*/
+        }
         try {
-            //$driveFile = $this->_drive->files->get($file->getDriveId(), ['alt' => 'media']);
+            $driveFile = $this->_drive->files->get($file->getDriveId(), ['alt' => 'media']);
 
             $path = $this->_params->get('tmp_files_dir').'/'.$file->getName().$file->getExtension();
 
-            //$fileSystem = new Filesystem();
+            $fileSystem = new Filesystem();
             //$fileSystem->remove([$path]);
-            //$fileSystem->dumpFile($path, $driveFile->getBody()->getContents());
+            $fileSystem->dumpFile($path, $driveFile->getBody()->getContents());
 
            
             return $path;
@@ -344,7 +280,7 @@ public function getFilePath(File $file): ?string
             return null;
         }
     }
-	
+
     public function listFiles()
     {
         if($this->_isdev) {
@@ -440,18 +376,10 @@ public function getFilePath(File $file): ?string
      */
     private function getClient()
     {
-
-        
         $client = new Google_Client();
         $client->setApplicationName('Viag2e');
-        $client->setScopes([Google_Service_Drive::DRIVE,Google_Service_Drive::DRIVE_FILE, Google_Service_Drive::DRIVE_METADATA]);
-        try {
-			$client->setAuthConfig($this->_credentials);
-			
-		} catch (Exception $e) {
-			exit("Erreur setAuthConfig: " . $e->getMessage().". ".$this->_credentials);
-		}
-
+        $client->setScopes([Google_Service_Drive::DRIVE_FILE, Google_Service_Drive::DRIVE_METADATA]);
+        $client->setAuthConfig($this->_credentials);
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
 
@@ -460,7 +388,6 @@ public function getFilePath(File $file): ?string
         // created automatically when the authorization flow completes for the first
         // time.
         $tokenPath = $this->_token;
-		
         if (file_exists($tokenPath)) {
             $accessToken = json_decode(file_get_contents($tokenPath), true);
             $client->setAccessToken($accessToken);
@@ -482,9 +409,6 @@ public function getFilePath(File $file): ?string
                 $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
                 $client->setAccessToken($accessToken);
 
-				
-				
-				
                 // Check to see if there was an error.
                 if (array_key_exists('error', $accessToken)) {
                     throw new Exception(join(', ', $accessToken));

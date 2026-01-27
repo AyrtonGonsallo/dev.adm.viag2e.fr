@@ -101,7 +101,7 @@ class CronRegenInvoiceCommand extends Command
 
         $start = microtime(true);
 
-        $this->noMail =  $input->getOption('no-mail');
+        $this->noMail =  true;
         if ($this->areMailsDisabled()) {
             $io->note('Mails are disabled');
         }
@@ -151,8 +151,8 @@ class CronRegenInvoiceCommand extends Command
             'site'       => $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_site'])->getValue(),
         ];
 
-        //$d = new DateTime('First day of next month');
-        $d = new DateTime('2024-08-01');
+        $d = new DateTime('First day of next month');
+        //$d = new DateTime('2024-08-01');
 
         $this->date = [
             'current_day'   => (strftime('%A %e %B %Y')),
@@ -237,30 +237,37 @@ class CronRegenInvoiceCommand extends Command
                     }else{
                         $annuity=$plaf;
                     }
-                    $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity_base * $property->honorary_rates_object->getValeur()/100;
-                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
+                   $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
+                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
                         $honoraryRates=$property->honorary_rates_object->getMinimum();
                     }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                     //$honoraryRates    +=$honoraryRatesTax;
                 }else if(!$property->getIndexationOG2I()){
                     $annuity=$property->valeur_indexation_normale / $property->initial_index_object->getValue() * $property->getInitialAmount() ;
+					$io->note("annuity=".$property->valeur_indexation_normale."*".$property->getInitialAmount()."/".$property->initial_index_object->getValue());
+
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
-                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
+                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
                         $honoraryRates=$property->honorary_rates_object->getMinimum();
                     }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                     //$honoraryRates    +=$honoraryRatesTax;
                 }else{
                     $annuity          = ($property->getRevaluationIndex() > 0) ? $property->getRevaluationIndex() / $property->getInitialIndex() * $property->getInitialAmount() : $property->getInitialAmount();
+					$io->note("annuity=".$property->getRevaluationIndex()."*".$property->getInitialAmount()."/".$property->getInitialIndex());
+
                     $honoraryRates    = ($property->hasHonorariesDisabled()) ? 0.0 : $annuity * $property->honorary_rates_object->getValeur()/100;
-                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
+                    if($honoraryRates<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object->getId()==24){
                         $honoraryRates=$property->honorary_rates_object->getMinimum();
                     }
                     $honoraryRatesTax = ($property->hasHonorariesDisabled()) ? 0.0 : $honoraryRates / (100 + $parameters['tva']) * $parameters['tva'];
                     //$honoraryRates    +=$honoraryRatesTax;
                 }
-                
+				 if($honoraryRates<$property->honorary_rates_object->getMinimum() ){
+                        $honoraryRates=$property->honorary_rates_object->getMinimum();
+                    }
+                $io->note("min ({$property->honorary_rates_object->getMinimum()} ) value {$honoraryRates}");
 
                 if ($annuity <= 0) {
                     $io->note("Skipping property {$property->getId()}, annuity = 0");
@@ -300,7 +307,7 @@ class CronRegenInvoiceCommand extends Command
                     ];
 
                     
-                        $number = $last_number->getValue() + ($this->isDryRun() ? $i : 1);
+                        $number = 7289;
 
                         $data = $data_full;
                         $data['number'] = Invoice::formatNumber($number, Invoice::TYPE_NOTICE_EXPIRY);
@@ -336,7 +343,7 @@ class CronRegenInvoiceCommand extends Command
                                 $data["debirentier_different"]= $property->getDebirentierDifferent();
                             }
                         if (!$this->isDryRun()) {
-                            $last_number->setValue($number);
+                            //$last_number->setValue($number);
                         }
 
                         if (($data['property']['honoraryRates'] > 0) || ( $data['property']['annuity'] > 0)) {
@@ -353,11 +360,12 @@ class CronRegenInvoiceCommand extends Command
                     $this->manager->flush();
                 }
                 else {
-                    $number = $last_number->getValue() + 1;
+                    $number = 7289;
                     $mht=($property->honorary_rates_object)?(($property->getInitialAmount() * $property->honorary_rates_object->getValeur())/100):0.0;
                     if($property->honorary_rates_object){
                         if($mht<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
                             $mht=$property->honorary_rates_object->getMinimum();
+							$io->note("min ({$property->honorary_rates_object->getMinimum()} ) value {$mht}");
                         }
                     }
 
@@ -409,7 +417,7 @@ class CronRegenInvoiceCommand extends Command
                         $data["debirentier_different"]= $property->getDebirentierDifferent();
                     }
                     if (!$this->isDryRun()) {
-                        $last_number->setValue($number);
+                        //$last_number->setValue($number);
                     }
 
                     $this->generateInvoice($io, $data, $parameters, $property);

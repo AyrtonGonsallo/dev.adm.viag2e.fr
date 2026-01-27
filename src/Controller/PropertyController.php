@@ -301,7 +301,6 @@ class PropertyController extends AbstractController
                     // each field has an array of errors
                     if(strlen($formField->getErrors())>=3){
                         $errors .= 'Champ: '.$fieldName.'- Erreur: '.$formField->getErrors().'<br/>';
-                        $errors .= 'Si vous essayez de changer un indice dans une liste: choisissez la valeur vide, enregistrez et au rechargement de la page vous pourriez choisir votre valeur.<br/>';
                     }
                 }
                 $this->addFlash('error', 'Problème lors de l\'enregistrement <br/>'.$errors);
@@ -511,7 +510,7 @@ class PropertyController extends AbstractController
                         //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
                         $pdf->writeHTML($this->twig->render('regul_annuelle/credit.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     }
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output('/var/www/vhosts/adm.univers-viager.com/adm.univers-viager.com/pdf/'. $fileName, 'F');
                     
                     $file = new File();
                     $file->setType(File::TYPE_DOCUMENT);
@@ -729,7 +728,7 @@ class PropertyController extends AbstractController
         $options="<option value=''></option>";
         $i=0;
         foreach ($rhs as  $rh) {
-            $options.='<option selected value="'.$rh->getId().'">'.$rh->getValue().' '.$rh->getType().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp())) .'</option>';
+            $options.='<option selected value="'.$rh->getId().'">'.$rh->getValue().' '.$rh->getType().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp())).'</option>';
             $i++;
             if($i==1){continue;}
         }
@@ -756,15 +755,7 @@ class PropertyController extends AbstractController
         }else{
             $indice_m_u = (object) array('value' => 0,'id'=>0);
         }
-        return new JsonResponse(
-            [
-                'data' => $rhs,
-                'options'=> $options,
-                "valeur_indice_de_référence"=> $indice_m_u->getValue(),
-                "valeur_indice_de_référence_id"=> $indice_m_u->getId()
-                ,
-            ]
-        );
+        return new JsonResponse(['data' => $rhs,'options'=> $options,"valeur_indice_de_référence"=> $indice_m_u->getValue(),"valeur_indice_de_référence_id"=> $indice_m_u->getId(),]);
     }
     /**
      *@Route(name="get_currents_ipcs",path="/get_currents_ipcs/{type}")
@@ -792,18 +783,6 @@ class PropertyController extends AbstractController
         $query = $qb->getQuery();
         // Execute Query
         $rhs = $query->getResult();
-        if(!$rhs){
-            //si pas d'indice pour ce mois prendre le dernier renseigné
-            $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
-            ->select("rh")
-            ->from('App\Entity\RevaluationHistory', 'rh')
-            ->where('rh.type LIKE :key')
-            ->setParameter('key', $type)
-                ->orderBy('rh.date', 'DESC');
-            $query = $qb->getQuery();
-            // Execute Query
-            $rhs = $query->getResult();
-        }
         $options=$rhs[0];
         
         return new JsonResponse(['data' => $rhs,'options'=> $options]);
@@ -847,7 +826,8 @@ class PropertyController extends AbstractController
         $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
         ->select("inv")
         ->from('App\Entity\Invoice', 'inv')
-        ->where('inv.property = :property AND inv.category = 1 AND inv.type=1 AND inv.status=5 AND inv.file2 is null AND inv.date BETWEEN :start AND :end')
+                ->where('inv.property = :property AND inv.category = 1 AND inv.type=1 AND inv.status=5 AND inv.file2 is null AND inv.date BETWEEN :start AND :end')
+
         ->setParameter('property', $property)
         ->setParameter('start', $startDate)
         ->setParameter('end', $endDate)
@@ -1032,13 +1012,12 @@ class PropertyController extends AbstractController
         $taux_hon = $this->getDoctrine()
         ->getRepository(Honoraire::class)
         ->find($taux_id);
-        $formule='rdb*taux';
+         $formule='rdb*taux';
         $res=$taux_hon->getValeur()*$rdb/100;
-        if($res<$taux_hon->getMinimum()){
-            $res=$taux_hon->getMinimum();
-            $formule='rdb*taux (minoré à '.$taux_hon->getMinimum().')';
-        }
-       
+		if($res<$taux_hon->getMinimum()){
+			$res=$taux_hon->getMinimum();
+			$formule='rdb*taux (minoré à '.$taux_hon->getMinimum().')';
+		}
         
         return new JsonResponse(['formule'=> $formule,'res' => $res,'taux'=>$taux_hon->getValeur(),'rdb'=>$rdb ]);
         

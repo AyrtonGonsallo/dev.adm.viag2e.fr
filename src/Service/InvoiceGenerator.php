@@ -403,7 +403,7 @@ class InvoiceGenerator
                 try {
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-debit-template-auto.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output($this->path.'/'. $fileName, 'F');
                     return  $this->path."/".$fileName;
 
                 } catch (Html2PdfException $e) {
@@ -514,7 +514,7 @@ class InvoiceGenerator
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-credit-template-auto.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output($this->path.'/'. $fileName, 'F');
                     return  $this->path."/".$fileName;
 
                 } catch (Html2PdfException $e) {
@@ -625,7 +625,7 @@ class InvoiceGenerator
                 try {
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-mandant-template-auto.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-					$pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+					$pdf->output($this->path.'/'. $fileName, 'F');
                     return  $this->path."/".$fileName;
                     
                 } catch (Html2PdfException $e) {
@@ -681,8 +681,9 @@ class InvoiceGenerator
                 $plaff=$property->plafonnement_index_og2_i;
                 $plaff_v=(1+($plaff/100))*$rdb;
 
-                if($res<$mi){7
+                if($res<$mi){
                     $rente = $mi;
+                    $is_plaff=false;
                 }
                 else if(!$plaff || $plaff<=0){
                     $rente=round($res,2);
@@ -765,7 +766,7 @@ class InvoiceGenerator
                 try {
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-og2i-debit-template-auto.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output($this->path.'/'. $fileName, 'F');
                     return  $this->path."/".$fileName;
 
                 } catch (Html2PdfException $e) {
@@ -814,13 +815,14 @@ class InvoiceGenerator
                 $mi = $property->getInitialAmount();
 
 
-                $rdb=round(($property->valeur_indice_ref_og2_i_object->getValue()*$mi)/$property->initial_index_object->getValue(),2);
+               $rdb=round(($property->valeur_indice_ref_og2_i_object->getValue()*$mi)/$property->initial_index_object->getValue(),2);
                 $res=($indice_og2i->getValue() *$rdb)/$property->valeur_indice_ref_og2_i_object->getValue();
                 $plaff=$property->plafonnement_index_og2_i;
                 $plaff_v=(1+($plaff/100))*$rdb;
 
                 if($res<$mi){
                     $rente = $mi;
+                    $is_plaff=false;
                 }
                 else if(!$plaff || $plaff<=0){
                     $rente=round($res,2);
@@ -903,7 +905,7 @@ class InvoiceGenerator
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-og2i-credit-template-auto.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
                     
-                    $pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+                    $pdf->output($this->path.'/'. $fileName, 'F');
                     return  $this->path."/".$fileName;
 
                 } catch (Html2PdfException $e) {
@@ -952,13 +954,14 @@ class InvoiceGenerator
                 $mi = $property->getInitialAmount();
 
 
-                $rdb=round(($property->valeur_indice_ref_og2_i_object->getValue()*$mi)/$property->initial_index_object->getValue(),2);
+                 $rdb=round(($property->valeur_indice_ref_og2_i_object->getValue()*$mi)/$property->initial_index_object->getValue(),2);
                 $res=($indice_og2i->getValue() *$rdb)/$property->valeur_indice_ref_og2_i_object->getValue();
                 $plaff=$property->plafonnement_index_og2_i;
                 $plaff_v=(1+($plaff/100))*$rdb;
 
                 if($res<$mi){
                     $rente = $mi;
+                    $is_plaff=false;
                 }
                 else if(!$plaff || $plaff<=0){
                     $rente=round($res,2);
@@ -1040,7 +1043,7 @@ class InvoiceGenerator
                 try {
                     $pdf->pdf->SetDisplayMode('fullpage');
                     $pdf->writeHTML($this->twig->render('generated_files/courrier-indexation-og2i-mandant-template-auto.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-					$pdf->output('/var/www/vhosts/dev.adm.viag2e.fr/dev.adm.viag2e.fr/pdf/'. $fileName, 'F');
+					$pdf->output($this->path.'/'. $fileName, 'F');
                     return  $this->path."/".$fileName;
                     
                 } catch (Html2PdfException $e) {

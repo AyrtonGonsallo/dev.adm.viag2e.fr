@@ -268,3 +268,5 @@ nash
 UPDATE `property` SET `date_maj_indice_ref` = '2025-10-14 14:33:10' WHERE revaluation_date like "1-1" and date_maj_indice_ref is null;
 SELECT id,title,revaluation_date,date_maj_indice_ref,active FROM `property` WHERE revaluation_date like "1-1";
 verifiez le taux d'honoraire du bien 110 il cause une panne
+marquer l'indexation du 123 comme faite
+ablard 164

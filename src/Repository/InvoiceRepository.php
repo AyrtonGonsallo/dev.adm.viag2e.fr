@@ -157,8 +157,7 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-            */
-
+*/
     public function findReceiptsToDo(int $max)
     {
         return $this->createQueryBuilder('i')
@@ -218,7 +217,7 @@ class InvoiceRepository extends ServiceEntityRepository
 {
    // $numbers = [5591, 5592, 5588, 5589, 5590, 5581, 5582, 5584, 5585, 5586, 5587, 5681, 5790, 5791, 5682];
    
-   $numbers = [5576];
+   $numbers = [7194,7197];
 
     return $this->createQueryBuilder('i')
         ->where('i.number IN (:numbers)')
@@ -245,7 +244,19 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-    public function  getLastPropertyRente(int $pid)
+    public function  getLastPropertyInvoice(int $pid)
+    {
+        return $this->createQueryBuilder('i')
+        ->where('i.property = :pid')
+        ->andWhere('i.category = :cat')
+        ->setParameter('cat', 0)
+        ->setParameter('pid', $pid)
+        ->orderBy('i.id', 'DESC')
+        ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+    }
+	public function  getLastPropertyRente(int $pid)
     {
         return $this->createQueryBuilder('i')
         ->where('i.property = :pid')
@@ -330,16 +341,19 @@ class InvoiceRepository extends ServiceEntityRepository
     }
 
     public function findForRecap(Property $property, int $year) {
-        return $this->createQueryBuilder('i')
-            ->andWhere('i.property = :property')
-            ->andWhere('i.date >= :start')
-            ->andWhere('i.date <= :end')
-            ->andWhere('i.type = :type')
-            ->setParameter('property', $property)
-            ->setParameter('start', \DateTime::createFromFormat('Y-m-d',($year - 1).'-12-19'))
-            ->setParameter('end', \DateTime::createFromFormat('Y-m-d',$year.'-12-01'))
-            ->setParameter('type', Invoice::TYPE_NOTICE_EXPIRY)
-            ->getQuery()
-            ->getResult();
-    }
+    return $this->createQueryBuilder('i')
+        ->andWhere('i.property = :property')
+        ->andWhere('i.date >= :start')
+        ->andWhere('i.date <= :end')
+        ->andWhere('i.category = :category')
+        ->andWhere('i.date_generation_avoir IS NULL')
+        ->andWhere('i.type = :type')
+        ->setParameter('property', $property)
+        ->setParameter('start', \DateTime::createFromFormat('Y-m-d', ($year - 1).'-12-19'))
+        ->setParameter('end', \DateTime::createFromFormat('Y-m-d', $year.'-12-01'))
+        ->setParameter('type', Invoice::TYPE_NOTICE_EXPIRY)
+        ->setParameter('category', Invoice::CATEGORY_ANNUITY)
+        ->getQuery()
+        ->getResult();
+}
 }

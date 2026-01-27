@@ -75,7 +75,7 @@ class CronRegenerateInvoicesCommand extends Command
         $this->mailer = $mailer;
         $this->params = $params;
         $this->twig = $this->container->get('twig');
-        $this->invoice_number = 5766;
+        $this->invoice_number = 5812;
         $this->pdf_dir = $this->params->get('pdf_tmp_dir');
         $this->pdf_logo = $this->params->get('pdf_logo_path');
 
@@ -162,7 +162,7 @@ class CronRegenerateInvoicesCommand extends Command
           function processNumber(int $number)
           {
               static $assignedNumbers = []; // Keeps track of numbers and their corresponding results
-              static $nextNumber = 6554; // Starting value for the first number
+              static $nextNumber = 	7309; // Starting value for the first number
           
               // Check if the number has already been assigned a value
               if (isset($assignedNumbers[$number])) {
@@ -182,14 +182,16 @@ class CronRegenerateInvoicesCommand extends Command
         
 
           
-        if (date('d') == 19) {
+        if (date('d') >= 20) {
         
+            
+
 
             $io->comment('Creating avoirs');
             $quittances = $this->manager
                 ->getRepository(Invoice::class)
                 ->findAvoirsTogenerate(50);
-                $number=6554;
+                $number=7309;
             foreach ($quittances as $quittance) {
                 
                 $data=$quittance->getData();
@@ -327,8 +329,8 @@ code de janvier 2024
     public function generateAvoir(SymfonyStyle &$io, array $data, array $parameters, Property $property,Invoice $invoice,int $number)
     {
         try {   
-		$number=processNumber($data["number_int"]);
-        $type=$invoice->getFile()?"rente":"honoraire";
+			$number=processNumber($data["number_int"]);
+          $type=$invoice->getFile()?"rente":"honoraire";
         $io->note("generation d'avoir avec le numero ".$number." sur la facture ".$data["number_int"]." du fichier de type ".$type." avec le numéro ".$number);
         
         $invoice2 = new Invoice();

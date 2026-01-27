@@ -43,6 +43,6 @@ class NotificationExtension extends AbstractExtension
 
     public function getNotifications()
     {
-        return $this->manager->getRepository(Notification::class)->findBy(array('status' =>1 ));
+        return $this->manager->getRepository(Notification::class)->findAll();
     }
 }

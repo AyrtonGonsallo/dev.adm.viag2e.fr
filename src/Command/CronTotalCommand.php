@@ -102,7 +102,7 @@ class CronTotalCommand extends Command
         }
 
         $start = microtime(true);
-
+		//$this->noMail = true;
         $this->noMail = $input->getOption('no-mail');
         if ($this->areMailsDisabled()) {
             $io->note('Mails are disabled');
@@ -135,7 +135,7 @@ class CronTotalCommand extends Command
             'site'       => $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_site'])->getValue(),
         ];
 
-       // $d = new DateTime('First day of last month');//novembre
+         //$d = new DateTime('First day of last month');//novembre
         //$d = new DateTime('First day of this month');//decembre
         $d = new DateTime('First day of next month');//janvier
 
@@ -143,74 +143,41 @@ class CronTotalCommand extends Command
             'current_day'   => utf8_encode(strftime('%A %e %B %Y')),
             'current_month' => date('m'),
             'max_days'      => cal_days_in_month(CAL_GREGORIAN, $d->format('m'), $d->format('Y')),
-            'month'         => strftime('%B', $d->getTimestamp()),
+            'month'         => utf8_encode(strftime('%B', $d->getTimestamp())),
             'month_n'       => $d->format('m'),
             'year'          => $d->format('Y'),
         ];
 
         $last_number = $this->manager->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_number']);
         $io->comment('jour: '.date('d').' date totale:'.date('Y-m-d H:i:s'));
-   
-/*
-        
-        $io->comment('Recuperation des factures et ajout des invoices');
-        $dateLimite = date('Y-04-20');
-        // Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
-        $queryBuilder = $this->manager->createQueryBuilder();
-        $factureMensuelles = $queryBuilder->select('f')
-        ->from(FactureMensuelle::class, 'f')
-        ->join('f.property', 'p') // Rejoindre la table Property
-        ->where('f.date > :dateLimite')
-        ->andWhere('p.warrant = 16')
-        ->setParameter('dateLimite', $dateLimite)
-        ->orderBy('f.number', 'DESC') // Tri par la propriété "title" de l'objet Property
-        ->getQuery()
-        ->getResult();
-        $this->addInvoices($io, $factureMensuelles);
-      */
-        
-        if (date('d') <= 21) {
+       
+        if (date('d') >= 21) {
+          //if (date('d') == 7) {   
             
-            /*
             $io->comment('Processing total invoices');
 			// Obtenez la date du 20 du mois actuel
-            $dateLimite = date('2024-11-10');
-            $dateLimite2 = date('2024-12-10');
-            // Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
-            $queryBuilder = $this->manager->createQueryBuilder();
-            $factureMensuelles = $queryBuilder->select('f')
-            ->from(FactureMensuelle::class, 'f')
-            ->join('f.property', 'p') // Rejoindre la table Property
-            ->where('f.date > :dateLimite')
-            ->andWhere('f.date < :dateLimite2')
-            ->andWhere('p.warrant = 16')
-            ->setParameter('dateLimite', $dateLimite)
-            ->setParameter('dateLimite2', $dateLimite2)
-            ->orderBy('p.title', 'ASC') // Tri par la propriété "title" de l'objet Property
-            ->getQuery()
-            ->getResult();
-            $this->generateTotal($io, $parameters, $factureMensuelles);
-*/
-			$dateLimite = date('Y-m-14');
+			$dateLimite = date('Y-m-19');
+			//$dateLimite = date('Y-04-20');
 
-            // Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
-            $queryBuilder = $this->manager->createQueryBuilder();
-            $factureMensuelles = $queryBuilder->select('f')
-            ->from(FactureMensuelle::class, 'f')
-            ->join('f.property', 'p') // Rejoindre la table Property
-            ->where('f.date > :dateLimite')
-            ->andWhere('p.warrant = 16')
-            ->setParameter('dateLimite', $dateLimite)
-            ->orderBy('p.title', 'ASC') // Tri par la propriété "title" de l'objet Property
-            ->getQuery()
-            ->getResult();
-            $this->generateTotal($io, $parameters, $factureMensuelles);
-                    
+			// Créez une requête personnalisée pour récupérer les factures dont la date est supérieure au 20 de ce mois
+			$queryBuilder = $this->manager->createQueryBuilder();
+			$factureMensuelles = $queryBuilder->select('f')
+			->from(FactureMensuelle::class, 'f')
+			->join('f.property', 'p') // Rejoindre la table Property
+			->where('f.date > :dateLimite')
+			->andWhere('p.warrant = 16')
+			->setParameter('dateLimite', $dateLimite)
+			->orderBy('p.title', 'ASC') // Tri par la propriété "title" de l'objet Property
+			->getQuery()
+			->getResult();
+				$this->generateTotal($io, $parameters, $factureMensuelles);
+               
+			
             
         }
     }
-       
-    public function addInvoices(SymfonyStyle &$io, array $factureMensuelles)
+	
+	 public function addInvoices(SymfonyStyle &$io, array $factureMensuelles)
     {
         
         
@@ -256,7 +223,7 @@ class CronTotalCommand extends Command
             $this->manager->flush();
 		
     }
-
+       
     public function generateTotal(SymfonyStyle &$io, array $parameters, array $factureMensuelles)
     {
         try {   
@@ -280,9 +247,9 @@ class CronTotalCommand extends Command
             }
             $somme_h = round($somme_h, 2);
             $somme_r = round($somme_r, 2);
+			  $d = new DateTime('First day of next month');
             if($somme_r>0){
                 $filePath= $this->generator->generateFile($dest_r,$somme_r,$factureMensuelles, $parameters,$date_r,utf8_encode(strftime('%A %e %B %Y')));
-                $filePathExcel= $this->generator->generateExcelFile($factureMensuelles);
                 $totalFactureMensuelle= new TotalFactureMensuelle();
                 $totalFactureMensuelle->setAmount($somme_r);
                 $totalFactureMensuelle->setDestinataire($dest_r);
@@ -290,26 +257,25 @@ class CronTotalCommand extends Command
 
                 $file = new File();
                 $file->setType(File::TYPE_DOCUMENT);
-                $file->setName("TOTAL_RENTES_{$dest_r->getName()}.pdf");
+                $file->setName("TOTAL_RENTES_{$dest_r->getName()}");
                 $file->setWarrant($warrant_r);
                 $file->setDriveId($this->drive->addFile($file->getName(), $filePath, File::TYPE_INVOICE, $warrant_r->getId()));
                 $this->manager->persist($file);
                 $totalFactureMensuelle->setFile($file);
                 $this->manager->persist($totalFactureMensuelle);
                 $this->manager->flush();
-
-                $fileExcel = new File();
+				$filePathExcel= $this->generator->generateExcelFile($factureMensuelles);
+				$fileExcel = new File();
                 $fileExcel->setType(File::TYPE_DOCUMENT);
-                $fileExcel->setName("TOTAL_RENTES_{$dest_r->getName()}_Excel.pdf");
-                $fileExcel->setMime("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+				$fileExcel->setMime("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                $fileExcel->setName("TOTAL_RENTES_{$dest_r->getName()}_Excel");
                 $fileExcel->setWarrant($warrant_r);
                 $fileExcel->setDriveId($this->drive->addFile($file->getName(), $filePathExcel, File::TYPE_INVOICE, $warrant_r->getId()));
                 $this->manager->persist($fileExcel);
                 $this->manager->flush();
             }
             if($somme_h>0){
-                $filePath2= $this->generator->generateFile2($dest_h,$somme_h,$factureMensuelles, $parameters,$date_h,utf8_encode(strftime('%A %e %B %Y')));
-                $filePathExcel2= $this->generator->generateExcelFile2($factureMensuelles);
+                $filePath2= $this->generator->generateFile2($dest_h,$somme_h,$factureMensuelles, $parameters,$date_h,utf8_encode(strftime('%A %e %B %Y')));                $filePathExcel2= $this->generator->generateExcelFile2($factureMensuelles);
                 $totalFactureMensuelle= new TotalFactureMensuelle();
                 $totalFactureMensuelle->setAmount($somme_h);
                 $totalFactureMensuelle->setDestinataire($dest_h);
@@ -317,32 +283,32 @@ class CronTotalCommand extends Command
 
                 $file2 = new File();
                 $file2->setType(File::TYPE_DOCUMENT);
-                $file2->setName("TOTAL_HONORAIRES_{$dest_h->getName()}.pdf");
+                $file2->setName("TOTAL_HONORAIRES_{$dest_h->getName()}");
                 $file2->setWarrant($warrant_h);
                 $file2->setDriveId($this->drive->addFile($file2->getName(), $filePath2, File::TYPE_INVOICE, $warrant_h->getId()));
                 $this->manager->persist($file2);
                 $totalFactureMensuelle->setFile($file2);
                 $this->manager->persist($totalFactureMensuelle);
                 $this->manager->flush();
-
-                $fileExcel2 = new File();
+				
+				$fileExcel2 = new File();
                 $fileExcel2->setType(File::TYPE_DOCUMENT);
-                $fileExcel2->setMime("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-                $fileExcel2->setName("TOTAL_HONORAIRES_{$dest_h->getName()}_Excel.pdf");
+				$fileExcel2->setMime("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                $fileExcel2->setName("TOTAL_HONORAIRES_{$dest_h->getName()}_Excel");
                 $fileExcel2->setWarrant($warrant_h);
                 $fileExcel2->setDriveId($this->drive->addFile($fileExcel2->getName(), $filePathExcel2, File::TYPE_INVOICE, $warrant_h->getId()));
                 $this->manager->persist($fileExcel2);
                 $this->manager->flush();
             }
-            $d = new DateTime('First day of next month');
+           
 
 
             if($somme_r>0){
                 $message = (new Swift_Message("ADF ".$d->format('m/y')." OB2"))
                     ->setFrom($this->mail_from)
-                    ->setBcc($this->mail_from)
-                    //->setTo($dest_r->getEmail())
-                    ->setTo( "roquetigrinho@gmail.com")
+                    ->setBcc([$this->mail_from,"ayrtongonsalloheroku@gmail.com"])
+                    ->setTo($dest_r->getEmail())
+                    //->setTo( "ayrtongonsalloheroku@gmail.com")
                     ->setBody($this->twig->render('invoices/emails/total_r.twig', [ 'date' => "{$date_r}"]), 'text/html')
                     ->attach(Swift_Attachment::fromPath($filePath))
                     ->attach(Swift_Attachment::fromPath($filePathExcel));
@@ -356,11 +322,11 @@ class CronTotalCommand extends Command
             if($somme_h>0){
                 $message2 = (new Swift_Message("ADF ".$d->format('m/y')."  OG2I"))
                     ->setFrom($this->mail_from)
-                    ->setBcc($this->mail_from)
-                    //->setTo($dest_h->getEmail())
-                    ->setTo( "roquetigrinho@gmail.com")
+                    ->setBcc([$this->mail_from,"ayrtongonsalloheroku@gmail.com"])
+                    ->setTo($dest_h->getEmail())
+                    //->setTo( "ayrtongonsalloheroku@gmail.com")
                     ->setBody($this->twig->render('invoices/emails/total_h.twig', [ 'date' => "{$date_h}"]), 'text/html')
-                    ->attach(Swift_Attachment::fromPath($filePath2))
+                     ->attach(Swift_Attachment::fromPath($filePath2))
                     ->attach(Swift_Attachment::fromPath($filePathExcel2));
                    
                 if (!$this->areMailsDisabled() && $this->mailer->send($message2)) {
@@ -383,7 +349,7 @@ class CronTotalCommand extends Command
 		
     }
 
-    
+
     private function areMailsDisabled()
     {
         return $this->noMail;

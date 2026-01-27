@@ -421,8 +421,8 @@ class MailController extends AbstractController
 
         return $mailer->send($message);
     }
-
-    /**
+	
+	/**
      * @Route("/mail/send_test_mail", name="send_test_mail")
      *
      * @param Request $request
@@ -440,4 +440,5 @@ class MailController extends AbstractController
         $mailer->send($message);
         return $this->redirectToRoute('dashboard');
     }
+	
 }

@@ -88,6 +88,7 @@ class RecapCommand extends Command
 
         $start = microtime(true);
 
+		//$this->noMail = true;
         $this->noMail = $input->getOption('no-mail');
         if ($this->areMailsDisabled()) {
             $io->note('Mails are disabled');
@@ -148,7 +149,8 @@ class RecapCommand extends Command
         if(empty($id) || !is_numeric($id)) {
             $properties = $this->manager
                 ->getRepository(Property::class)
-                ->findAll();
+                //->findByIdRange(122,140);
+				->findAll();
         }
         else {
             $property = $this->manager->getRepository(Property::class)->find($id);
@@ -173,7 +175,7 @@ class RecapCommand extends Command
         $d = new DateTime('First day of this month');
 
         $date = [
-            'current_day'   => utf8_encode(strftime('%A %e %B %Y')),
+             'current_day'   => utf8_encode(strftime('%A %e %B %Y')),
             'current_month' => date('m'),
             'max_days'      => cal_days_in_month(CAL_GREGORIAN, $d->format('m'), $d->format('Y')),
             'month'         => strftime('%B', $d->getTimestamp()),
@@ -358,8 +360,8 @@ class RecapCommand extends Command
             if (!empty($recap->getMailRecipient())) {
                 $message = (new Swift_Message($recap->getMailSubject()))
                     ->setFrom($this->mail_from)
-                    ->setBcc($this->mail_from)
-                    ->setTo("roquetigrinho@gmail.com")
+                    ->setBcc([$this->mail_from,"agonsallo@gmail.com"])
+                    ->setTo($recap->getMailRecipient())
                     ->setBody($this->twig->render('invoices/emails/recap.twig', ['type' => $recap->getTypeString(), 'year' => $data['year']]), 'text/html')
                     ->attach(Swift_Attachment::fromPath($filePath));
 
@@ -368,6 +370,7 @@ class RecapCommand extends Command
                 }
 
                 if (!$this->areMailsDisabled() && $this->mailer->send($message)) {
+					$io->note("mail envoyé a ".$recap->getMailRecipient());
                     $recap->setStatus(Recap::STATUS_SENT);
                 } else {
                     $recap->setStatus(Recap::STATUS_UNSENT);

@@ -37,8 +37,18 @@ class ParameterRepository extends ServiceEntityRepository
     }
     */
 
-    
+    /*
     public function findOneBySomeField($value): ?Parameter
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.exampleField = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    */
+	 public function findOneBySomeField($value): ?Parameter
     {
         return $this->createQueryBuilder('p')
             ->andWhere('p.name = :name_val')
@@ -47,5 +57,4 @@ class ParameterRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
-    
 }

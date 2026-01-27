@@ -77,7 +77,7 @@ class PropertyFormType extends AbstractType
             
            
             ->add('dosAuthenticInstrument', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy', 'years' => range(2010, date('Y'))])
-            ->add('num_mandat_gestion', TextType::class, ['required' => false])
+            ->add('num_mandat_gestion', TextType::class, ['required' => true])
             ->add('startDateManagement', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy', 'years' => range(2010, date('Y') + 2)])
             ->add('endDateManagement', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy', 'years' => range(2010, date('Y') + 25)])
             

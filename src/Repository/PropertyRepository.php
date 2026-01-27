@@ -22,21 +22,7 @@ class PropertyRepository extends ServiceEntityRepository
         parent::__construct($registry, Property::class);
     }
 /**/
-    public function findInvoicesToDo(int $max)
-    {
-        return $this->createQueryBuilder('p')
-            ->where('p.last_invoice < :date')
-            //->where('p.last_invoice < :date OR p.last_receipt < p.last_invoice')
-            ->andWhere('p.start_date_management < :last_month')
-            ->andWhere('p.billing_disabled = false')
-            ->andWhere('p.active = true')
-            ->setParameter('date', new DateTime('last day of last month'))
-            ->setParameter('last_month', new DateTime('last day of next month'))
-            ->setMaxResults($max)
-            ->getQuery()
-            ->getResult();
-    }
-    public function findInvoicesToSend(int $idinf,int $idsupp)
+	public function findInvoicesToSend(int $idinf,int $idsupp)
     {
         return $this->createQueryBuilder('p')
             ->where('p.last_invoice < :date')
@@ -54,6 +40,32 @@ class PropertyRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+	public function findByIdRange(int $idMin, int $idMax): array
+{
+    return $this->createQueryBuilder('p')
+        ->where('p.id >= :idMin')
+        ->andWhere('p.id <= :idMax')
+        ->setParameter('idMin', $idMin)
+        ->setParameter('idMax', $idMax)
+        ->orderBy('p.id', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
+    public function findInvoicesToDo(int $max)
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.last_invoice < :date')
+            //->where('p.last_invoice < :date OR p.last_receipt < p.last_invoice')
+            ->andWhere('p.start_date_management < :last_month')
+            ->andWhere('p.billing_disabled = false')
+            ->andWhere('p.active = true')
+            ->setParameter('date', new DateTime('last day of last month'))
+            ->setParameter('last_month', new DateTime('last day of next month'))
+            ->setMaxResults($max)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findInvoiceToDo(int $id)
     {
         return $this->createQueryBuilder('p')
@@ -176,12 +188,14 @@ pour faire les tests sur les charges de copro
     }
     public function findIndicestoUpdate($max)
     {
-        $datePattern = $this->get_indexation_date_pattern(date("m"));
+		$datePattern = $this->get_indexation_date_pattern(date("m"));
+       //$datePattern = "%-11";
         return $this->createQueryBuilder('p')
             ->where('p.date_maj_indice_ref <= :date')
 			->andWhere('p.initial_index_object IS NOT NULL')
             //->andWhere('p.billing_disabled = false')
             ->andWhere('p.active = true')
+			->andWhere('p.no_indexation = false')
             //->andWhere('p.honoraries_disabled = false')
             ->andWhere('p.revaluation_date like :pattern_indexation')
            // ->andWhere('p.annuities_disabled = false')

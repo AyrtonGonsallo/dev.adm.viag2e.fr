@@ -80,10 +80,12 @@
     {{data.adresse_bien }}<br />
     <br />
 
-
+  Le montant actuel de votre rente est de {{data.ia}} €. <br /><br />
    
     {% if not data.is_plaff %}
-           Nouveau montant = Rente actuelle ({{data.rdb}} €) x Nouvel indice de {{data.date_indice_actuel_og2i}} ({{data.montant_indice_actuel_og2i}}) / indice de référence de 
+        Rente de base = Rente actuelle ({{data.ia}} €) x Indice og2i de base de {{data.date_indice_base_og2i}} ({{data.montant_indice_base_og2i}}) / Nouvel indice de {{data.date_indice_base}} ({{data.montant_indice_base}}). <br /><br />
+
+        Nouveau montant = Rente de base ({{data.rdb}} €) x Nouvel indice de {{data.date_indice_actuel_og2i}} ({{data.montant_indice_actuel_og2i}}) / indice de référence de 
         {{data.date_indice_base_og2i}} ({{data.montant_indice_base_og2i}}). <br /><br />
     {% endif %}
     {% if data.is_plaff %}
@@ -91,9 +93,9 @@
     {% endif %}    
     <b>Le nouveau montant de la rente viagère sera ainsi porté à {{data.rente}} €</b> pour le virement 
     de la rente du mois de {{data.date_virement}}.<br /><br />
-     {% if  data.honoraires >0  %}
+    
         <b>Les honoraires de gestion passent eux à {{data.honoraires}} € TTC. </b><br /><br />
-   {% endif %}
+   
     
     La prochaine date de révision est fixée pour le mois de {{data.date_revision}}. <br /><br />
     
