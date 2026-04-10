@@ -287,9 +287,15 @@ class Invoice implements JsonSerializable
     {
         switch ($this->getCategory()) {
             case self::CATEGORY_ANNUITY:
-                return 'Rente';
+                $res = "";
+                if($this->getFile()){
+                    $res = "Rente";
+                }else{
+                    $res = "Honoraires";
+                }
+                return $res;
             case self::CATEGORY_CONDOMINIUM_FEES:
-                return 'Frais de co-pro';
+                return 'Co-pro';
             case self::CATEGORY_REGULE_CONDOMINIUM_FEES:
                 return 'Régule manuelle';
                 
@@ -349,7 +355,7 @@ class Invoice implements JsonSerializable
             case self::STATUS_PAYED:
                 return 'Payée';
             case self::STATUS_SENT:
-                return 'Envoyée';
+                return 'Appelée';
             case self::STATUS_UNSENT:
                 return 'Erreur d\'envoi';
             case self::STATUS_TREATED:
@@ -476,9 +482,9 @@ class Invoice implements JsonSerializable
                     'id'        => $this->getProperty()->getId().'02',
                     'firstname' => $data['property']['firstname'],
                     'lastname'  => $data['property']['lastname'],
-                    'bic'       => $this->getProperty()->getBankBic(),
-                    'iban'      => str_replace(' ', '', $this->getProperty()->getBankIban()),
-                    'ics'       => $this->getProperty()->getBankIcs(),
+                    'bic'       => $this->getProperty()->bank_bic_1,
+                    'iban'      => str_replace(' ', '', $this->getProperty()->bank_iban_1),
+                    'ics'       => $this->getProperty()->bank_ics_1,
                 ];
             }
             elseif($this->getCategory() === self::CATEGORY_ANNUITY) { // was CATEGORY_CONDOMINIUM_FEES ??
@@ -507,9 +513,9 @@ class Invoice implements JsonSerializable
                         'id'        => $this->getProperty()->getId() . '02',
                         'firstname' => $data['property']['firstname'],
                         'lastname'  => $data['property']['lastname'],
-                        'bic'       => $this->getProperty()->getBankBic(),
-                        'iban'      => str_replace(' ', '', $this->getProperty()->getBankIban()),
-                        'ics'       => $this->getProperty()->getBankIcs(),
+                        'bic'       => $this->getProperty()->bank_bic_1,
+                        'iban'      => str_replace(' ', '', $this->getProperty()->bank_iban_1),
+                        'ics'       => $this->getProperty()->bank_ics_1,
                     ];
                 }
             }
@@ -539,9 +545,9 @@ class Invoice implements JsonSerializable
                         'id'        => $this->getProperty()->getId() . '02',
                         'firstname' => $data['property']['firstname'],
                         'lastname'  => $data['property']['lastname'],
-                        'bic'       => $this->getProperty()->getBankBic(),
-                        'iban'      => str_replace(' ', '', $this->getProperty()->getBankIban()),
-                        'ics'       => $this->getProperty()->getBankIcs(),
+                        'bic'       => $this->getProperty()->bank_bic_1,
+                        'iban'      => str_replace(' ', '', $this->getProperty()->bank_iban_1),
+                        'ics'       => $this->getProperty()->bank_ics_1,
                     ];
                 }
             }
@@ -562,9 +568,9 @@ class Invoice implements JsonSerializable
                             'id'        => $this->getProperty()->getId() . '02',
                             'firstname' => $data['property']['firstname'],
                             'lastname'  => $data['property']['lastname'],
-                            'bic'       => $this->getProperty()->getBankBic(),
-                            'iban'      => str_replace(' ', '', $this->getProperty()->getBankIban()),
-                            'ics'       => $this->getProperty()->getBankIcs(),
+                            'bic'       => $this->getProperty()->bank_bic_1,
+                            'iban'      => str_replace(' ', '', $this->getProperty()->bank_iban_1),
+                            'ics'       => $this->getProperty()->bank_ics_1,
                         ];
                     }
                     elseif($data['target'] === PendingInvoice::TARGET_BUYER) {

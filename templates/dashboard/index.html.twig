@@ -426,30 +426,39 @@
                     <div class="m-portlet__body">
                         <div class="m-widget2">
 
-                            {% for rappel in rappels_valides %}
-                                <div class="rappel-item">
-                                    {{ rappel.id }} – 
-                                    Le {{ rappel.expiryLabel }} : {{ rappel.texte }}
+                            {% if rappels_valides is not empty %}
+                                {% for type, rappels in rappels_valides %}
+                                    <h5>{{ type}}</h5> {# ou directement: Rappel::REMIND_TYPES[type] si tu passes le tableau #}
 
-                                    <!-- CHECK -->
-                                    <a href="{{ path('rappel_check', {id: rappel.id}) }}"
-                                    title="Marquer comme fait"
-                                    onclick="return confirm('Marquer ce rappel comme effectué ?');">
-                                        <i class="la la-check text-success"></i>
-                                    </a>
+                                    {% for rappel in rappels %}
+                                        <div class="rappel-item">
+                                            {{ rappel.getTypeString }} – 
+                                            Le {{ rappel.expiryLabel }} : {{ rappel.texte }}
 
-                                    <!-- DELETE -->
-                                    <a href="{{ path('rappel_delete', {id: rappel.id}) }}"
-                                    title="Supprimer"
-                                    onclick="return confirm('Supprimer définitivement ce rappel ?');">
-                                        <i class="la la-trash text-danger"></i>
-                                    </a>
-                                </div>
+                                            <!-- CHECK -->
+                                            <a href="{{ path('rappel_check', {id: rappel.id}) }}"
+                                            title="Marquer comme fait"
+                                            class="check"
+                                            onclick="return confirm('Marquer ce rappel comme effectué ?');">
+                                                <i class="la la-check text-success"></i>
+                                            </a>
+
+                                            <!-- DELETE -->
+                                            <a href="{{ path('rappel_delete', {id: rappel.id}) }}"
+                                            title="Supprimer"
+                                            class="delete"
+                                            onclick="return confirm('Supprimer définitivement ce rappel ?');">
+                                                <i class="la la-trash text-danger"></i>
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
                             {% else %}
                                 <div class="text-center">
                                     Aucun rappel
                                 </div>
-                            {% endfor %}
+                            {% endif %}
+
 
 
 
@@ -491,7 +500,15 @@
 
                             
                         </div>
+
+
+                        <div class="text-center"><i><small><a href="/all_news_view">Voir plus</a></small></i></div>
                     </div>
+
+                    
+                                    
+                                
+
                 </div>
             </div>
 
@@ -695,6 +712,8 @@
                                 </div>
                             {% endfor %}
                         </div>
+
+                        <div class="text-center"><i><small><a href="/all_insurances_view">Voir plus</a></small></i></div>
                     </div>
                 </div>
             </div>
@@ -766,6 +785,8 @@
                                 </div>
                             {% endfor %}
                         </div>
+
+                        <div class="text-center"><i><small><a href="/all_invoices_view">Voir plus</a></small></i></div>
                     </div>
                 </div>
             </div>
@@ -831,6 +852,8 @@
                                 </div>
                             {% endfor %}
                         </div>
+
+                        <div class="text-center"><i><small><a href="/all_expiring_warrants_view">Voir plus</a></small></i></div>
                     </div>
                 </div>
             </div>
@@ -847,15 +870,15 @@ jQuery(document).ready(function($){
         console.log("type",type)
 
         if(type <=3) { // adapter selon tes valeurs exactes
-            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-8').show();
-            $('#form-date_rappel_annuel').closest('.col-lg-8').hide();
+            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-12').show();
+            $('#form-date_rappel_annuel').closest('.col-lg-12').hide();
         } else if(type == 4) {
-            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-8').hide();
-            $('#form-date_rappel_annuel').closest('.col-lg-8').show();
+            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-12').hide();
+            $('#form-date_rappel_annuel').closest('.col-lg-12').show();
         } else {
             // si aucun type choisi, cacher les deux
-            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-8').hide();
-            $('#form-date_rappel_annuel').closest('.col-lg-8').hide();
+            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-12').hide();
+            $('#form-date_rappel_annuel').closest('.col-lg-12').hide();
         }
     }
 

@@ -7,6 +7,7 @@ use DateTime;
 use Doctrine\Persistence\ObjectManager;
 use Psr\Container\ContainerInterface;
 
+
 class Bank
 {
     /**
@@ -27,10 +28,14 @@ class Bank
     /** @var string */
     private $message_id;
 
+
     public function __construct(ContainerInterface $container)
     {
         $this->manager = $container->get('doctrine')->getManager();
     }
+
+    
+
 
     private function buildXML()
     {
@@ -272,6 +277,203 @@ class Bank
         return $this->buildXML();
     }
 
+
+    public function generate_by_ids(array $ids, string $message_id): string
+    {
+        set_time_limit(0);
+        ini_set('max_execution_time', 0);
+
+        $this->message_id = $message_id;
+        $this->total = new Total();
+
+        // sécurité minimale
+        $ids = array_map('intval', $ids);
+        $ids = array_filter($ids);
+
+        if (empty($ids)) {
+            throw new \InvalidArgumentException('Aucune facture valide fournie');
+        }
+
+        $invoices = $this->manager
+            ->getRepository(Invoice::class)
+            ->listByDate2IdVersion($ids);
+
+        /** @var Invoice $invoice */
+        foreach ($invoices as $invoice) {
+            $data = $invoice->getData();
+            if(empty($data['recursion'])) {
+                $data['recursion'] = Invoice::RECURSION_MONTHLY;
+            }
+/*
+            if($data['recursion'] == Invoice::RECURSION_MONTHLY && $invoice->getProperty()->getHideExportMonthly() && $invoice->getFile()) {//si cacher rente et facture de rente
+                continue;
+            }
+
+            if($data['recursion'] == Invoice::RECURSION_MONTHLY && $invoice->getProperty()->hide_honorary_export && $invoice->getFile2()) {//si cacher honoraire et facture de honoraire
+                continue;
+            }
+*/
+            if($data['recursion'] == Invoice::RECURSION_OTP && $invoice->getProperty()->getHideExportOtp()) {
+                continue;
+            }
+
+            if($data['recursion'] == Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getHideExportQuarterly()) {
+                continue;
+            }
+
+            $amount = $this->getAmount($data,$invoice->getProperty()->hide_honorary_export,$invoice->getProperty()->getHideExportMonthly());
+
+            if($amount <= 0) {
+                continue;
+            }
+
+            if(empty($this->data[$invoice->getProperty()->getId()])) {
+                $this->data[$invoice->getProperty()->getId()] = [];
+            }
+
+            if(empty($this->data[$invoice->getProperty()->getId()][$data['recursion']]) || empty($this->data[$invoice->getProperty()->getId()][$data['recursion']]['payer'])) {
+                $this->data[$invoice->getProperty()->getId()][$data['recursion']] = [
+                    'payer' => $invoice->getPayer(),
+                    'title' => $invoice->getProperty()->getTitle(),
+                    'type' => $data['recursion'],
+                    'total' => new Total(),
+                    'invoices' => []
+                ];
+            }
+
+            if(empty($this->data[$invoice->getProperty()->getId()][$data['recursion']]['payer']['ics'])) {
+                continue; //si C'Est acquereur et que le warrant n'a pas d'ics il va sauter, si c'est vendeur et que le buyer n'a pas d'ics il va sauter exemple sur le bien 26
+            }
+            if($invoice->getType() == Invoice::TYPE_AVOIR) {
+                $this->total->addTransaction(-$amount);
+                $this->data[$invoice->getProperty()->getId()][$data['recursion']]['total']->addTransaction(-$amount);            
+            }else{
+                $this->total->addTransaction($amount);
+                $this->data[$invoice->getProperty()->getId()][$data['recursion']]['total']->addTransaction($amount);
+            }
+            
+
+            $this->data[$invoice->getProperty()->getId()][$data['recursion']]['invoices'][] = [
+                'amount' => $amount,
+                'inv_id' => $invoice->getId(),
+                'date'   => $invoice->getDate(),
+                'type'   =>$invoice->getType(),
+                'dos'    => $invoice->getProperty()->getDosAuthenticInstrument()->format('Y-m-d'),
+                'number' => $invoice->getFormattedNumber(),
+            ];
+        }
+
+        return $this->buildXML();
+    }
+
+    public function generate_fa_by_ids(array $ids, string $message_id): string
+    {
+        set_time_limit(0);
+        ini_set('max_execution_time', 0);
+
+        $this->message_id = $message_id;
+        $this->total = new Total();
+
+        // sécurité minimale
+        $ids = array_map('intval', $ids);
+        $ids = array_filter($ids);
+
+        if (empty($ids)) {
+            throw new \InvalidArgumentException('Aucune facture valide fournie');
+        }
+
+        $invoices = $this->manager
+            ->getRepository(Invoice::class)
+            ->listByDateNE2IdVersion($ids);
+
+        /** @var Invoice $invoice */
+        foreach ($invoices as $invoice) {
+            $data = $invoice->getData();
+            if(empty($data['recursion'])) {
+                $data['recursion'] = Invoice::RECURSION_MONTHLY;
+            }
+         
+
+            
+            /*
+                if($data['recursion'] == Invoice::RECURSION_MONTHLY && $invoice->getProperty()->getHideExportMonthly() && $invoice->getFile()) {//si cacher rente et facture de rente
+                    continue;
+                }
+
+                if($data['recursion'] == Invoice::RECURSION_MONTHLY && $invoice->getProperty()->hide_honorary_export && $invoice->getFile2()) {//si cacher honoraire et facture de honoraire
+                    continue;
+                }
+            
+            if($data['recursion'] == Invoice::RECURSION_OTP && $invoice->getProperty()->getHideExportOtp()) {
+                continue;
+            }
+
+            if($data['recursion'] == Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getHideExportQuarterly()) {
+                continue;
+            }*/
+
+            $amount = $this->getAmount($data,0,0);
+            Logger::getInstance()->logInfo(
+                "facture {$invoice->getProperty()->getId()} - titre : {$invoice->getProperty()->getTitle()} - getamount : {$amount} - type : {$invoice->getType()} - recursion : {$data['recursion']}",
+                [
+                    'property_id' => $data['property']['id'] ?? null,
+                    'property_title' => $data['property']['title'] ?? null,
+                    'recursion' => $data['recursion'] ?? null,
+                    'amount_input' => $data['amount'] ?? null,
+                    'montantttc' => $data['montantttc'] ?? null,
+                    'annuity' => $data['property']['annuity'] ?? null,
+                    'honoraryRates' => $data['property']['honoraryRates'] ?? null,
+                    'condominiumFees' => $data['property']['condominiumFees'] ?? null,
+                    'calculated_amount' => $amount,
+                    'ics' => $invoice->getPayer()['ics'],
+                    'bank_bic_1' => $invoice->getProperty()->bank_bic_1,
+                    'bank_iban_1' => str_replace(' ', '', $invoice->getProperty()->bank_iban_1),
+
+                ]
+            );
+            if($amount <= 0) {
+                continue;
+            }
+
+            if(empty($this->data[$invoice->getProperty()->getId()])) {
+                $this->data[$invoice->getProperty()->getId()] = [];
+            }
+
+            if(empty($this->data[$invoice->getProperty()->getId()][$data['recursion']]) || empty($this->data[$invoice->getProperty()->getId()][$data['recursion']]['payer'])) {
+                $this->data[$invoice->getProperty()->getId()][$data['recursion']] = [
+                    'payer' => $invoice->getPayer(),
+                    'title' => $invoice->getProperty()->getTitle(),
+                    'type' => $data['recursion'],
+                    'total' => new Total(),
+                    'invoices' => []
+                ];
+            }
+
+            if(empty($this->data[$invoice->getProperty()->getId()][$data['recursion']]['payer']['ics'])) {
+                continue; //si C'Est acquereur et que le warrant n'a pas d'ics il va sauter, si c'est vendeur et que le buyer n'a pas d'ics il va sauter exemple sur le bien 26
+            }
+            if($invoice->getType() == Invoice::TYPE_AVOIR) {
+                $this->total->addTransaction(-$amount);
+                $this->data[$invoice->getProperty()->getId()][$data['recursion']]['total']->addTransaction(-$amount);            
+            }else{
+                $this->total->addTransaction($amount);
+                $this->data[$invoice->getProperty()->getId()][$data['recursion']]['total']->addTransaction($amount);
+            }
+            
+
+            $this->data[$invoice->getProperty()->getId()][$data['recursion']]['invoices'][] = [
+                'amount' => $amount,
+                'inv_id' => $invoice->getId(),
+                'date'   => $invoice->getDate(),
+                'type'   =>$invoice->getType(),
+                'dos'    => $invoice->getProperty()->getDosAuthenticInstrument()->format('Y-m-d'),
+                'number' => $invoice->getFormattedNumber(),
+            ];
+        }
+
+        return $this->buildXML();
+    }
+
     private function getAmount(?array $data,$invoice_honn,$invoice_rente)
     {
         switch ($data['recursion']) {
@@ -304,5 +506,7 @@ class Bank
                 return number_format($data['property']['annuity'] + $data['property']['honoraryRates'], 2, '.', '');
                 break;
         }
+
+        
     }
 }

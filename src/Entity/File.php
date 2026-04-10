@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class File implements JsonSerializable
 {
+    
     public const TYPE_DOCUMENT = 1;
     public const TYPE_INVOICE = 2;
     public const TYPE_RECAP = 3;

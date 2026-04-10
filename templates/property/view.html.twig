@@ -4,6 +4,7 @@
 {% block title %}Viag2e | Bien #{{ property.id }} ({{ property.title }}){% endblock %}
 
 {% block body %}
+{% set isAdmin = is_granted('ROLE_ADMIN') %}
     <div class="m-subheader">
         <div class="d-flex align-items-center">
             <div class="mr-auto">
@@ -105,11 +106,11 @@
                         </div>
                     </div>
                 {% endif %}
-                {% if not form_payment.vars.valid %}
+                {% if not form.vars.valid %}
                     <div class="m-alert m-alert--icon m-alert--outline m-alert--square alert alert-danger" role="alert">
                         <div class="m-alert__icon"><i class="la la-exclamation-circle"></i></div>
                         <div class="m-alert__text">
-                            {% set formErrors = form_payment.vars.errors.form.getErrors(true) %}
+                            {% set formErrors = form.vars.errors.form.getErrors(true) %}
                                                             
                             {# If there are errors in the form, display them in this unorganized list #}
                             {% if formErrors|length %}
@@ -129,7 +130,7 @@
                     <div class="col-xl-6 order-2 order-xl-1">
                         <i>Propriété créée par {{ property.creationUser.firstname }} {{ property.creationUser.lastname }} ({{ property.creationUser.id }}) - Dernière édition par {{ property.editionUser.firstname }} {{ property.editionUser.lastname }} ({{ property.editionUser.id }})</i>
                     </div>
-                    <div class="col-xl-3 order-1 order-xl-2 m--align-right">
+                    <div class="col-xl-3 order-1 order-xl-2 m--align-right  {% if not isAdmin %}d-none-2{% endif %}">
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="la la-plus-square"></i> Nouvelle facture manuelle
                         </button>
@@ -145,1178 +146,956 @@
                             <i class="la la-plus-square"></i> Générer un fichier
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                            <a class="dropdown-item" href="{{ path('generate_facture', {'propertyId' : property.id}) }}">Facture manuelle</a>
+                            <a class="dropdown-item" href="{{ path('generate_avoir', {'propertyId' : property.id}) }}">Avoir</a>
                             <a class="dropdown-item" href="{{ path('generate_mandat_sepa', {'propertyId' : property.id}) }}">Mandat sepa</a>
-                            <a class="dropdown-item" href="{{ path('generate_courrier_mandat_prelevement_sepa', {'propertyId' : property.id}) }}">Courrier envoi de mandat de prélèvement SEPA</a>
-                            <a class="dropdown-item" href="{{ path('generate_courrier_regularisation_charges_copro', {'propertyId' : property.id}) }}">Courrier de régularisation des charges de copropriété</a>
-                            <a class="dropdown-item" href="{{ path('generate_mandat_de_gestion', {'propertyId' : property.id}) }}">Mandat de gestion</a>
-                            <a class="dropdown-item" href="{{ path('generate_courrier_premier_contact', {'propertyId' : property.id}) }}">Courrier de premier contact</a>
-                            <a class="dropdown-item" href="{{ path('generate_mise_en_place_charges_copro', {'propertyId' : property.id}) }}">Courrier mise en place des avances de charges de copropriété</a>
-                            <a class="dropdown-item" href="{{ path('generate_courrier_abandon_duh', {'propertyId' : property.id}) }}">Courrier d’abandon du DUH</a>
-                            <a class="dropdown-item" href="{{ path('generate_courrier_indexation_og2i_annee1', {'propertyId' : property.id}) }}">Courrier d’indexation OG2I Année 1</a>
-                            <a class="dropdown-item" href="{{ path('generate_courrier_indexation', {'propertyId' : property.id}) }}">Courrier d’indexation </a>
-                            <a class="dropdown-item" href="{{ path('generate_courrier_libre', {'propertyId' : property.id}) }}">Courrier Libre</a>
+                            <a class="dropdown-item" href="{{ path('generate_mandat_gestion', {'propertyId' : property.id}) }}">Mandat de gestion</a>
+                            <a class="dropdown-item" href="{{ path('generate_courrier_indexation', {'propertyId' : property.id}) }}">Courrier d'indexation</a>
+                            <a class="dropdown-item" href="{{ path('generate_cpc', {'propertyId' : property.id}) }}">Courrier 1er contact</a>
+                            <a class="dropdown-item" href="{{ path('generate_courrier_ctcopro', {'propertyId' : property.id}) }}">Courrier appel des charges trimestrielles de copro</a>
+                            <a class="dropdown-item" href="{{ path('generate_courrier_regul_copro', {'propertyId' : property.id}) }}">Courrier régularisation charges copro</a>
+                            <a class="dropdown-item" href="{{ path('generate_courrier_abandon_duh', {'propertyId' : property.id}) }}">Courrier abandon du DUH</a>
+                            <a class="dropdown-item" href="{{ path('generate_courrier_libre', {'propertyId' : property.id}) }}">Courrier libre</a>
+
                         </div>
                     </div>
                 </div>
                 <ul class="nav nav-tabs  m-tabs-line m-tabs-line--brand" role="tablist">
-                    <li class="autres_tabs nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link{% if not buyer_tab or property.warrant.type != constant('App\\Entity\\Warrant::TYPE_SELLERS') %} active{% endif %}" data-toggle="tab" href="#m_tabs_profil" role="tab"><i class="flaticon-user-settings"></i> Bien N°{{ property.id}}</a>
-                    </li>
-                    <li id="lien_pay" class="autres_tabs nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_pay" role="tab"><i class="flaticon-piggy-bank"></i> Paiement</a>
-                    </li>
-                    <li id="lien_copro" class="autres_tabs nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_copro" role="tab"> Copro</a>
+                   
+                    <li id="lien_bien" class="autres_tabs nav-item m-tabs__item">
+                        <a class="nav-link active m-tabs__link" data-toggle="tab" href="#m_tabs_bien" role="tab"><i class="flaticon-user-settings"></i>Bien N°{{ property.id}}</a>
                     </li>
                     <li id="lien_fichiers" class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_files" role="tab"><i class="flaticon-attachment"></i> Fichiers</a>
+                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_fichier" role="tab"><i class="flaticon-attachment"></i>Fichiers</a>
                     </li>
-                    <li class="autres_tabs nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_messages" role="tab"><i class="flaticon-mail"></i> Messages</a>
-                    </li>
-                    <li id="lien_suivi" class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_mails" role="tab"><i class="flaticon-mail"></i> Suivi</a>
-                    </li>
-                    {% if property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
-                    <li class="autres_tabs nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link {% if buyer_tab %} active{% endif %}" data-toggle="tab" href="#m_tabs_buyer" role="tab"><i class="flaticon-cart"></i> Acheteur</a>
-                    </li>{% endif %}
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane{% if not buyer_tab or property.warrant.type != constant('App\\Entity\\Warrant::TYPE_SELLERS') %} active{% endif %}" id="m_tabs_profil" role="tabpanel">
-                       
-                        <div>
-                            
-                            <div id="active-box">
-                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                    <label>
-                                        <input type="checkbox" id="active_property" {% if property.active == 1 %} checked{% endif %} name="activer" class=" form-control m-input" value="{{property.active}}">
-                                        <span></span>
-                                    </label>
-                                </span>
-                                <label  class="">{% if property.active == 1 %}Bien actif {% else %}Bien désactivé{% endif %}</label>
-                            </div>
-                            
-                        </div>
+                    <div class="tab-pane active" id="m_tabs_bien" role="tabpanel">
                         {{ form_start(form, {'attr': {'class': 'm-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed'}}) }}
-
-                            <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    {{ property.title}} - Bien N°{{ property.id}}
-                                </h2>
-                            </div>
                             <div class="form-group row">
-                                <div class="col-lg-12">
-                                    <label for="form-title" class="col-4 col-form-label">Titre <span class="m--font-danger">*</span></label>
+                                <div class="col-lg-6">
+                                    <label for="form-title" class="col-12 col-form-label">Titre dossier <span class="m--font-danger">*</span></label>
                                     <div class="col-12">
                                         {{ form_row(form.title, {'attr': {'class': 'form-control m-input'}, 'id': 'form-title', 'label': false}) }}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-group row">
                                 <div class="col-lg-6">
-                                    <label for="form-firstname1" class="col-4 col-form-label">Prénom Crédirentier<span class="m--font-danger">*</span></label>
+                                    <label for="form-mandataire" class="col-12 col-form-label">Mandataire </label>
                                     <div class="col-12">
-                                        {{ form_row(form.firstname1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-firstname1', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-firstname2" class="col-4 col-form-label">Prénom Crédirentier 2</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.firstname2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-firstname2', 'label': false}) }}
+                                        {{ form_row(form.mandataire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mandataire', 'label': false}) }}
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-lg-6">
-                                    <label for="form-lastname1" class="col-4 col-form-label">Nom Crédirentier<span class="m--font-danger">*</span></label>
+                                    <label for="form-sell_type" class="col-12 col-form-label">Type de vente </label>
                                     <div class="col-12">
-                                        {{ form_row(form.lastname1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lastname1', 'label': false}) }}
+                                        {{ form_row(form.sell_type, {'attr': {'class': 'form-control m-input'}, 'id': 'form-sell_type', 'label': false}) }}
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <label for="form-lastname2" class="col-4 col-form-label">Nom Crédirentier 2</label>
+                                    <label for="form-dosAuthenticInstrument" class="col-12 col-form-label">Date de signature de l’Acte authentique </label>
                                     <div class="col-12">
-                                        {{ form_row(form.lastname2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lastname2', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-dateofbirth1" class="col-4 col-form-label">Date de naissance <span class="m--font-danger">*</span></label>
-                                    <div class="col-12">
-                                        {{ form_row(form.dateofbirth1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dateofbirth1', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-dateofbirth2" class="col-4 col-form-label">Date de naissance 2</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.dateofbirth2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dateofbirth2', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-mail1" class="col-4 col-form-label">Adresse mail</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.mail1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail1', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-mail2" class="col-4 col-form-label">Adresse mail 2</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.mail2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail2', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-buyer_phone1" class="col-4 col-form-label">Téléphone</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.buyer_phone1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-buyer_phone1', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-buyer_phone2" class="col-4 col-form-label">Téléphone 2</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.buyer_phone2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-buyer_phone2', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-buyer_phone1" class="col-4 col-form-label">Adresse</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.adresse_credirentier1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-buyer_phone1', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-buyer_phone2" class="col-4 col-form-label">Adresse 2</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.adresse_credirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-buyer_phone2', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-buyer_phone1" class="col-4 col-form-label">Code postal</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.code_postal_credirentier1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-buyer_phone1', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-buyer_phone2" class="col-4 col-form-label">Code postal 2</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.code_postal_credirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-buyer_phone2', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-buyer_phone1" class="col-4 col-form-label">Ville</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.ville_credirentier1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-buyer_phone1', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-buyer_phone2" class="col-4 col-form-label">Ville 2</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.ville_credirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-buyer_phone2', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-6">
-                                    <label for="form-show_duh" class="col-4 col-form-label">Abandon du DUH</label>
-                                    <div class="col-6">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form.show_duh, {'attr': {'class': 'form-control m-input'}, 'id': 'form-show_duh', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div id="adresse_crédirentier" class="form-group row" >
-                                <div class="col-lg-6">
-                                    <label for="form-date_duh" class="col-4 col-form-label">Date <span class="m--font-danger">*</span></label>
-                                    <div class="col-12">
-                                        {{ form_row(form.date_duh, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_duh', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <label for="form-address" class="col-4 col-form-label">Adresse <span class="m--font-danger">*</span></label>
-                                    <div class="col-12">
-                                        {{ form_row(form.address, {'attr': {'class': 'form-control m-input'}, 'id': 'form-address', 'label': false}) }}
-                                    </div>
-                                </div>
-                
-                                <div class="col-lg-12">
-                                    <label for="form-acte_abandon_duh_drive_id" class="col-4 col-form-label">Extrait de l'acte<span class="m--font-danger">*</span></label>
-                                    <div class="col-12">
-                                        {{ form_row(form.acte_abandon_duh_drive_id, {'attr': {'class': 'form-control m-input'}, 'id': 'form-acte_abandon_duh_drive_id', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    PROPRIETE
-                                </h2>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-12">
-                                    <label for="form-good_address" class="col-4 col-form-label">Adresse du bien <span class="m--font-danger">*</span></label>
-                                    <div class="col-12">
-                                        <div class="m-typeahead">
-                                            {{ form_row(form.good_address, {'attr': {'class': 'form-control m-input'}, 'id': 'form-good_address', 'label': false}) }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-goodType" class="col-4 col-form-label">Type de viager <span class="m--font-danger">*</span></label>
-                                    <div class="col-6">
-                                        {{ form_row(form.goodType, {'attr': {'class': 'form-control m-input'}, 'id': 'form-goodType', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-dosAuthenticInstrument" class="col-4 col-form-label">Date de signature de l'acte authentique</label>
-                                    <div class="col-6">
                                         {{ form_row(form.dosAuthenticInstrument, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dosAuthenticInstrument', 'label': false}) }}
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
-                                    <label for="form-propertyType" class="col-4 col-form-label">Type de bien</label>
-                                    <div class="col-6">
-                                        <div class="m-typeahead">
-                                            {{ form_row(form.propertyType, {'attr': {'class': 'form-control m-input'}, 'id': 'form-propertyType', 'label': false}) }}
-                                        </div>
-                                    </div>
-                                </div>
+                                
                             </div>
-                            <div id="appartement" class="form-group row">
+
+                             <div class="form-group row">
                                 <div class="col-lg-6">
-                                    <label for="form-coordonnees_syndic" class="col-4 col-form-label">Coordonnées Syndic</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.coordonnees_syndic, {'attr': {'class': 'form-control m-input'}, 'id': 'form-coordonnees_syndic', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-codes_syndic" class="col-4 col-form-label">Codes syndic</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.codes_syndic, {'attr': {'class': 'form-control m-input'}, 'id': 'form-codes_syndic', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                
-                                <div class="col-lg-6" id="date-fin-copro-appartement">
-                                    <label for="form-date_fin_exercice_copro" class="col-4 col-form-label">Date de fin d'exercice de copropriété<span class="m--font-danger">*</span></label>
-                                    <div class="col-6">
-                                        {{ form_row(form.date_fin_exercice_copro, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_fin_exercice_copro', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                
-                                
-                                <div class="col-lg-12">
-                                    <label for="form-designation_du_bien" class="col-4 col-form-label">Désignation du bien<span class="m--font-danger">*</span></label>
+                                    <label for="form-num_mandat_gestion" class="col-12 col-form-label">N° du mandat de gestion </label>
                                     <div class="col-12">
-                                        {{ form_row(form.designation_du_bien, {'attr': {'class': 'form-control m-input'}, 'id': 'form-designation_du_bien', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <label for="form-ref_cadastrales" class="col-4 col-form-label">Références cadastrales<span class="m--font-danger">*</span></label>
-                                    <div class="col-12">
-                                        {{ form_row(form.ref_cadastrales, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ref_cadastrales', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-12">
-                                    <label for="form-assurance_habitation" class="col-4 col-form-label">Assurance habitation</label>
-                                    <div class="col-12">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form.assurance_habitation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-assurance_habitation', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12" id="date_assurance_habitation">
-                                    <label for="form-date_assurance_habitation" class="col-4 col-form-label"> Date Assurance habitation<span class="m--font-danger">*</span></label>
-                                    <div class="col-12">
-                                        {{ form_row(form.date_assurance_habitation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_assurance_habitation', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <label for="form-chaudiere" class="col-4 col-form-label">Chaudière</label>
-                                    
-                                    <div class="col-12">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form.chaudiere, {'attr': {'class': 'form-control m-input'}, 'id': 'form-chaudiere', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <div class="col-12">
-                                        <div  id="date_chaudiere">
-                                            <div class="col-12">
-                                                <label for="form-date_assurance_habitation" class="col-4 col-form-label"> Date Assurance chaudiere<span class="m--font-danger">*</span></label>
-                                                {{ form_row(form.date_chaudiere, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_chaudiere', 'label': false}) }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <label for="form-fireplace" class="col-4 col-form-label">Cheminée</label>
-                                    <div class="col-12">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form.fireplace, {'attr': {'class': 'form-control m-input'}, 'id': 'form-fireplace', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <div class="col-12">
-                                        
-                                        <div id="date_cheminee" >
-                                            <div class="col-12">
-                                                <label for="form-date_assurance_cheminee'" class="col-4 col-form-label"> Date Assurance cheminee'<span class="m--font-danger">*</span></label>
-                                                {{ form_row(form.date_cheminee, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_cheminee', 'label': false}) }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-lg-12" >
-                                    <label for="form-climatisation_pompe_chaleur" class="col-4 col-form-label">Climatisation / Pompe à chaleur</label>
-                                    <div class="col-12">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form.climatisation_pompe_chaleur, {'attr': {'class': 'form-control m-input'}, 'id': 'form-climatisation_pompe_chaleur', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                        
-                                    </div>
-                                </div>
-                                 <div class="col-lg-12" >
-                                    <div class="col-12">
-                                        
-                                        <div id="date_climatisation" >
-                                            <div class="col-12">
-                                                <label for="form-date_assurance_climatisation_pompe_chaleur" class="col-4 col-form-label"> Date Assurance Climatisation / Pompe à chaleur<span class="m--font-danger">*</span></label>
-                                                {{ form_row(form.date_climatisation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_climatisation', 'label': false}) }}
-                                            </div>
-                                        </div>
+                                        {{ form_row(form.num_mandat_gestion, {'attr': {'class': 'form-control m-input'}, 'id': 'form-num_mandat_gestion', 'label': false}) }}
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <label for="form-startDateManagement" class="col-4 col-form-label">Date du mandat de gestion<span class="m--font-danger">*</span></label>
+                                    <label for="form-startDateManagement" class="col-12 col-form-label">Date du mandat de gestion </label>
                                     <div class="col-12">
                                         {{ form_row(form.startDateManagement, {'attr': {'class': 'form-control m-input'}, 'id': 'form-startDateManagement', 'label': false}) }}
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
-                                    <label for="form-endDateManagement" class="col-4 col-form-label">Date de fin du mandat de gestion<span class="m--font-danger">*</span></label>
-                                    <div class="col-6">
-                                        {{ form_row(form.endDateManagement, {'attr': {'class': 'form-control m-input'}, 'id': 'form-endDateManagement', 'label': false}) }}
 
+                            </div>
+
+
+                            <div class="form-group row">
+                                <div class="col-lg-6">
+                                    <h3 class="section-title">crédirentier 1</h3>
+                                    <label for="form-civilite1" class="col-12 col-form-label">Civilité </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.civilite1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-civilite1', 'label': false}) }}
+                                    </div>
+                                    <label for="form-lastname1" class="col-12 col-form-label">Nom </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.lastname1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lastname1', 'label': false}) }}
+                                    </div>
+                                    <label for="form-firstname1" class="col-12 col-form-label">Prénom </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.firstname1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-firstname1', 'label': false}) }}
+                                    </div>
+                                    <label for="form-dateofbirth1" class="col-12 col-form-label">Date de naissance </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.dateofbirth1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dateofbirth1', 'label': false}) }}
+                                    </div>
+                                    <label for="form-mail1" class="col-12 col-form-label">Adresse mail </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.mail1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail1', 'label': false}) }}
+                                    </div>
+                                    <label for="form-buyer_phone1" class="col-12 col-form-label">Téléphone </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.buyer_phone1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-buyer_phone1', 'label': false}) }}
+                                    </div>
+                                    <label for="form-adresse_credirentier1" class="col-12 col-form-label">Adresse </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.adresse_credirentier1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-adresse_credirentier1', 'label': false}) }}
+                                    </div>
+                                    <label for="form-code_postal_credirentier1" class="col-12 col-form-label">Code postal </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.code_postal_credirentier1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_credirentier1', 'label': false}) }}
+                                    </div>
+                                    <label for="form-ville_credirentier1" class="col-12 col-form-label">Ville </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.ville_credirentier1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_credirentier1', 'label': false}) }}
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <label for="form-num_mandat_gestion" class="col-4 col-form-label">N° du mandat de gestion<span class="m--font-danger">*</span></label>
-                                    <div class="col-6">
-                                        {{ form_row(form.num_mandat_gestion, {'attr': {'class': 'form-control m-input'}, 'id': 'form-num_mandat_gestion', 'label': false}) }}
-
+                                    <h3 class="section-title">crédirentier 2</h3>
+                                    <label for="form-civilite2" class="col-12 col-form-label">Civilité </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.civilite2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-civilite2', 'label': false}) }}
+                                    </div>
+                                    <label for="form-lastname2" class="col-12 col-form-label">Nom </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.lastname2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lastname2', 'label': false}) }}
+                                    </div>
+                                    <label for="form-firstname2" class="col-12 col-form-label">Prénom </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.firstname2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-firstname2', 'label': false}) }}
+                                    </div>
+                                    <label for="form-dateofbirth2" class="col-12 col-form-label">Date de naissance </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.dateofbirth2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dateofbirth2', 'label': false}) }}
+                                    </div>
+                                    <label for="form-mail2" class="col-12 col-form-label">Adresse mail </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.mail2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail2', 'label': false}) }}
+                                    </div>
+                                    <label for="form-buyer_phone2" class="col-12 col-form-label">Téléphone </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.buyer_phone2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-buyer_phone2', 'label': false}) }}
+                                    </div>
+                                    <label for="form-adresse_credirentier2" class="col-12 col-form-label">Adresse </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.adresse_credirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-adresse_credirentier2', 'label': false}) }}
+                                    </div>
+                                    <label for="form-code_postal_credirentier2" class="col-12 col-form-label">Code postal </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.code_postal_credirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_credirentier2', 'label': false}) }}
+                                    </div>
+                                    <label for="form-ville_credirentier2" class="col-12 col-form-label">Ville </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.ville_credirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_credirentier2', 'label': false}) }}
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group row">
                                 <div class="col-lg-12">
-                                    <label for="form-debirentier_different" class="col-4 col-form-label">
-                                     {% if property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
-                                        Crédirentier différent du mandant
-                                    {% else %}
-                                        Débirentier différent du mandant
-                                    {% endif %}
-                                    
-                                    </label>
+                                    <h3 class="section-title">COORDONNÉES BANCAIRES</h3>
+                                </div>
+                                <div class="col-lg-6">
+
+                                     <label for="form-bank_establishment_code_1" class="col-12 col-form-label">Code banque</label>
                                     <div class="col-12">
-                                        <div class="m-typeahead">
+                                        {{ form_row(form.bank_establishment_code_1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_establishment_code_1', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_code_box_1" class="col-12 col-form-label">Code guichet</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_code_box_1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_code_box_1', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_rib_1" class="col-12 col-form-label">Clé RIB</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_rib_1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_rib_1', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_account_number_1" class="col-12 col-form-label">N° compte</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_account_number_1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_account_number_1', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_domiciliation_1" class="col-12 col-form-label">Domiciliation</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_domiciliation_1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_domiciliation_1', 'label': false}) }}
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+
+                                     <label for="form-bank_iban_1" class="col-12 col-form-label">IBAN</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_iban_1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_iban_1', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_bic_1" class="col-12 col-form-label">BIC</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_bic_1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_bic_1', 'label': false}) }}
+                                    </div>
+
+
+                                     <label for="form-bank_ics_1" class="col-12 col-form-label">N° ICS</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_ics_1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_ics_1', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_rum_1" class="col-12 col-form-label">N° RUM</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_rum_1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_rum_1', 'label': false}) }}
+                                    </div>
+
+                                </div>
+                            </div>
+                                
+                            <div class="form-group row">
+                                <div class="col-lg-6">
+                                    <h3 class="section-title">DÉBIRENTIER 1</h3>
+
+                                    <label for="form-civilite_debirentier" class="col-12 col-form-label">Civilité </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.civilite_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-civilite_debirentier', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-nom_debirentier" class="col-12 col-form-label">Nom ou raison sociale </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.nom_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-nom_debirentier', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-prenom_debirentier" class="col-12 col-form-label">Prénom </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.prenom_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-prenom_debirentier', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-email_debirentier" class="col-12 col-form-label">Adresse mail </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.email_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-email_debirentier', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-telephone_debirentier" class="col-12 col-form-label">Téléphone </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.telephone_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-telephone_debirentier', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-addresse_debirentier" class="col-12 col-form-label">Adresse </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.addresse_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_debirentier', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-code_postal_debirentier" class="col-12 col-form-label">Code postal </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.code_postal_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_debirentier', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-ville_debirentier" class="col-12 col-form-label">Ville </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.ville_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_debirentier', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-pays_debirentier" class="col-12 col-form-label">Pays </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.pays_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-pays_debirentier', 'label': false}) }}
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-6">
+                                    <h3 class="section-title">DÉBIRENTIER 2</h3>
+
+                                    <label for="form-civilite_debirentier2" class="col-12 col-form-label">Civilité </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.civilite_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-civilite_debirentier2', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-nom_debirentier2" class="col-12 col-form-label">Nom ou raison sociale </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.nom_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-nom_debirentier2', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-prenom_debirentier2" class="col-12 col-form-label">Prénom </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.prenom_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-prenom_debirentier2', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-email_debirentier2" class="col-12 col-form-label">Adresse mail </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.email_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-email_debirentier2', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-telephone_debirentier2" class="col-12 col-form-label">Téléphone </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.telephone_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-telephone_debirentier2', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-addresse_debirentier2" class="col-12 col-form-label">Adresse </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.addresse_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_debirentier2', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-code_postal_debirentier2" class="col-12 col-form-label">Code postal </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.code_postal_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_debirentier2', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-ville_debirentier2" class="col-12 col-form-label">Ville </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.ville_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_debirentier2', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-pays_debirentier2" class="col-12 col-form-label">Pays </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.pays_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-pays_debirentier2', 'label': false}) }}
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <h3 class="section-title">COORDONNÉES BANCAIRES</h3>
+                                </div>
+                                <div class="col-lg-6">
+
+                                     <label for="form-bank_establishment_code_2" class="col-12 col-form-label">Code banque</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_establishment_code_2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_establishment_code_2', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_code_box_2" class="col-12 col-form-label">Code guichet</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_code_box_2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_code_box_2', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_rib_2" class="col-12 col-form-label">Clé RIB</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_rib_2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_rib_2', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_account_number_2" class="col-12 col-form-label">N° compte</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_account_number_2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_account_number_2', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_domiciliation_2" class="col-12 col-form-label">Domiciliation</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_domiciliation_2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_domiciliation_2', 'label': false}) }}
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+
+                                     <label for="form-bank_iban_2" class="col-12 col-form-label">IBAN</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_iban_2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_iban_2', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_bic_2" class="col-12 col-form-label">BIC</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_bic_2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_bic_2', 'label': false}) }}
+                                    </div>
+
+
+                                     <label for="form-bank_ics_2" class="col-12 col-form-label">N° ICS</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_ics_2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_ics_2', 'label': false}) }}
+                                    </div>
+
+                                     <label for="form-bank_rum_2" class="col-12 col-form-label">N° RUM</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.bank_rum_2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_rum_2', 'label': false}) }}
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <h3 class="section-title">NOTAIRE ACTE</h3>
+                                </div>
+
+                                <div class="col-lg-6">
+
+                                    <label for="form-civilite_notaire" class="col-12 col-form-label">Civilité</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.civilite_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-civilite_notaire', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-nom_notaire" class="col-12 col-form-label">Nom</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.nom_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-nom_notaire', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-prenom_notaire" class="col-12 col-form-label">Prénom</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.prenom_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-prenom_notaire', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-email_notaire" class="col-12 col-form-label">Adresse mail</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.email_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-email_notaire', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-telephone_notaire" class="col-12 col-form-label">Téléphone</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.telephone_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-telephone_notaire', 'label': false}) }}
+                                    </div>
+                                
+                                </div>
+
+                                <div class="col-lg-6">
+
+                                    <label for="form-addresse_notaire" class="col-12 col-form-label">Adresse</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.addresse_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_notaire', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-code_postal_notaire" class="col-12 col-form-label">Code postal</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.code_postal_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_notaire', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-ville_notaire" class="col-12 col-form-label">Ville</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.ville_notaire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_notaire', 'label': false}) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <h3 class="section-title">LE BIEN</h3>
+                                </div>
+
+                                <div class="col-lg-6">
+
+                                    <label for="form-propertyType" class="col-12 col-form-label">Type de bien</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.propertyType, {'attr': {'class': 'form-control m-input'}, 'id': 'form-propertyType', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-adresse_similaire_credirentier" class="col-12 col-form-label">Adresse similaire à celle de(s) crédirentier(s)</label>
+                                    <div class="col-12">
+                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                            <label>
+                                                {{ form_widget(form.adresse_similaire_credirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-adresse_similaire_credirentier', 'label': false}) }}
+                                                <span></span>
+                                            </label>
+                                        </span>
+                                    </div>
+
+                                    <label for="form-good_address" class="col-12 col-form-label">Adresse</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.good_address, {'attr': {'class': 'form-control m-input'}, 'id': 'form-good_address', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-postalCode" class="col-12 col-form-label">Code postal</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.postalCode, {'attr': {'class': 'form-control m-input'}, 'id': 'form-postalCode', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-city" class="col-12 col-form-label">Ville</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.city, {'attr': {'class': 'form-control m-input'}, 'id': 'form-city', 'label': false}) }}
+                                    </div>
+
+                                    
+                                    <label for="form-ref_cadastrales" class="col-4 col-form-label">Références cadastrales</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.ref_cadastrales, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ref_cadastrales', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-lots_propriete" class="col-4 col-form-label">Lots de propriété</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.lots_propriete, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lots_propriete', 'label': false}) }}
+                                    </div>
+                                
+
+
+                                </div>
+
+                                <div class="col-lg-6">
+
+                                     <div class="col-lg-12">
+                                        <label for="form-assurance_habitation" class="col-12 col-form-label">Assurance habitation</label>
+                                        <div class="col-12">
                                             <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
                                                 <label>
-                                                    {{ form_widget(form.debirentier_different, {'attr': {'class': 'form-control m-input'}, 'id': 'form-debirentier_different', 'label': false}) }}
+                                                    {{ form_widget(form.assurance_habitation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-assurance_habitation', 'label': false}) }}
                                                     <span></span>
                                                 </label>
                                             </span>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    DEBIRENTIER 1
-                                </h2>
-                            </div>
-                            <div id="partie-debirentier" class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-nom_debirentier" class="col-12 col-form-label">Nom ou Raison sociale</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.nom_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-nom_debirentier', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-prenom_debirentier" class="col-4 col-form-label">Prénom </label>
-                                    <div class="col-12">
-                                        {{ form_row(form.prenom_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-prenom_debirentier', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <label for="form-addresse_debirentier" class="col-4 col-form-label">Adresse </label>
-                                    <div class="col-12">
-                                        {{ form_row(form.addresse_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_debirentier', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-code_postal_debirentier" class="col-4 col-form-label">Code postal </label>
-                                    <div class="col-6">
-                                        {{ form_row(form.code_postal_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_debirentier', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-pays_debirentier" class="col-4 col-form-label">Pays</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.pays_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-pays_debirentier', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-ville_debirentier" class="col-4 col-form-label">Ville</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.ville_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_debirentier', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-telephone_debirentier" class="col-4 col-form-label">Téléphone</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.telephone_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-telephone_debirentier', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-email_debirentier" class="col-4 col-form-label">Adresse email</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.email_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-email_debirentier', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                            </div>
-                             <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    DEBIRENTIER 2
-                                </h2>
-                            </div>
-                            <div id="partie-debirentier2" class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-nom_debirentier2" class="col-12 col-form-label">Nom ou Raison sociale 2</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.nom_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-nom_debirentier2', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-prenom_debirentier2" class="col-4 col-form-label">Prénom 2</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.prenom_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-prenom_debirentier2', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <label for="form-addresse_debirentier2" class="col-4 col-form-label">Adresse 2</label>
-                                    <div class="col-12">
-                                        {{ form_row(form.addresse_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_debirentier2', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-code_postal_debirentier2" class="col-4 col-form-label">Code postal 2</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.code_postal_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_debirentier2', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-pays_debirentier2" class="col-4 col-form-label">Pays 2</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.pays_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-pays_debirentier2', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-ville_debirentier2" class="col-4 col-form-label">Ville 2</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.ville_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_debirentier2', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-telephone_debirentier2" class="col-4 col-form-label">Téléphone 2</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.telephone_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-telephone_debirentier2', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-email_debirentier2" class="col-4 col-form-label">Adresse email 2</label>
-                                    <div class="col-6">
-                                        {{ form_row(form.email_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-email_debirentier2', 'label': false}) }}
-
-                                    </div>
-                                </div>
-                            </div>
-                       
-                       
-                        <input id="bouton_envoyer" class="btn btn-outline-success btn-block" type="submit" value="Enregistrer" />
-                        
-                        {{ form_end(form) }}
-                    </div>
-                    
-                    <div class="tab-pane" id="m_tabs_pay" role="tabpanel">
-                        {{ form_start(form_payment, {'attr': {'class': 'm-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed'}}) }}
-
-                            <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    {{ property.title}} - Bien N°{{ property.id}}
-                                </h2>
-                            </div>
-                            
-                        
-                            <div class="form-group row">
-                                <div class="col-6">
-                                    <label for="form-no_indexation" class="col-4 col-form-label">Désactiver l'indexation</label>
-                                    <div class="col-6">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form_payment.no_indexation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-no_indexation', 'label': false}) }}
-
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label for="form-billingDisabled" class="col-4 col-form-label">Désactiver la facturation</label>
-                                    <div class="col-6">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form_payment.billingDisabled, {'attr': {'class': 'form-control m-input'}, 'id': 'form-billingDisabled', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label for="form-hide_export_monthly" class="col-4 col-form-label">Masquer les rentes de l'export</label>
-                                    <div class="col-6">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form_payment.hide_export_monthly, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_export_monthly', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label for="form-annuitiesDisabled" class="col-4 col-form-label">Désactiver les rentes</label>
-                                    <div class="col-12">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form_payment.annuitiesDisabled, {'attr': {'class': 'form-control m-input'}, 'id': 'form-annuitiesDisabled', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label for="form-hide_export_quarterly" class="col-4 col-form-label">Masquer les frais de co-pro de l'export</label>
-                                    <div class="col-6">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form_payment.hide_export_quarterly, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_export_quarterly', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label for="form-honorariesDisabled" class="col-4 col-form-label">Désactiver les honoraires</label>
-                                    <div class="col-6">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form_payment.honorariesDisabled, {'attr': {'class': 'form-control m-input'}, 'id': 'form-honorariesDisabled', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label for="form-hide_export_otp" class="col-4 col-form-label">Masquer les factures exceptionnelles de l'export (ex: poubelles)</label>
-                                    <div class="col-6">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form_payment.hide_export_otp, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_export_otp', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label for="form-hide_honorary_export" class="col-4 col-form-label">Masquer les honoraires de l'export</label>
-                                    <div class="col-6">
-                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form_payment.hide_honorary_export, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_honorary_export', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <span{% if property.propertyType != "Appartement" and property.propertyType != "Maison" %} style="display: none;" {% endif %}>
-                                        <label for="form-condominiumFees" class="col-4 col-form-label">Montant charges de copropriété (trimestrielles)</label>
+                                    <div class="col-lg-12" id="date_assurance_habitation">
+                                        <label for="form-date_assurance_habitation" class="col-12 col-form-label"> Date début</label>
                                         <div class="col-12">
-                                            {{ form_row(form_payment.condominiumFees, {'attr': {'class': 'form-control m-input'}, 'id': 'form-condominiumFees', 'label': false}) }}
-                                        </div>
-                                    </span>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-garbageTax" class="col-4 col-form-label">Montant ordures ménagères</label>
-                                    <div class="col-12">
-                                        {{ form_row(form_payment.garbageTax, {'attr': {'class': 'form-control m-input'}, 'id': 'form-garbageTax', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    BANQUE
-                                </h2>
-                            </div>
-                            <div class="m-divider"><span></span>Relevé d'Identité Bancaire<span></span></div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-bank_establishment_code" class="col-4 col-form-label">Code banque</label>
-                                    <div class="col-12">
-                                        {{ form_row(form_payment.bank_establishment_code, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_establishment_code', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-bank_code_box" class="col-4 col-form-label">Code guichet</label>
-                                    <div class="col-12">
-                                        {{ form_row(form_payment.bank_code_box, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_code_box', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-bank_account_number" class="col-4 col-form-label">N° de compte</label>
-                                    <div class="col-12">
-                                        {{ form_row(form_payment.bank_account_number, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_account_number', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-bank_key" class="col-4 col-form-label">Clé RIB</label>
-                                    <div class="col-12">
-                                        {{ form_row(form_payment.bank_key, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_key', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-bank_domiciliation" class="col-4 col-form-label">Domiciliation</label>
-                                    <div class="col-12">
-                                        {{ form_row(form_payment.bank_domiciliation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_domiciliation', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6"></div>
-                            </div>
-                            <div class="m-divider"><span></span>Numéro International de Compte Bancaire (IBAN)<span></span></div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-bank_iban" class="col-4 col-form-label">IBAN</label>
-                                    <div class="col-12">
-                                        {{ form_row(form_payment.bank_iban, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_iban', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="form-bank_bic" class="col-4 col-form-label">Code banque (BIC)</label>
-                                    <div class="col-12">
-                                        {{ form_row(form_payment.bank_bic, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_bic', 'label': false}) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="m-divider"><span></span>Identifiant Créancier SEPA<span></span></div>
-                            <div class="form-group row">
-                                <div class="col-lg-6">
-                                    <label for="form-bank_iban" class="col-4 col-form-label">N° ICS</label>
-                                    <div class="col-12">
-                                        {{ form_row(form_payment.bank_ics, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_ics', 'label': false}) }}
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                <label for="form-bank_rum" class="col-4 col-form-label">N° RUM</label>
-                                    <div class="col-12">
-                                        {{ form_row(form_payment.bank_rum, {'attr': {'class': 'form-control m-input'}, 'id': 'form-bank_rum', 'label': false}) }}
-                                    </div></div>
-                            </div>
-                            <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    RENTE
-                                </h2>
-                            </div>
-                            <h4 class="titre-sous-partie"> ACTE</h4>
-                            <div id="billingBox">
-                                <div class="form-group row">
-                                    <div class="col-lg-6">
-                                        <label for="form-intitules_indices_initial" class="col-4 col-form-label">Intitulé indice initial <span class="m--font-danger">*</span></label>
-                                        <div class="col-6">
-                                            {{ form_row(form_payment.intitules_indices_initial, {'attr': {'class': 'form-control m-input'}, 'id': 'form-intitules_indices_initial', 'label': false}) }}
+                                            {{ form_row(form.date_assurance_habitation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_assurance_habitation', 'label': false}) }}
                                         </div>
                                     </div>
-                                    <div class="col-lg-6">
-                                        <label for="form-mois_indice_initial" class="col-4 col-form-label">Mois indice initial<span class="m--font-danger">*</span></label>
+
+                                    <div class="col-lg-12">
+                                        <label for="form-chaudiere" class="col-12 col-form-label">Chaudière</label>
+                                        
                                         <div class="col-12">
-                                            {{ form_row(form_payment.mois_indice_initial, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mois_indice_initial', 'label': false,'date_pattern': '<span style="display: none;">{{ day }}</span> {{ month }} <span class="delim">&#47;</span> {{ year }}' }) }}
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <label for="form-initial_index_object" class="col-4 col-form-label">Valeur Indice initial<span class="m--font-danger">*</span></label>
-                                        <div class="col-12">
-                                            {{ form_row(form_payment.initial_index_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initial_index_object', 'label': false}) }}
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <label for="form-initialAmount" class="col-4 col-form-label">Montant initial de rente <span class="m--font-danger">*</span></label>
-                                        <div class="col-12">
-                                            {{ form_row(form_payment.initialAmount, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initialAmount', 'label': false}) }}
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <label for="form-revaluationDate" class="col-4 col-form-label">Date d’indexation</label>
-                                        <div class="col-12">
-                                            {{ form_row(form_payment.revaluationDate, {'attr': {'class': 'form-control m-input'}, 'id': 'form-revaluationDate', 'label': false}) }}
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <label for="form-abandonmentIndex" class="col-4 col-form-label">Indice de d'abandon</label>
-                                        <div class="col-12">
-                                            {{ form_row(form_payment.abandonmentIndex, {'attr': {'class': 'form-control m-input'}, 'id': 'form-abandonmentIndex', 'label': false}) }}
+                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.chaudiere, {'attr': {'class': 'form-control m-input'}, 'id': 'form-chaudiere', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="col-lg-12">
-                                        <label for="form-clause_OG2I" class="col-4 col-form-label">CLAUSE OG2I</label>
+                                        <div class="col-12">
+                                            <div  id="date_chaudiere">
+                                                <div class="col-12">
+                                                    <label for="form-date_assurance_habitation" class="col-12 col-form-label"> Date de l'entretien</label>
+                                                    {{ form_row(form.date_chaudiere, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_chaudiere', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12" >
+                                        <label for="form-climatisation_pompe_chaleur" class="col-12 col-form-label">Climatisation / Pompe à chaleur</label>
                                         <div class="col-12">
                                             <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form_payment.clause_OG2I, {'attr': {'class': 'form-control m-input'}, 'id': 'form-clause_OG2I', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
+                                                <label>
+                                                    {{ form_widget(form.climatisation_pompe_chaleur, {'attr': {'class': 'form-control m-input'}, 'id': 'form-climatisation_pompe_chaleur', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
+                                            
                                         </div>
                                     </div>
-                                    <div class="col-lg-12" id="avec_indexation">
-                                        <label for="form-indexation_OG2I" class="col-4 col-form-label">INDEXATION OG2I</label>
+                                    <div class="col-lg-12" >
+                                        <div class="col-12">
+                                            
+                                            <div id="date_climatisation" >
+                                                <div class="col-12">
+                                                    <label for="form-date_assurance_climatisation_pompe_chaleur" class="col-12 col-form-label"> Date de l'entretien</label>
+                                                    {{ form_row(form.date_climatisation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_climatisation', 'label': false}) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-lg-12">
+                                        <label for="form-fireplace" class="col-12 col-form-label">Cheminée</label>
                                         <div class="col-12">
                                             <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                            <label>
-                                                {{ form_widget(form_payment.indexation_OG2I, {'attr': {'class': 'form-control m-input'}, 'id': 'form-indexation_OG2I', 'label': false}) }}
-                                                <span></span>
-                                            </label>
-                                        </span>
+                                                <label>
+                                                    {{ form_widget(form.fireplace, {'attr': {'class': 'form-control m-input'}, 'id': 'form-fireplace', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
                                         </div>
                                     </div>
-                                </div>
-                                <div id="ogi2" >
-                                    <h4 class="titre-sous-partie"> INDEXATION OG2I année 1</h4>
-                                    <div  class="form-group row">
-                                        <div class="col-lg-6">
-                                            <label for="form-valeur_indice_ref_og2_i_object" class="col-12 col-form-label">Valeur Indice de référence<span class="m--font-danger">*</span></label>
-                                            <div class="col-12">
-                                                {{ form_row(form_payment.valeur_indice_ref_og2_i_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-valeur_indice_ref_og2_i_object', 'label': false}) }}
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <label for="form-mois_indice_ref_og2_i" class="col-12 col-form-label">Mois indice de référence<span class="m--font-danger">*</span></label>
-                                            <div class="col-12">
-                                                {{ form_row(form_payment.mois_indice_ref_og2_i, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mois_indice_ref_og2_i', 'label': false,'date_pattern': '<span style="display: none;">{{ day }}</span> {{ month }} <span class="delim">&#47;</span> {{ year }}' }) }}                            
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <label for="form-plafonnement_index_og2_i" class="col-12 col-form-label">Plafonnement de l'indexation</label>
-                                            <div class="col-12">
-                                                {{ form_row(form_payment.plafonnement_index_og2_i, {'attr': {'class': 'form-control m-input'}, 'id': 'form-plafonnement_index_og2_i', 'label': false}) }}
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <label class="col-12  col-form-label">indice OG2I</label>
-                                            <input type="text" id="form-indice-og2i" name="form-indice-og2i" value="{{indice_og2i.value}}" disabled="disabled" class="form-control m-input">
-                                        </div>
-                                        <div class="col-lg-6 pad-15">
-                                        </div>
-                                        <div class="col-lg-6 pad-15">
-                                            Montant de la rente de base
-                                            <div class="col-12">
-                                                <h3>
-                                                    <span id="montant_rente">0.00€</span>
-                                                    <span id="montant_rente_sans_arrondis" style="display:none">0.00€</span>
-                                                </h3>
+                                    <div class="col-lg-12">
+                                        <div class="col-12">
+                                            
+                                            <div id="date_cheminee" >
+                                                <div class="col-12">
+                                                    <label for="form-date_assurance_cheminee'" class="col-12 col-form-label"> Date de l'entretien</label>
+                                                    {{ form_row(form.date_cheminee, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_cheminee', 'label': false}) }}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <h4 class="titre-sous-partie"> INDEXATION</h4>
-                                <div class="form-group row">
-                                    <input type="text" id="form-indice_m_u_hide" style="display:none" name="form-indice_m_u_hide" value="{{indice_m_u.id}}"  disabled="disabled" class="form-control m-input">
-                                    <input type="text" id="form-indice_og2i_hide" style="display:none" name="form-indice_og2i_hide" value="{{indice_og2i.id}}"  disabled="disabled" class="form-control m-input">
-                                    <div class="col-lg-6">
-                                            <label for="form-valeur_indice_reference_object" class="col-12 col-form-label">Valeur Indice de référence<span class="m--font-danger">*</span></label>
-                                            <div class="col-12">
-                                                {{ form_row(form_payment.valeur_indice_reference_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-valeur_indice_reference_object', 'label': false}) }}
-                                            </div>
-                                        </div>
                                     
-                                    <div class="col-lg-6">
-                                    Nouveau montant de rente
+                                    
+
+                                </div>
+
+                               
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <h3 class="section-title">FINANCIER</h3>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <label for="form-billingDisabled" class="col-12 col-form-label">Désactiver la facturation</label>
+                                    <div class="col-12">
+                                        <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                            <label>
+                                                {{ form_widget(form.billingDisabled, {'attr': {'class': 'form-control m-input'}, 'id': 'form-billingDisabled', 'label': false}) }}
+                                                <span></span>
+                                            </label>
+                                        </span>
+                                    </div>
+
+                                    <label for="form-initialAmount" class="col-12 col-form-label">Montant de la rente initiale</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.initialAmount, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initialAmount', 'label': false}) }}
+                                    </div>
+
+                                    
+
+                                    <div class="col-lg-12">
+                                        Montant de la rente
                                         <div class="col-12">
                                             <h3>
                                                 <span id="nv_montant_rente">0.00€</span>
                                             </h3>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="">
-                                    <h2 class="separateur-horizontal">                                                
-                                        HONORAIRES
-                                    </h2>
-                                </div>
-                                <div class="form-group row" id="box-honorary_rates_object">
-                                    <div class="col-lg-6">
-                                        <label for="form-honorary_rates_object" class="col-4 col-form-label">Taux honoraires</label>
+
+                                    <div id="box-honorary_rates_object">
+                                        
+                                        <label for="form-honorary_rates_object" class="col-12 col-form-label">Taux honoraires</label>
                                         <div class="col-12">
-                                            {{ form_row(form_payment.honorary_rates_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-honorary_rates_object', 'label': false}) }}
+                                            {{ form_row(form.honorary_rates_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-honorary_rates_object', 'label': false}) }}
                                         </div>
-                                    </div>
-                                    <div class="col-lg-6 pad-15">
-                                        Montant des honoraires
+                                        
+                                        <div class="col-12 pad-15">
+                                            Montant des honoraires
+                                            <div>
+                                                <h3>
+                                                    <span id="honorary_amount">0.00€</span>
+                                                </h3>
+                                            </div>
+                                        </div>
                                         <div class="col-12">
-                                            <h3>
-                                                <span id="honorary_amount">0.00€</span>
-                                            </h3>
+                                            <label for="form-dernier_jour_paiement_rente" class="col-12 col-form-label">Dernier jour de paiement de la rente</label>
+                                            <div class="col-12">
+                                                {{ form_row(form.dernier_jour_paiement_rente, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dernier_jour_paiement_rente', 'label': false}) }}
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6">
-                                        <label for="form-commentaire_honoraire" class="col-4 col-form-label">Commentaires</label>
+
+
+                                </div>
+
+                                <div class="col-lg-6">
+
+                                    <label for="form-revaluationDate" class="col-12 col-form-label">Mois d’indexation</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.revaluationDate, {'attr': {'class': 'form-control m-input'}, 'id': 'form-revaluationDate', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-intitules_indices_initial" class="col-12 col-form-label">Intitulé indice initial </label>
+                                    <div class="col-12">
+                                        {{ form_row(form.intitules_indices_initial, {'attr': {'class': 'form-control m-input'}, 'id': 'form-intitules_indices_initial', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-mois_indice_initial" class="col-12 col-form-label">Mois / année indice initial</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.mois_indice_initial, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mois_indice_initial', 'label': false,'date_pattern': '<span style="display: none;">{{ day }}</span> {{ month }} <span class="delim">&#47;</span> {{ year }}' }) }}
+                                    </div>
+
+                                    <label for="form-initial_index_object" class="col-12 col-form-label">Valeur Indice initial</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.initial_index_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initial_index_object', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-valeur_indice_reference_object" class="col-12 col-form-label">Valeur de l’indice de référence</label>
                                         <div class="col-12">
-                                            {{ form_row(form_payment.commentaire_honoraire, {'attr': {'class': 'form-control m-input autosize'}, 'id': 'form-commentaire_honoraire', 'label': false}) }}
+                                            {{ form_row(form.valeur_indice_reference_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-valeur_indice_reference_object', 'label': false}) }}
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <input id="bouton_payment" class="btn btn-outline-success btn-block" type="submit" value="Enregistrer" />
-                        {{ form_end(form_payment) }}
-                    </div>
-                    
-                    <div class="tab-pane" id="m_tabs_copro" role="tabpanel">
-                       {{ form_start(form_copro, {'attr': {'class': 'm-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed'}}) }}
-                            <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    {{ property.title}} - Bien N°{{ property.id}}
-                                </h2>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-6">
-                                    <label class="col-4">Coordonnées Syndic</label>
-                                    <div class="col-6">
-                                        {{ form_row(form_copro.coordonnees_syndic, {'attr': {'class': 'form-control m-input'}, 'id': 'form-coordonnees_syndic', 'label': false}) }}
 
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label class="col-4">Codes syndic</label>
-                                    <div class="col-6">
-                                        {{ form_row(form_copro.codes_syndic, {'attr': {'class': 'form-control m-input'}, 'id': 'form-codes_syndic', 'label': false}) }}
+                                        <label for="form-plafonnement_index_og2_i" class="col-12 col-form-label">Taux de plafonnement de l’indexation</label>
+                                        <div class="col-12">
+                                            {{ form_row(form.plafonnement_index_og2_i, {'attr': {'class': 'form-control m-input'}, 'id': 'form-plafonnement_index_og2_i', 'label': false}) }}
+                                        </div>
 
-                                    </div>
-                                </div>
-                                
-                                <div class="col-6" id="date-fin-copro-appartement2">
-                                    <label class="col-4">Date de fin d'exercice de copropriété <span class="m--font-danger">*</span></label>
-                                    <div class="col-6">
-                                        {{ form_row(form_copro.date_fin_exercice_copro, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_fin_exercice_copro', 'label': false}) }}
+                                        <label for="form-pas_de_baisse" class="col-12 col-form-label">Pas de baisse de rente</label>
+                                        <div class="col-12">
+                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.pas_de_baisse, {'attr': {'class': ' form-control m-input'}, 'id': 'form-pas_de_baisse', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
+                                        </div>
 
-                                    </div>
-                                </div>
-                                
-                            </div>
-                            <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    AVANCES DE CHARGES DE COPROPRIETE
-                                </h2>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-6">
-                                    <label class="col-12">Année de vente</label>
-                                    <select class="form-control" id="annee_vente">
-                                        {% for year in "now"|date('Y')-50.."now"|date('Y')+10 -%}
-                                        <option value="{{ year }}">{{ year }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-6">
-                                    <label class="col-12">Date de début de gestion de copropriété</label>
-                                    {{ form_row(form_copro.date_debut_gestion_copro, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_debut_gestion_copro', 'label': false}) }}
+                                    
 
-                                </div>
-                            </div>
-                            <div id="invoices_ajax" class="form-group row">
-                            {% for inv in invoices %}
-                                {% if ('FA00' in inv.data.number) and inv.data.property and inv.data.property.condominiumFees|default(null) %}
-                                    <div class="col-6 mb-2">
-                                        <input type="text" id="{{inv.id}}" name="invoice-{{inv.data.number}}" disabled="disabled" value="{{inv.data.number}} {{inv.date| date('d-m-Y')}} {{inv.data.property.condominiumFees}}" class="form-control m-input">
+                                    <div class="col-12">
+                                        <h4>INDEXATION OG2I</h4>
                                     </div>
-                                    <div class="col-6 mb-2">
-                                        <div class="form-group row">
-                                            <div class="col-4 mx-0 px-0">
-                                                <select class="form-control" id="jour_{{inv.id}}">
-                                                    <option value=""></option>
-                                                    {% for day in 1..31 %}
-                                                        {% if inv.date_de_paiement and day == inv.date_de_paiement| date('d') %}
-                                                            <option value="{{ day }}" selected>{{ day }}</option>
-                                                        {% else %}
-                                                            <option value="{{ day }}">{{ day }}</option>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                            <div class="col-4 mx-0 px-0">
-                                                <select class="form-control" id="mois_{{inv.id}}" >
-                                                <option value=""></option>
-                                                    {% for month in 1..12 %}
-                                                        {% if inv.date_de_paiement and month == inv.date_de_paiement| date('m') %}
-                                                            <option value="{{ month }}" selected>{{ month }}</option>
-                                                        {% else %}
-                                                            <option value="{{ month }}">{{ month }}</option>
-                                                        {% endif %}    
-                                                    {% endfor %}
-                                                </select>      
-                                            </div>
-                                            <div class="col-4 mx-0 px-0">
-                                                <select class="form-control" id="annee_{{inv.id}}">
-                                                    <option value=""></option>
-                                                    {% for year in "now"|date('Y')-50.."now"|date('Y')+10 -%}
-                                                        
-                                                        {% if inv.date_de_paiement and year == inv.date_de_paiement| date('Y') %}
-                                                            <option value="{{ year }}" selected>{{ year }}</option>
-                                                        {% else %}
-                                                            <option value="{{ year }}">{{ year }}</option>
-                                                        {% endif %}    
-                                                    {% endfor %}
-                                                </select>
+                                    <div {% if not isAdmin %}style="display:none"{% endif %}>
+                                        <div class="col-12">
+                                            <label for="form-clause_OG2I" >CLAUSE OG2I</label>
+                                            <div >
+                                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.clause_OG2I, {'attr': {'class': 'form-control m-input'}, 'id': 'form-clause_OG2I', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
                                             </div>
                                         </div>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-12">
-                                    <label class="col-12">Commentaires</label>
-                                    {{ form_row(form_copro.commentaire_copro, {'attr': {'class': 'form-control m-input autosize'}, 'id': 'form-commentaire_copro', 'label': false}) }}
-                                </div>
-                            </div>
-                            <div class="">
-                                <h2 class="separateur-horizontal">                                                
-                                    REGULARISATION ANNUELLE
-                                </h2>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-12">
-                                Période de régularisation<span class="m--font-danger">*</span>
-                                </div>
-                                <div class="col-6">
-                                    <label class="col-12">Du :</label>
-                                    {{ form_row(form_copro.date_reg_debut, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_reg_debut', 'label': false}) }}
-                                </div>
-                                <div class="col-6">
-                                    <label class="col-12">Au:</label>
-                                    {{ form_row(form_copro.date_reg_fin, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_reg_fin', 'label': false}) }}
-                                </div>
-                                <div class="col-6">
-                                    <label class="col-12">Total crédit (crédit)</label>
-                                    <input type="text" id="form-total-credit" name="total-credit" disabled="disabled" class="form-control m-input">
-                                </div>
-                                <div class="col-6">
-                                    <label class="col-12">Décompte de charges (débit)</label>
-                                    <input type="text" id="form-total-debit" name="total-debit"  class="form-control m-input">
-                                </div>
-                                <div class="col-6">
-                                    <label class="col-12">Régul annuelle</label>
-                                    {{ form_row(form_copro.regul, {'attr': {'class': 'form-control m-input'}, 'id': 'form-regul', 'label': false}) }}
-
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-8">
-                                </div>
-                                <div class="col-4">
-                                    <input id="bouton_regularisation" class="btn btn-outline-success btn-block" type="submit" value="valider et envoyer" />
-                                </div>
-                            </div>
-                        {{ form_end(form_copro) }}
-                    </div>
-                    <div class="tab-pane" id="m_tabs_messages" role="tabpanel">
-                        <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
-                            <div class="row align-items-center">
-                                <div class="col-xl-8 order-2 order-xl-1">
-                                    <div class="form-group m-form__group row align-items-center">
-                                        <div class="col-md-4">
-                                            <div class="m-form__group m-form__group--inline">
-                                                <div class="m-form__label">
-                                                    <label class="m-label m-label--single" for="m_form_status">Statut:</label>
-                                                </div>
-                                                <div class="m-form__control">
-                                                    <select class="form-control m-bootstrap-select" id="m_form_status">
-                                                        <option value="">Tous</option>
-                                                        <option value="Envoyé">Envoyé</option>
-                                                        <option value="Erreur">Erreur</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="d-md-none m--margin-bottom-10"></div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="m-input-icon m-input-icon--left">
-                                                <input type="text" class="form-control m-input" placeholder="Recherche..." id="mailSearch">
-                                                <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                <span><i class="la la-search"></i></span>
+                                        <div class="col-12" id="avec_indexation">
+                                            <label for="form-indexation_OG2I" >INDEXATION OG2I</label>
+                                            <div>
+                                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.indexation_OG2I, {'attr': {'class': 'form-control m-input'}, 'id': 'form-indexation_OG2I', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
                                             </span>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="col-xl-4 order-1 order-xl-2 m--align-right">
-                                    <a href="#" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill" data-toggle="modal" data-target="#m_modal_send_mail">
-                                    <span>
-                                        <i class="la la-envelope"></i>
-                                        <span>Envoyer un e-mail</span>
-                                    </span>
-                                    </a>
-                                    <div class="m-separator m-separator--dashed d-xl-none"></div>
-                                </div>
-                                
-                            </div>
-                        </div>
+                                    
 
-                        <table class="m-datatable-mails" id="html_table" width="100%">
-                            <thead>
-                            <tr>
-                                <th title="Date" data-field="Date">Date</th>
-                                <th title="Object" data-field="Object">Objet</th>
-                                <th title="Status" data-field="Status">Statut</th>
-                                <th title="Sender" data-field="Sender">Expéditeur</th>
-                                <th title="Resend" data-field="Resend"></th>
-                                <th title="View" data-field="View"></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% if messages %}
-                                {% for mail in messages %}
-                                    {% if mail.property_id == property.id %}
-                                        <tr>
-                                            <td>{{ mail.date|date('d-m-Y H:i') }}</td>
-                                            <td>{{ mail.object }}</td>
-                                            <td><span class="{{ mail.statusclass }}">{{ mail.statusstring }}</span></td>
-                                            <td>
-                                            {% if mail.user %}
-                                                {{ mail.user.firstname }} {{ mail.user.lastname }}
-                                            {% endif %}
-                                            </td>
-                                            <td><a href="{{ path('mail_resend', {'mailId': mail.id}) }}"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a></td>
-                                            <td><a href="#" data-id="{{ mail.id }}" data-toggle="modal" data-target="#m_modal_view_mail" class="view-mail"><i class="la la-eye" title="Voir"></i> Voir</a></td>
-                                        </tr>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td align="center" colspan="4">Aucun Message</td>
-                                </tr>
-                            {% endif %}
-                            </tbody>
-                        </table>
-                        <div class="modal fade" id="m_modal_view_mail" tabindex="-1" role="dialog" aria-labelledby="mail_view" aria-hidden="true">
-                            <div class="modal-dialog modal-lg" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="file_add">Voir un mail (<span id="mail-id"></span>)</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body" id="mail-content"></div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal fade" id="m_modal_send_mail" tabindex="-1" role="dialog" aria-labelledby="mail_add3" aria-hidden="true">
-                            <div class="modal-dialog modal-lg" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="file_add">Envoyer un mail</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        {{ form_start(form_mail, {attr: {'id': 'mail-form'}}) }}
-                                        <div class="form-group m-form__group row">
-                                            <label for="form-mail-object" class="col-2 col-form-label">Objet</label>
-                                            <div class="col-10">
-                                                {{ form_row(form_mail.object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail-object', 'label': false}) }}
-                                            </div>
+                                    <div class="col-12" id="ogi2">
+                                        <label for="form-mois_indice_ref_og2_i" >Mois / année indice de référence</label>
+                                        <div >
+                                            {{ form_row(form.mois_indice_ref_og2_i, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mois_indice_ref_og2_i', 'label': false,'date_pattern': '<span style="display: none;">{{ day }}</span> {{ month }} <span class="delim">&#47;</span> {{ year }}' }) }}                            
                                         </div>
+
+                                        <label for="form-valeur_indice_ref_og2_i_object" >Valeur Indice de référence</label>
+                                            <div >
+                                                {{ form_row(form.valeur_indice_ref_og2_i_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-valeur_indice_ref_og2_i_object', 'label': false}) }}
+                                            </div>
+
                                         
-                                        {{ form_widget(form_mail.content, {'id': 'form-mail-content', 'label': false}) }}
-                                        {{ form_rest(form_mail) }}
-                                        {{ form_end(form_mail) }}
+
+                                        <div class=" pad-15">
+                                        Montant de la rente initiale
+                                        <div class="">
+                                            <h3>
+                                                <span id="montant_rente">0.00€</span>
+                                                <span id="montant_rente_sans_arrondis" style="display:none">0.00€</span>
+                                            </h3>
+                                        </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                                        <button class="btn btn-primary" form="mail-form">Envoyer</button>
+                                    </div>    
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <h3 class="section-title">ABANDON DU DUH</h3>
+                                </div>
+
+                                <div class="col-lg-6">
+
+                                    <label for="form-acte_abandon_duh_drive_id" class="col-12 col-form-label">Extrait de l’acte</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.acte_abandon_duh_drive_id, {'attr': {'class': 'form-control m-input'}, 'id': 'form-acte_abandon_duh_drive_id', 'label': false}) }}
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+
+                                    <label for="form-pourcentage_revaluation_rente" class="col-12 col-form-label">Pourcentage de revalorisation de la rente</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.pourcentage_revaluation_rente, {'attr': {'class': 'form-control m-input'}, 'id': 'form-pourcentage_revaluation_rente', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-date_remise_cles" class="col-12 col-form-label">Date remise des clefs</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.date_remise_cles, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_remise_cles', 'label': false}) }}
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <h3 class="section-title">COPROPRIÉTÉ</h3>
+                                </div>
+
+                                <div class="col-lg-6">
+
+                                    <label for="form-syndic_nom" class="col-12 col-form-label">Nom du syndic de copropriété</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.syndic_nom, {'attr': {'class': 'form-control m-input'}, 'id': 'form-syndic_nom', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-syndic_mail" class="col-12 col-form-label">Adresse mail</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.syndic_mail, {'attr': {'class': 'form-control m-input'}, 'id': 'form-syndic_mail', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-syndic_phone" class="col-12 col-form-label">Téléphone</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.syndic_phone, {'attr': {'class': 'form-control m-input'}, 'id': 'form-syndic_phone', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-syndic_address" class="col-12 col-form-label">Adresse</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.syndic_address, {'attr': {'class': 'form-control m-input'}, 'id': 'form-syndic_address', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-syndic_postal_code" class="col-12 col-form-label">Code postal</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.syndic_postal_code, {'attr': {'class': 'form-control m-input'}, 'id': 'form-syndic_postal_code', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-syndic_ville" class="col-12 col-form-label">Ville</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.syndic_ville, {'attr': {'class': 'form-control m-input'}, 'id': 'form-syndic_ville', 'label': false}) }}
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    
+                                    Codes d’accès syndic en ligne :
+                                    <label for="form-syndic_id" class="col-12 col-form-label">Identifiant</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.syndic_id, {'attr': {'class': 'form-control m-input'}, 'id': 'form-syndic_id', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-syndic_password" class="col-12 col-form-label">Mot de passe</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.syndic_password, {'attr': {'class': 'form-control m-input'}, 'id': 'form-syndic_password', 'label': false}) }}
+                                    </div>
+                                    <div class="flex-line">
+                                        <div>
+                                        Exercice du
+                                        </div>
+                                        <div>
+                                            {{ form_row(form.date_reg_debut, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_reg_debut', 'label': false}) }}
+                                        </div>
+                                        <div>
+                                        au 
+                                        </div>
+                                        <div>
+                                            {{ form_row(form.date_reg_fin, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_reg_fin', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                    <label for="form-syndic_quote_part" class="col-12 col-form-label">Quote part locative - charges trimestrielles</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.syndic_quote_part, {'attr': {'class': 'form-control m-input'}, 'id': 'form-syndic_quote_part', 'label': false}) }}
+                                    </div>
+
+                                    <label for="form-syndic_dernier_decompte" class="col-12 col-form-label">Montant du dernier décompte de charge (quote part locative annuelle)</label>
+                                    <div class="col-12">
+                                        {{ form_row(form.syndic_dernier_decompte, {'attr': {'class': 'form-control m-input'}, 'id': 'form-syndic_dernier_decompte', 'label': false}) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                                <div class="form-group row" {% if not isAdmin %}style="display:none"{% endif %}>
+
+                                    <div class="col-lg-12">
+                                        <h3 class="section-title">AUTRES</h3>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <label for="form-no_indexation" class="col-12 col-form-label">Désactiver l'indexation</label>
+                                        <div class="col-6">
+                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.no_indexation, {'attr': {'class': 'form-control m-input'}, 'id': 'form-no_indexation', 'label': false}) }}
+
+                                                    <span></span>
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-6">
+                                        <label for="form-hide_export_monthly" class="col-4 col-form-label">Masquer les rentes de l'export</label>
+                                        <div class="col-6">
+                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.hide_export_monthly, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_export_monthly', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="form-annuitiesDisabled" class="col-4 col-form-label">Désactiver les rentes</label>
+                                        <div class="col-12">
+                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.annuitiesDisabled, {'attr': {'class': 'form-control m-input'}, 'id': 'form-annuitiesDisabled', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="form-hide_export_quarterly" class="col-4 col-form-label">Masquer les frais de co-pro de l'export</label>
+                                        <div class="col-6">
+                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.hide_export_quarterly, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_export_quarterly', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="form-honorariesDisabled" class="col-4 col-form-label">Désactiver les honoraires</label>
+                                        <div class="col-6">
+                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.honorariesDisabled, {'attr': {'class': 'form-control m-input'}, 'id': 'form-honorariesDisabled', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="form-hide_export_otp" class="col-4 col-form-label">Masquer les factures exceptionnelles de l'export (ex: poubelles)</label>
+                                        <div class="col-6">
+                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.hide_export_otp, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_export_otp', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="form-hide_honorary_export" class="col-4 col-form-label">Masquer les honoraires de l'export</label>
+                                        <div class="col-6">
+                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                                <label>
+                                                    {{ form_widget(form.hide_honorary_export, {'attr': {'class': 'form-control m-input'}, 'id': 'form-hide_honorary_export', 'label': false}) }}
+                                                    <span></span>
+                                                </label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <span{% if property.propertyType != "Appartement" and property.propertyType != "Maison" %} style="display: none;" {% endif %}>
+                                            <label for="form-condominiumFees" class="col-4 col-form-label">Montant charges de copropriété (trimestrielles)</label>
+                                            <div class="col-12">
+                                                {{ form_row(form.condominiumFees, {'attr': {'class': 'form-control m-input'}, 'id': 'form-condominiumFees', 'label': false}) }}
+                                            </div>
+                                        </span>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label for="form-garbageTax" class="col-4 col-form-label">Montant ordures ménagères</label>
+                                        <div class="col-12">
+                                            {{ form_row(form.garbageTax, {'attr': {'class': 'form-control m-input'}, 'id': 'form-garbageTax', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                        <div class="form-group row">
+                            <div class="col-lg-6">
+                                <input id="bouton_envoyer" class="btn btn-outline-success btn-block" type="submit" value="Enregistrer" />
+                            </div>
+                            <div class="col-lg-6">
+                                <input id="active_property" class="btn btn-outline-success btn-block" type="button" value="{% if property.active == 1 %}Désactiver le dossier {% else %}Activer le dossier{% endif %}" />
+                            </div>
                         </div>
+                       
+                        {{ form_end(form) }}
                     </div>
-                   <div class="tab-pane" id="m_tabs_files" role="tabpanel">
-                        <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                    <div class="tab-pane" id="m_tabs_fichier" role="tabpanel">
+                        
+                         <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
                             <div class="row align-items-center">
                                 <div class="col-xl-8 order-2 order-xl-1">
                                     <div class="form-group m-form__group row align-items-center">
@@ -1331,6 +1110,7 @@
                                                         <option value="Document">Documents</option>
                                                         <option value="Facture">Factures</option>
                                                         <option value="Recap">Recap</option>
+                                                        <option value="autres">Autres</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1355,7 +1135,10 @@
                             <tr>
                                 <th title="Date" data-field="Date">Date</th>
                                 <th title="Nom" data-field="Name">Nom</th>
+                                {% if isAdmin %}
                                 <th title="Number" data-field="Number">N° Fact</th>
+                                {% endif %}
+                                
                                 <th title="Type" data-field="Type">Type</th>
                                 <th data-field="Download"></th>
                                 <th data-field="Delete"></th>
@@ -1368,10 +1151,12 @@
                                         <tr>
                                             <td>{{ invoice_file.file.date |date('d-M-Y H:m:s')}}</td>
                                             <td>{{ invoice_file.file.name }}</td>
-                                            <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_INVOICE') and invoice_file.file.invoice is not empty %}{{ invoice_file.file.invoice.formattednumber }}{% endif %}</td>
+                                            {% if isAdmin %}
+                                                <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_INVOICE') and invoice_file.file.invoice is not empty %}{{ invoice_file.file.invoice.formattednumber }}{% endif %}</td>
+                                            {% endif %}
                                             <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif invoice_file.file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
                                             <td><a href="{{ path('file_download', {'fileId': invoice_file.file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
-                                            <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': invoice_file.file.driveId}) }}" data-name="{{ invoice_file.file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
+                                            <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': invoice_file.file.driveId}) }}" data-name="{{ invoice_file.file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% endif %}</td>
                                         </tr>
                                     {% endif %}
                                 {% endfor %}   
@@ -1380,10 +1165,12 @@
                                         <tr>
                                             <td>{{ invoice_file.file2.date |date('d-M-Y H:m:s')}}</td>
                                             <td>{{ invoice_file.file2.name }}</td>
-                                            <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_INVOICE') and invoice_file.file2.invoice is not empty %}{{ invoice_file.file2.invoice.formattednumber }}{% endif %}</td>
+                                            {% if isAdmin %}
+                                                <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_INVOICE') and invoice_file.file2.invoice is not empty %}{{ invoice_file.file2.invoice.formattednumber }}{% endif %}</td>
+                                            {% endif %}
                                             <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif invoice_file.file2.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
                                             <td><a href="{{ path('file_download', {'fileId': invoice_file.file2.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
-                                            <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': invoice_file.file2.driveId}) }}" data-name="{{ invoice_file.file2.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
+                                            <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': invoice_file.file2.driveId}) }}" data-name="{{ invoice_file.file2.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% endif %}</td>
                                         </tr>
                                     {% endif %}
                                 {% endfor %}
@@ -1392,10 +1179,12 @@
                                         <tr>
                                             <td>{{ generated_file.date |date('d-M-Y H:m:s')}}</td>
                                             <td>{{ generated_file.name }}</td>
-                                            <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') and generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}</td>
+                                            {% if isAdmin %}
+                                                <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') and generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}</td>
+                                            {% endif %}
                                             <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
                                             <td><a href="{{ path('file_download', {'fileId': generated_file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
-                                            <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': generated_file.driveId}) }}" data-name="{{ generated_file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% else %}<i class="la la-remove"></i> Supprimer{% endif %}</td>
+                                            <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': generated_file.driveId}) }}" data-name="{{ generated_file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% endif %}</td>
                                         </tr>
                                     {% endif %}
                                 {% endfor %}     
@@ -1409,108 +1198,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="tab-pane add-form2" id="m_tabs_mails" role="tabpanel">
-                        <div class="m-divider"><span></span>Suivi<span></span></div>
-                        <button class="btn btn-primary mb-5" type="button" id="addcomm">
-                             Ajouter un commentaire
-                        </button>
-                        <div id="formulaire-commentaire">
-                                {{ form_start(form_comment) }}
-                                    <div class="form-group row">
-                                        <div class="col-lg-6">
-                                        titre
-                                        </div>
-                                        <div class="col-lg-6">
-                                        {{ form_row(form_comment.titre, {'label':false}) }}
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <div class="col-lg-6">
-                                        message
-                                        </div>
-                                        <div class="col-lg-6">
-                                        {{ form_row(form_comment.message, {'label':false}) }}
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <div class="col-lg-6">
-                                        date butoir
-                                        </div>
-                                        <div class="col-lg-6">
-                                        {{ form_row(form_comment.dateButoir, {'label':false}) }}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row align-items-center">
-                                <div class="col-xl-3">
-                                    <button type="submit" class="mt-50 btn btn-outline-success btn-block">Ajouter</button>
-                                </div>
-                            </div>
-                            {{ form_end(form_comment) }}
-                        </div>
-                        <div class="form-group row mt-5">
-                            <div class="col-lg-12">
-                            Liste des commentaires
-                            <table class="m-datatable-warrants kt-datatable" id="html_table1" width="100%">
-                                <thead>
-                                    <tr>
-                                    
-                                        <th title="Date" data-field="date">Date d'ajout</th>
-                                        <th title="Date butoir" data-field="dateButoir">Date butoir</th>
-                                        <th title="Titre" data-field="titre">Titre</th>
-                                        <th title="Commentaire" data-field="message">Commentaire</th>
-                                        <th title="Status" data-field="status">Status</th>
-                                        <th title="Actions" data-field="actions">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {% for comment in comments %}
-                                    <tr>
-                                        <td>{{ comment.date |date('d-M-Y H:m:s')}}</td>
-                                        <td>{{ comment.dateButoir |date('d-M-Y H:m:s')}}</td>
-                                        <td>{{ comment.titre }} </td>
-                                        <td>{{ comment.message}} </td>
-                                        <td>
-                                            <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
-                                                <label>
-                                                    <input type="checkbox" {% if comment.status==1 %} checked{% endif %} name="{{comment.id}}" class="change-comment-{{comment.id}}-state form-control m-input" value="{{comment.status}}">
-                                                    <span></span>
-                                                </label>
-                                            </span>
-                                        
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-danger button-special" href="{{ path('property_comment_delete', {'commentId': comment.id}) }}">supprimer</a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                            </div>
-                        </div>
-                    </div>
-                     {% if property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
-                     
-                        <div class="tab-pane {% if buyer_tab %} active{% endif %}" id="m_tabs_buyer" role="tabpanel">buyer
-                            {{ form_start(form_buyer, {'attr': {'class': 'm-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed'}}) }}
-                                {{ mforms.group(form_buyer.buyerFirstname, 'buyer_firstname', 'Prénom', form_buyer.buyerLastname, 'buyer_lastname', 'Nom') }}
-                                {{ mforms.group(form_buyer.buyerAddress, 'buyer_address', 'Adresse', form_buyer.buyerPhone1, 'buyer_phone1', 'Téléphone') }}
-                                {{ mforms.group(form_buyer.buyerPostalCode, 'buyer_postal_code', 'Code postal', form_buyer.buyerPhone2, 'buyer_phone2', 'Téléphone2') }}
-                                {{ mforms.group(form_buyer.buyerCity, 'buyer_city', 'Ville', form_buyer.buyerMail1, 'buyer_mail1', 'Adresse mail') }}
-                                {{ mforms.group(form_buyer.buyerCountry, 'buyer_country', 'Pays', form_buyer.buyerMail2, 'buyer_mail2', 'Adresse mail 2', true) }}
-                                <div class="m-divider"><span></span>Relevé d'Identité Bancaire<span></span></div>
-                                {{ mforms.group(form_buyer.buyer_bank_establishment_code, 'buyer_bank_establishment_code', 'Code banque', form_buyer.buyer_bank_code_box, 'buyer_bank_code_box', 'Code guichet') }}
-                                {{ mforms.group(form_buyer.buyer_bank_account_number, 'buyer_bank_account_number', 'N° de compte', form_buyer.buyer_bank_key, 'buyer_bank_key', 'Clé RIB') }}
-                                {{ mforms.group(form_buyer.buyer_bank_domiciliation, 'buyer_bank_domiciliation', 'Domiciliation', null, null, null) }}
-                                <div class="m-divider"><span></span>Numéro International de Compte Bancaire (IBAN)<span></span></div>
-                                {{ mforms.group(form_buyer.buyer_bank_iban, 'buyer_bank_iban', 'N° de compte', form_buyer.buyer_bank_bic, 'buyer_bank_bic', 'Code banque (BIC)') }}
-                                <div class="m-divider"><span></span>Identifiant Créancier SEPA<span></span></div>
-                                {{ mforms.group(form_buyer.buyer_bank_ics, 'buyer_bank_ics', 'N° ICS', null, null, null) }}
-                                <input id="bouton_envoyer" class="btn btn-outline-success btn-block" type="submit" value="Enregistrer" />
-                            {{ form_end(form_buyer) }}
-                        </div>
-                    
-                    {% endif %}
                 </div>
                 
             </div>
@@ -1592,6 +1279,9 @@ function get_nv_montant_rente(ri,ii,ia){
                 });
         }
         function get_honoraires(taux,rdb){
+            if(!taux){
+                taux=0;
+            }
             let route = "{{ path('get_honoraire', {'taux':'taux_val','rdb':'rdb_val'}) }}";
                 changePath0 = route.replace('taux_val', taux);
                 changePath = changePath0.replace('rdb_val', rdb);
@@ -1609,8 +1299,11 @@ function get_nv_montant_rente(ri,ii,ia){
 
 
 function load_payment_datas(){
-            if($("#form-bank_rum").val().length>2){
-                $("#form-bank_rum").prop('disabled', true);
+            if($("#form-bank_rum_1").val().length>2){
+                $("#form-bank_rum_1").prop('disabled', true);
+            }
+            if($("#form-bank_rum_2").val().length>2){
+                $("#form-bank_rum_2").prop('disabled', true);
             }
             $('#form-indexation_OG2I').is(":checked")? $('#ogi2').show() : $('#ogi2').hide();
             if($('#form-no_indexation').is(":checked") ){
@@ -1692,7 +1385,7 @@ function load_payment_datas(){
             $('#date_assurance_habitation').hide()
         };
 
- if(parameter !== null){
+    if(parameter !== null){
         console.log(parameter)
         function toggleClass(id_element){
             let elements = [];
@@ -1712,11 +1405,12 @@ function load_payment_datas(){
             element_actif.classList.add('active');
         }
         toggleClass(parameter);
-     $('#bouton_envoyer').hide();
+        $('#bouton_envoyer').hide();
      
-     }else{
-        console.log("pas de parametres")
-     }
+    }else{
+    console.log("pas de parametres")
+    load_payment_datas()
+    }
      
      
      $('#lien_fichiers').click(function(){
@@ -1727,20 +1421,12 @@ function load_payment_datas(){
         console.log("Suivi cliqué");
         $('#bouton_envoyer').hide();
     });
-    $('#lien_pay').click(function(){
-        console.log("payment cliqué");
+    $('#lien_bien').click(function(){
+        console.log("partie payment cliqué");
         load_payment_datas()
         
     });
-    if(parameter=="m_tabs_pay"){
-            load_payment_datas()
-            /*$('#bouton_payment').click(function(){
-                $("#form-initial_index_object").removeAttr('disabled');
-                $("#form-valeur_indice_ref_og2_i_object").removeAttr('disabled');
-                console.log("soumission payment",$("#form-initial_index_object").find(":selected").val(), $("#form-valeur_indice_ref_og2_i_object").find(":selected").val());
-                // $('#bouton_envoyer').show();
-            });*/
-        }
+    
     $('#lien_copro').click(function(){
         console.log("copro cliqué");
     });
@@ -1963,40 +1649,21 @@ function load_payment_datas(){
         }, 2000);
         
     });
-    $('#formulaire-commentaire').hide();
-        $(function() {
-            $('.view-mail').click(function () {
-                $('#mail-id').html($(this).attr('data-id'));
-                $('#mail-content').html('Chargement ...').load("{{ path('mail_content') }}?id=" + $(this).attr('data-id'));
-            });
-            $('#addcomm').click(function () {
-                $('#formulaire-commentaire').show();
-            });
-            
-            {% for comment in comments %}
-                $('.change-comment-{{comment.id}}-state').click(function () {
-                    $index=$(this).attr("name");
-                    console.log("comment :",$index)
-                    if ($(this).is(':checked')) {
-                        console.log("activation du commentaire n°{{comment.id}}")
-                        window.location ="{{ path('property_comment_activate', {'commentId': comment.id }) }}";
-                    }else{
-                        console.log("desactivation du commentaire n°{{comment.id}}")
-                        window.location ="{{ path('property_comment_desactivate', {'commentId': comment.id }) }}";
-                    }
-                });
-            {% endfor %}
+    
+
+        $('#active_property').click(function (e) {
+            e.preventDefault(); // empêche toute soumission
+
+            {% if property.active == 1 %}
+                console.log("Desactivation du bien n°{{ property.id }}");
+                window.location = "{{ path('property_deactivate', {'propertyId': property.id }) }}";
+            {% else %}
+                console.log("Activation du bien n°{{ property.id }}");
+                window.location = "{{ path('property_activate', {'propertyId': property.id }) }}";
+            {% endif %}
         });
 
-        $('#active_property').click(function () {
-                    if ($(this).is(':checked')) {
-                        console.log("activation du bien n°{{property.id}}")
-                        window.location ="{{ path('property_activate', {'propertyId': property.id }) }}";
-                    }else{
-                        console.log("desactivation du bien n°{{property.id}}")
-                        window.location ="{{ path('property_deactivate', {'propertyId': property.id }) }}";
-                    }
-                });
+
 
        $('#property_payment_form_mois_indice_initial_day').val("1").change();
         $('#adresse_crédirentier').hide();

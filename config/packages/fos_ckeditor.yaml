@@ -1,0 +1,20 @@
+fos_ck_editor:
+    # On force la version gratuite officielle avant qu'ils ne changent la licence
+    base_path: "https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"
+    
+    configs:
+        my_config:
+            # IMPORTANT : On retire les plugins qui demandent un abonnement (PDF et Spellcheck)
+            removePlugins: "exportpdf,scayt,wsc,copyright"
+            # On retire le check de licence
+            versionCheck: false
+            language: 'fr'
+            height: 400
+            toolbar: [
+                ['Bold', 'Italic', 'Underline', 'Strike'],
+                ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
+                ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+                ['Link', 'Unlink'],
+                ['Table'],
+                ['Maximize', 'Source']
+            ]

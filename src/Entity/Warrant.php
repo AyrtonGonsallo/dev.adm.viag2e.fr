@@ -549,7 +549,7 @@ class Warrant
         return $this->type;
     }
 
-    public function getTypeString(): string
+    public function getTypeString(): ?string
     {
         return self::getTypeName($this->getType());
     }

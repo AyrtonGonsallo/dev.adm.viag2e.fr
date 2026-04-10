@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class FileController extends AbstractController
 {
@@ -95,6 +96,50 @@ class FileController extends AbstractController
         $this->addFlash('danger', 'Une erreur a eu lieu pendant la suppression');
         return $this->redirect($route);
     }
+
+     /**
+     * @Route("/file/delete_by_id/{fileId}", name="file_delete_by_id")
+     *
+     * @param Request $request
+     * @param DriveManager $driveManager
+     * @return Response
+     */
+    public function delete_by_id(Request $request, DriveManager $driveManager)
+    {
+        $file = $this->getDoctrine()
+            ->getRepository(File::class)
+            ->findOneBy(['id' => $request->get('fileId')]);
+
+        //$route = $this->generateUrl('warrant_view', ['type' => $file->getWarrant()->getTypeString(), 'warrantId' => $file->getWarrant()->getId()]);
+
+        if (empty($file) ) {
+            $this->addFlash('danger', 'Fichier introuvable');
+            return $this->redirectToRoute('dashboard', [], 302);
+        }
+
+        
+        $manager = $this->getDoctrine()->getManager();
+        $manager->remove($file);
+        $manager->flush();
+
+        $this->addFlash('success', 'Fichier supprimé');
+        return $this->redirect($request->headers->get('referer'));
+    }
+
+    /**
+     * @Route("/file/download_local/{id}", name="file_download_local")
+     */
+    public function download_local(File $file,ParameterBagInterface $params)
+    {
+        $path = $params->get('pdf_tmp_dir'). '/' . $file->getName();
+
+        if (!file_exists($path)) {
+            throw $this->createNotFoundException('Fichier introuvable');
+        }
+
+        return $this->file($path);
+    }
+
 
 
 

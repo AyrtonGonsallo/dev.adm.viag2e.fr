@@ -1,0 +1,164 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Accueil{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="#" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    
+
+
+    <div class="m-content">
+        <div class="row">
+            
+            <div class="col-xl-6">
+                <div class="m-portlet m-portlet--full-height ">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h3 class="m-portlet__head-text">
+                                    Actualités
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-widget2">
+
+                            {% if rappels_valides is not empty %}
+                                {% for type, rappels in rappels_valides %}
+                                    <h5>{{ type}}</h5> {# ou directement: Rappel::REMIND_TYPES[type] si tu passes le tableau #}
+
+                                    {% for rappel in rappels %}
+                                        <div class="rappel-item">
+                                            {{ rappel.getTypeString }} – 
+                                            Le {{ rappel.expiryLabel }} : {{ rappel.texte }}
+
+                                            <!-- CHECK -->
+                                            <a href="{{ path('rappel_check', {id: rappel.id}) }}"
+                                            title="Marquer comme fait"
+                                            class="check"
+                                            onclick="return confirm('Marquer ce rappel comme effectué ?');">
+                                                <i class="la la-check text-success"></i>
+                                            </a>
+
+                                            <!-- DELETE -->
+                                            <a href="{{ path('rappel_delete', {id: rappel.id}) }}"
+                                            title="Supprimer"
+                                            class="delete"
+                                            onclick="return confirm('Supprimer définitivement ce rappel ?');">
+                                                <i class="la la-trash text-danger"></i>
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center">
+                                    Aucun rappel
+                                </div>
+                            {% endif %}
+
+
+
+
+
+                            <div id="rappel-form-container"  style="display:none;">
+                                {{ form_start(rappel_form) }}
+                                <div class="form-group row">
+                                    <div class="col-lg-12">
+                                        <label for="form-texte" class="col-12 col-form-label">Texte</label>
+                                        <div class="col-12">
+                                            {{ form_widget(rappel_form.texte, {'attr': {'class': 'form-control m-input'},'id': 'form-texte', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label for="form-type" class="col-12">type:</label>
+                                        <div class="col-12">
+                                            {{ form_row(rappel_form.type, {'attr': {'class': 'form-control m-input'}, 'id': 'form-type', 'label': false}) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12">
+                                        <label for="form-date_rappel_mensuel_trimestre" class="col-12">date de rappel:</label>
+                                        <div class="col-12">
+                                            {{ form_row(rappel_form.date_rappel_mensuel_trimestre, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_rappel_mensuel_trimestre', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label for="form-date_rappel_annuel" class="col-12">date de rappel:</label>
+                                        <div class="col-12">
+                                            {{ form_row(rappel_form.date_rappel_annuel, {'attr': {'class': 'form-control m-input'}, 'id': 'form-date_rappel_annuel', 'label': false}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <input name="rappel_submit"  style="width:fit-content" class="btn btn-outline-success btn-block" type="submit" value="Ajouter le rappel" />
+                                {{ form_rest(rappel_form) }}
+                                {{ form_end(rappel_form) }}
+                            </div>
+                            <button id="toggle-rappel-btn" class="btn  btn-block">Ajouter un rappel</button>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+
+
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+jQuery(document).ready(function($){
+    // Fonction pour gérer l'affichage selon le type sélectionné
+    function toggleDateFields() {
+        let type = $('#form-type').val();
+        console.log("type",type)
+
+        if(type <=3) { // adapter selon tes valeurs exactes
+            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-12').show();
+            $('#form-date_rappel_annuel').closest('.col-lg-12').hide();
+        } else if(type == 4) {
+            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-12').hide();
+            $('#form-date_rappel_annuel').closest('.col-lg-12').show();
+        } else {
+            // si aucun type choisi, cacher les deux
+            $('#form-date_rappel_mensuel_trimestre').closest('.col-lg-12').hide();
+            $('#form-date_rappel_annuel').closest('.col-lg-12').hide();
+        }
+    }
+
+    // Au chargement de la page
+    toggleDateFields();
+
+    // Quand on change le type
+    $('#form-type').on('change', function(){
+        toggleDateFields();
+    });
+
+    // Bouton toggle formulaire
+    $('#toggle-rappel-btn').click(function(){
+        $('#rappel-form-container').slideToggle(200);
+        let btn = $(this);
+        btn.text(btn.text() === 'Ajouter un rappel' ? 'Annuler' : 'Ajouter un rappel');
+    });
+});
+</script>
+
+{% endblock %}

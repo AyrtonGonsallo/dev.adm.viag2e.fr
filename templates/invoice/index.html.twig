@@ -22,32 +22,42 @@
             </div>
         </div>
     </div>
-<div id="partie-reponse" class="m-content"></div>
-    <div class="m-content">
-        <div class="m-portlet m-portlet--mobile">
-            <div class="m-portlet__head">
-                <div class="m-portlet__head-caption">
-                    <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text">
-                            Envoi des factures
-                        </h3>
+
+    {% set isAdmin = is_granted('ROLE_ADMIN') %}
+    {% if isAdmin %}
+        <div class="m-content2"> 
+            <div id="partie-reponse" class="m-content2"></div>
+            <div class="m-portlet m-portlet--mobile">
+                <div class="m-portlet__head">
+                    <div class="m-portlet__head-caption">
+                        <div class="m-portlet__head-title">
+                            <h3 class="m-portlet__head-text">
+                                Envoi des factures
+                            </h3>
+                        </div>
                     </div>
                 </div>
-                
-            </div>
-            <div class="m-portlet__body" id="box_reponse_envoi">
-                <div id="box_reponse_envoi">
-                    Position: <span id="last_sending_email_position">{{ last_sending_email_position }}</span><br>
-                    Date du dernier envoi: <span id="last_sending_email_date">{{ last_sending_email_date }}</span><br>
-                    Prochain envoi: <span id="next_sending_email_delay">{{ next_sending_email_delay }}</span><br>
-                    Débogage: <input type='checkbox' id='debug-mode'><br>
-                    <button class="btn btn-custom " id="send_bunch_of_mails" type="button">Envoyer</button>
-                    <div id="results-container"></div>
-                    <div id="reponse_envoi" class="m-content"></div>
-                    
+                <div class="m-portlet__body" id="box_reponse_envoi">
+                    <div id="box_reponse_envoi">
+                        Position: <span id="last_sending_email_position">{{ last_sending_email_position }}</span><br>
+                        Date du dernier envoi: <span id="last_sending_email_date">{{ last_sending_email_date }}</span><br>
+                        Prochain envoi: <span id="next_sending_email_delay">{{ next_sending_email_delay }}</span><br>
+                        Débogage: <input type='checkbox' id='debug-mode'><br>
+                        <button class="btn btn-custom " id="send_bunch_of_mails" type="button">Envoyer</button>
+                        <div id="results-container"></div>
+                        <div id="reponse_envoi" class="m-content"></div>
+                        
+                    </div>
                 </div>
             </div>
         </div>
+    {% endif %}
+    <div class="m-content2"> 
+            <div id="partie-reponse-renvoi-tous" ></div>
+            <div id="results-container-renvoi-tous" class="m-content2"></div>
+    </div>
+    <div class="m-content"> 
+        
 
 
 
@@ -74,10 +84,10 @@
                 </div>
             </div>
             <div class="m-portlet__body">
-                <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                <div class="m-form m-form--label-align-right m--margin-top-20">
                     <div class="row align-items-center">
                         <div class="col-xl-12 order-2 order-xl-1">
-                            <div class="form-group m-form__group row align-items-center">
+                            <div class="form-group m-form__group row align-items-center" style="gap: 10px 0px;">
                                 <div class="col-md-2">
                                     <div class="m-form__group m-form__group--inline">
                                         <div class="m-form__label">
@@ -86,17 +96,21 @@
                                         <div class="m-form__control">
                                             <select class="form-control m-bootstrap-select" id="m_form_status">
                                                 <option value="">Tous</option>
-                                                <option value="{{ constant('App\\Entity\\Invoice::STATUS_TREATED') }}">Traitées</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::STATUS_SENT') }}">Appelés</option>
                                                 <option value="{{ constant('App\\Entity\\Invoice::STATUS_PAYED') }}">Payées</option>
                                                 <option value="{{ constant('App\\Entity\\Invoice::STATUS_UNSENT') }}">Erreur d'envoi</option>
-                                                <option value="{{ constant('App\\Entity\\Invoice::STATUS_SENT') }}">Envoyées</option>
-                                                <option value="{{ constant('App\\Entity\\Invoice::STATUS_GENERATED') }}">Générées</option>
+
+                                                {% if isAdmin %}
+                                                    <option value="{{ constant('App\\Entity\\Invoice::STATUS_TREATED') }}">Traitées</option>
+                                                    <option value="{{ constant('App\\Entity\\Invoice::STATUS_GENERATED') }}">Générées</option>
+                                                 {% endif %}
                                             </select>
                                         </div>
                                     </div>
                                     <div class="d-md-none m--margin-bottom-10"></div>
                                 </div>
                                 <div class="col-md-2">
+                                   
                                     <div class="m-form__group m-form__group--inline">
                                         <div class="m-form__label">
                                             <label class="m-label m-label--single" for="m_form_category">Catégorie:</label>
@@ -105,14 +119,14 @@
                                             <select class="form-control m-bootstrap-select" id="m_form_category">
                                                 <option value="6">Tous</option>
                                                 <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_ANNUITY') }}">Rente</option>
-                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_CONDOMINIUM_FEES') }}">Frais de co-pro</option>
-                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_GARBAGE') }}">Ordures ménagères</option>
-                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_AVOIR') }}">Avoir</option>
-                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_MANUAL') }}">Manuelle</option>
-                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES') }}">Regule Manuelle</option>
+                                                <option value="7">Honoraires</option>
+                                                <option value="{{ constant('App\\Entity\\Invoice::CATEGORY_CONDOMINIUM_FEES') }}">Co-pro</option>
+                                                <option value="4">Avoir</option>
+                                                <option value="8">Autres</option>
                                             </select>
                                         </div>
                                     </div>
+                                    
                                     <div class="d-md-none m--margin-bottom-10"></div>
                                 </div>
                                 <div class="col-md-2">
@@ -161,11 +175,27 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div class="col-md-1">
-                                    <button type="button" class="btn btn-primary" id="valider-tous">Générer</button>
+                                
+                            </div>
+
+
+                            <div class="separator"></div>
+
+                            <div class="align-center" >
+                                <div>
+                                    <button type="button" class="btn btn-primary" id="valider-tous">Valider le paiement</button>
                                 </div>
-                                <div class="col-md-2">
+                                <div>
                                     <button type="button" class="btn btn-primary" id="télécharger-tous">Télécharger sélection</button>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-primary" id="renvoyer-tous">Renvoyer sélection</button>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-primary" id="generer-export">Prélever les quittances</button>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-primary" id="generer-export-fa">Prélever les FA </button>
                                 </div>
                             </div>
                         </div>
@@ -228,6 +258,8 @@
     {# encore_entry_script_tags('html-table.invoices') #}
     <script type="text/javascript">
         $(function() {
+            const IS_ADMIN = {{ is_granted('ROLE_ADMIN') ? 'true' : 'false' }};
+            console.log("admin",IS_ADMIN)
             $('#reponse_envoi').hide();
             // Vérification de l'état du bouton en fonction de la valeur de `sending_email_active`
             // Injecter la valeur de `sending_email_active` en tant que chaîne 'true' ou 'false'
@@ -404,6 +436,26 @@
                 endDate: "{{ range_end }}",
             });
 
+            let columns_data = [
+                { field: 'Selected' },
+                { field: 'Date', title: 'Date' },
+                { field: 'Number', title: 'N°' },
+                { field: 'Category', title: 'Categorie', type: 'string' },
+                { field: 'Customer', title: 'Destinataire' },
+                { field: 'Title', title: 'Titre' },
+                { field: 'Amount', title: 'Montant' },
+                { field: 'Status', title: 'Statut', type: 'string' },
+            ];
+            if (IS_ADMIN) {
+                columns_data.push({
+                    field: 'Resend',
+                });
+            }
+            columns_data.push({
+                field: 'Download',
+            });
+
+
             let DatatableHtmlInvoices = function() {
                 let datatable = false;
                 let pending_only = false;
@@ -433,56 +485,7 @@
                         search: {
                             input: $('#generalSearch'),
                         },
-                        columns: [
-                             {
-                                field: 'Selected',
-                            },
-                            {
-                                field: 'Date',
-                                title: 'Date',
-                            },
-                            {
-                                field: 'Number',
-                                title: 'N°',
-                            },
-                            {
-                                field: 'Category',
-                                title: 'Categorie',
-                                type: 'string',
-                            },
-                            {
-                                field: 'Type',
-                                title: 'Type',
-                                type: 'string',
-                            },
-                            {
-                                field: 'Customer',
-                                title: 'Client',
-                            },
-                            {
-                                field: 'Title',
-                                title: 'Titre',
-                            },
-                            {
-                                field: 'Amount',
-                                title: 'Montant',
-                            },
-                            {
-                                field: 'HonoraryRates',
-                                title: 'Honoraires',
-                            },
-                            {
-                                field: 'Status',
-                                title: 'Statut',
-                                type: 'string',
-                            },
-                            {
-                                field: 'Resend',
-                            },
-                            {
-                                field: 'Download',
-                            },
-                        ],
+                        columns: columns_data,
                         toolbar: {
                             items: {
                                 pagination: {
@@ -531,7 +534,7 @@ $('#select_all').click(function() {
                             return "Tous"
                         }
                         else if(val==0){
-                            return "Rente"
+                            return "Rentes"
                         }else if(val==1){
                             return "Frais de co-pro"
                         }else if(val==2){
@@ -544,6 +547,12 @@ $('#select_all').click(function() {
                         }
                         else if(val==5){
                             return "Regule Manuelle"
+                        }
+                        else if(val==7){
+                            return "Honoraires"
+                        }
+                        else if(val==8){
+                            return "Divers"
                         }
                     }
                     $('#m_form_category').selectpicker().on('change', function() {
@@ -760,6 +769,163 @@ $('#select_all').click(function() {
                         
                     });
                     $('#partie-reponse').html('<div class="m-content"><div class="alert alert-pad alert-success">Fichiers téléchargés</div></div>');
+
+                    
+                }
+            });
+    });
+
+    $('#generer-export').click(function () {
+
+        let route = "{{ path('bank_generate_by_ids') }}";
+        let selected_ids = [];
+
+        $('input[type="checkbox"]:checked').each(function () {
+            let name = $(this).attr("name");
+            let id = name.split("_")[1];
+
+            selected_ids.push(id);
+        });
+
+        if (selected_ids.length === 0) {
+            alert('Aucune facture sélectionnée');
+            return;
+        }
+
+        // Création d’un formulaire POST dynamique
+        let form = $('<form>', {
+            method: 'POST',
+            action: route
+        });
+
+        selected_ids.forEach(function (id) {
+            form.append($('<input>', {
+                type: 'hidden',
+                name: 'ids[]',
+                value: id
+            }));
+        });
+
+        $('body').append(form);
+        form.submit();
+    });
+
+    $('#generer-export-fa').click(function () {
+
+        let route = "{{ path('bank_generate_fa_by_ids') }}";
+        let selected_ids = [];
+
+        $('input[type="checkbox"]:checked').each(function () {
+            let name = $(this).attr("name");
+            let id = name.split("_")[1];
+
+            selected_ids.push(id);
+        });
+
+        if (selected_ids.length === 0) {
+            alert('Aucune facture sélectionnée');
+            return;
+        }
+
+        // Création d’un formulaire POST dynamique
+        let form = $('<form>', {
+            method: 'POST',
+            action: route
+        });
+
+        selected_ids.forEach(function (id) {
+            form.append($('<input>', {
+                type: 'hidden',
+                name: 'ids[]',
+                value: id
+            }));
+        });
+
+        $('body').append(form);
+        form.submit();
+    });
+
+
+
+    $('#renvoyer-tous').click(function() {
+            let route = "{{ path('ressend_selected_invoices',{'type':'renvoyer-tous'}) }}";
+            selected_ids=[];
+            elements=$('input[type="checkbox"]').filter(function() {  
+                return $(this).is(':checked') && $(this).not('#select_all');
+            })
+            if($('#select_all').is(':checked')){
+                console.log("retirer le premier")
+                elements=elements.slice(1, elements.length)
+            }
+            console.log( 'elements: ',elements );
+             $.each(elements, function(key, value) {
+                name=$(value).attr("name");
+                fullname=name;
+                id=name.split("_")[1];
+                selected_ids.push(
+                    {
+                        "fullname":fullname,
+                        "id":id,
+                    }
+                )
+            });
+            console.log( 'sent: ',selected_ids );
+            $.ajax({
+                type: 'POST',
+                dataType: "json",
+                url:route,
+                data: {"ids":selected_ids},
+                success: function(data) {
+                    
+                    let results=data["results"]
+                    console.log('received: ',results)
+                    let $container = $("#results-container-renvoi-tous");
+
+                    // Appliquer un style initial à la div conteneur
+                    $container.css({
+                        opacity: 1, // La div reste toujours visible
+                        transform: "scale(1)", // Taille normale
+                        margin: "10px 0 10px 0",
+                        padding: "10px",
+                        width: "fit-content",
+                        backgroundColor: "rgb(37, 171, 43)",
+                        fontSize: "13px",
+                        color: "white",
+                        borderRadius: "5px",
+                        boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                        textAlign: "center"
+                    });
+
+                    // Animation en boucle pour chaque bien
+                    let index = 0;
+                    function showNextBien() {
+                        if (index < results.length) {
+                            // Mettre à jour le texte
+                            $container
+                                .css({ opacity: 0 }) // Rendre le texte invisible avant de le changer
+                                .text(
+                                    'Résultat : ' +
+                                        results[index].result_string
+                                )
+                                .animate(
+                                    { opacity: 1 }, // Faire apparaître le texte
+                                    {
+                                        duration: 500, // Durée de l'animation d'apparition
+                                        complete: function () {
+                                            // Attendre avant de passer au prochain texte
+                                            setTimeout(() => {
+                                                index++;
+                                                showNextBien(); // Passer à l'élément suivant
+                                            }, 3000); // Temps d'affichage pour chaque élément
+                                        }
+                                    }
+                                );
+                        }
+                    }
+
+                    // Démarrer l'animation
+                    showNextBien();
+                    $('#partie-reponse-renvoi-tous').html('<div class=""><div class="alert alert-pad alert-success">Messages renvoyés</div></div>');
 
                     
                 }

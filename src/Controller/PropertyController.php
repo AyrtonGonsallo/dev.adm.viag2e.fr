@@ -130,17 +130,10 @@ class PropertyController extends AbstractController
             /** @var Property $property */
             $property = $form->getData();
 
-            if (empty($property->getRevaluationIndex())) {
-                $property->setRevaluationIndex(0.0);
-            }
-            if (!$property->getInitialAmount()) {
-                $property->setInitialAmount(0.0);
-            }
-            
             $property->date_duh=new DateTime();
             $property->setMoisIndiceInitial(new DateTime());
             $property->setCoordonneesSyndic("");
-            $property->setIntitulesIndicesInitial(2);
+           // $property->setIntitulesIndicesInitial(2);
             $property->climatisation_pompe_chaleur=0;
             $property->chaudiere=0;
             $property->valeur_indice_ref_og2_i=0;
@@ -148,16 +141,36 @@ class PropertyController extends AbstractController
             
             $property->hide_honorary_export=0;
             $property->setDebirentierDifferent(0);
-            $property->setBankRum("");
+            $property->bank_rum_1="";
             $property->setAnnuitiesDisabled(0);
             $property->setShowDuh(0);
             $property->setIndexationOG2I(0);
-            $property->setBankIcs("FR12ZZZ886B32");
+            $property->bank_ics_1="FR12ZZZ886B32";
             $property->setClauseOG2I(0);
             $property->setWarrant($warrant);
             $property->setCreationUser($this->getUser());
             $property->setEditionUser($this->getUser());
             $property->setGoodAddress($property->getAddress()." ".$property->getPostalCode()." ".$property->getCity());
+            
+
+            if (empty($property->getRevaluationIndex())) {
+                $property->setRevaluationIndex(0.0);
+            }
+            if (!$property->getInitialAmount() || $property->getInitialAmount()<1) {
+                $property->setInitialAmount(0.0);
+                $property->setHonorariesDisabled(true);
+                $property->setBillingDisabled(true);
+                $property->setAnnuitiesDisabled(true);
+
+            }
+            if (!$property->honorary_rates_object) {
+                $property->setHonorariesDisabled(true);
+                $property->hide_honorary_export=1;
+            }
+            if (!$property->getRevaluationDate() || !$property->initial_index_object || !$property->getMoisIndiceInitial()) {
+                $property->setNoIndexation(1);
+            }
+            
             if($property->initial_index_object){
                 $property->valeur_indexation_normale=$property->valeur_indice_reference_object->getValue();
 
@@ -197,6 +210,9 @@ class PropertyController extends AbstractController
             ->getRepository(Property::class)
             ->find($request->get('propertyId'));
 
+          
+
+
         if (empty($property)) {
             $this->addFlash('danger', 'Bien introuvable');
             return $this->redirectToRoute('dashboard', [], 302);
@@ -213,7 +229,7 @@ class PropertyController extends AbstractController
                     }else if($i==2){
                         return 'Ménages';
                     }else{
-                        return 'Ménages';
+                        return 'IRL';
                     }
 
                 }
@@ -242,25 +258,8 @@ class PropertyController extends AbstractController
         }else{
             $indice_m_u = (object) array('value' => 0,'id'=>0);
         }
-        $propertyComment=new PropertyComment(); 
-        $form_comment = $this->createForm(PropertyCommentFormType::class, $propertyComment);
-        $form_comment->handleRequest($request);
-        if ($form_comment->isSubmitted() and $form_comment->isValid()) {
-            $manager = $this->getDoctrine()->getManager();
-            $data = $form_comment->getData();
-            $propertyComment->setProperty($property);
-            $propertyComment->setStatus(0);
-            $manager->persist($propertyComment);
-            $manager->flush();
-
-            return $this->redirectToRoute('property_view',['propertyId' => $property->getId(),'onglet' => 'm_tabs_mails']);
-        }
-        $comments = $this->getDoctrine()
-            ->getRepository(PropertyComment::class)
-            ->findByProperty($property);
-            $form_file = $this->createForm(FileFormType::class, new File(), ['action' => $this->generateUrl('property_file_add', ['propertyId' => $property->getId()])]);
-            //$form_mail = $this->createForm(MailFormType::class, new Mail(), ['action' => $this->generateUrl('property_mail_add', ['propertyId' => $property->getId()])]);
-    
+      
+     
             
         if (empty($property)) {
             $this->addFlash('danger', 'Bien introuvable');
@@ -268,13 +267,11 @@ class PropertyController extends AbstractController
         }
 
         $old_index = $property->getRevaluationIndex();
-        $form_payment= $this->createForm(PropertyPaymentFormType::class, $property);
-        $form_copro = $this->createForm(PropertyCoproFormType::class, $property);
+       
         if($property->getType() == Warrant::TYPE_SELLERS) {
             $form_buyer = $this->createForm(PropertyFormBuyerType::class, $property);
         }
         $form = $this->createForm(PropertyFormType::class, $property);
-        $form_mail = $this->createForm(MailFormType::class, new Mail(), ['action' => $this->generateUrl('mail_add3', ['p_id' => $property->getId()])]);
         $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
         ->select("inv")
         ->from('App\Entity\Invoice', 'inv')
@@ -285,8 +282,7 @@ class PropertyController extends AbstractController
         // Execute Query
         $invs = $query->getResult();
         $form->handleRequest($request);
-        $form_copro->handleRequest($request);
-        $form_payment->handleRequest($request);
+      
         if($property->getType() == Warrant::TYPE_SELLERS) {
             $form_buyer->handleRequest($request);
             if ($form_buyer->isSubmitted() and $form_buyer->isValid()) {
@@ -309,36 +305,18 @@ class PropertyController extends AbstractController
             }
         }
         if ($form->isSubmitted() && $form->isValid()) {
-            if($property->getPropertyType()=="Appartement" && $property->date_fin_exercice_copro==null){
-                $errors = ' la date de fin d\'exercice de copropriété est obligatoire pour un bien de type appartement.';
-                $this->addFlash('error', 'Problème lors de l\'enregistrement :'.$errors);
-
-            }else{
+            
                 $manager = $this->getDoctrine()->getManager();
                 $property->setEditionUser($this->getUser());
     
-                if ($old_index !== $property->getRevaluationIndex()) {
-                    $notifications = $manager
-                        ->getRepository(Notification::class)
-                        ->findProperty('revaluation', $property);
-    
-                    foreach ($notifications as $notification) {
-                        $manager->remove($notification);
-                    }
-    
-                    $history = new RevaluationHistory();
-                    $history->setValue($old_index);
-                    $history->setProperty($property);
-    
-                    $property->setLastRevaluation(new DateTime());
-    
-                    $manager->persist($history);
-                }
+               
+                
+               
                 
                 
-                $manager->flush();
-                $this->addFlash('success', 'Bien édité');
-            }
+               $manager->flush();
+                $this->addFlash('success', 'Bien édité ');
+            
             
         }else if($form->isSubmitted() && !$form->isValid()){
             $errors ='';
@@ -351,209 +329,7 @@ class PropertyController extends AbstractController
             $this->addFlash('error', 'Problème lors de l\'enregistrement <br/>'.$errors);
         }
        
-        if ($form_copro->isSubmitted() and $form_copro->isValid()) {
-            if($property->getPropertyType()=="Appartement" && $property->date_fin_exercice_copro==null){
-                $errors = ' la date de fin d\'exercice de copropriété est obligatoire pour un bien de type appartement.';
-                $this->addFlash('error', 'Problème lors de l\'enregistrement : '.$errors);
-
-            }else{
-                $manager = $this->getDoctrine()->getManager();
-                $data = $form_copro->getData();
-               // $pendingInvoice = new PendingInvoice();
-                //$pendingInvoice->setProperty($property);
-                setlocale(LC_TIME, 'fr_FR.utf8', 'French', 'French_France'); // dates in french
-                $regul = $data->regul;
-                $date_reg_fin = $data->date_reg_fin;
-                $date_reg_debut = $data->date_reg_debut;
-
-                $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
-                ->select("inv")
-                ->from('App\Entity\Invoice', 'inv')
-                ->where('inv.property = :property AND inv.category = 1 AND inv.date BETWEEN :start AND :end')
-                ->setParameter('property', $property)
-                ->setParameter('start', $date_reg_debut)
-                ->setParameter('end', $date_reg_fin)
-                    ->orderBy('inv.id', 'DESC');
-                $query = $qb->getQuery();
-                // Execute Query
-                $invs = $query->getResult();
-
-                $parameters = [
-                    'tva'        => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'tva'])->getValue(),
-                    'footer'     => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_footer'])->getValue(),
-                    'address'    => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_address'])->getValue(),
-                    'postalcode' => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_postalcode'])->getValue(),
-                    'city'       => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_city'])->getValue(),
-                    'phone'      => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_phone'])->getValue(),
-                    'mail'       => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_mail'])->getValue(),
-                    'site'       => $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'invoice_site'])->getValue(),
-                ];
-                $now_date=new DateTime();
-                $data = [
-                    'date'       => $now_date,
-                    'current_day'       => strftime("%A %d %B %Y", strtotime( $now_date->format('d-m-Y') )),
-                    'annee'       => $now_date->format('Y'),
-                    'date_a_f'       => $now_date->format('d/m/Y'),
-                    'date_d_f'       => $date_reg_debut->format('d/m/Y'),
-                    'date_f_f'       => $date_reg_fin->format('d/m/Y'),
-                    'amount'           => abs($regul),
-                    'period'           => ' '.strftime("%B %Y", strtotime( $date_reg_debut->format('d-m-Y') )).' à '.strftime("%B %Y", strtotime( $date_reg_fin->format('d-m-Y') )),
-                    'property'   => [
-                        'id'         => $property->getId(),
-                        'firstname'  => $property->getFirstname1(),
-                        'lastname'   => $property->getLastname1(),
-                        'firstname2' => $property->getFirstname2(),
-                        'lastname2'  => $property->getLastname2(),
-                        'address'    => $property->getAddress(),
-                        'postalcode' => $property->getPostalCode(),
-                        'city'       => $property->getCity(),
-                        'title'       => $property->getTitle(),
-                        'buyerfirstname'  => $property->getBuyerFirstname(),
-                        'buyerlastname'   => $property->getBuyerLastname(),
-                        'buyeraddress'    => $property->getBuyerAddress(),
-                        'buyerpostalcode' => $property->getBuyerPostalCode(),
-                        'buyercity'       => $property->getBuyerCity(),
-                        'property_type'       => $property->getPropertyType(),
-                        'condominiumFees' => $property->getCondominiumFees(),
-                        'achat' => $property->getDosAuthenticInstrument(),
-                    ],
-                    'warrant'    => [
-                        'id'         => $property->getWarrant()->getId(),
-                        'type'       => $property->getWarrant()->getType(),
-                        'firstname'  => $property->getWarrant()->getFirstname(),
-                        'lastname'   => $property->getWarrant()->getLastname(),
-                        'address'    => ($property->getWarrant()->hasFactAddress()) ? $property->getWarrant()->getFactAddress() : $property->getWarrant()->getAddress(),
-                        'postalcode' => ($property->getWarrant()->hasFactAddress()) ? $property->getWarrant()->getFactPostalCode() : $property->getWarrant()->getPostalCode(),
-                        'city'       => ($property->getWarrant()->hasFactAddress()) ? $property->getWarrant()->getFactCity() : $property->getWarrant()->getCity(),
-                    ],
-                    "debirentier" => null,
-                    "debirentier_different" => null,
-                    "target" => null,
-                    "nom_compte" => explode("/", $property->getTitle())[0],
-                    "factures" => null,
-                    "debit" => null,
-                    "credit" => null,
-    
-                ];
-                if($property->getDebirentierDifferent()){
-                    $debirentier    = [
-                        'nom_debirentier'         => $property->getNomDebirentier(),
-                        'prenom_debirentier'       => $property->getPrenomDebirentier(),
-                        'addresse_debirentier'  => $property->getAddresseDebirentier(),
-                        'code_postal_debirentier'   => $property->getCodePostalDebirentier(),
-                        'ville_debirentier'    => $property->getVilleDebirentier(),
-                    ];
-                    $data["debirentier"]=$debirentier;
-                    $data["debirentier_different"]=$property->getDebirentierDifferent();
-                }
-                $factures = array();
-                $credit=0;
-                foreach ($invs as  $inv) {
-                    if($inv->getDate()->format('m')>9){
-                        $trimestre='Trimestre 4';
-                    }else if($inv->getDate()->format('m')>6){
-                        $trimestre='Trimestre 3';
-                    }
-                    else if($inv->getDate()->format('m')>3){
-                        $trimestre='Trimestre 2';
-                    }
-                    else if($inv->getDate()->format('m')>0){
-                        $trimestre='Trimestre 1';
-                    }
-
-                    if ($inv->getCategory() === Invoice::CATEGORY_CONDOMINIUM_FEES) {
-                        $montant = number_format($inv->getData()['property']['condominiumFees'], 2, '.', ' ');
-                    }
-                    elseif ($inv->getCategory() === Invoice::CATEGORY_GARBAGE || $inv->getCategory() === Invoice::CATEGORY_MANUAL) {
-                        $montant = number_format($inv->getData()['amount'],2, '.', ' ');
-                    }
-                    else {
-                        $montant = number_format($inv->getData()['property']['annuity'],2, '.', ' ');
-                    }
-                    $facture    = [
-                        'year'         => $inv->getDate()->format('Y'),
-                        'date'         => $inv->getDate()->format('d/m/Y'),
-                        'montant'       => $montant,
-                        'trimestre'  => $trimestre,
-                        'numero'   => $inv->getNumber(),
-                    ];
-                    array_push($factures, $facture);
-                    $credit+= $montant;
-                }
-                $data["factures"]=$factures;
-                $data["credit"]=$credit;
-                $data["debit"]=$credit - $regul;
-                if($regul>0){
-                    //si résultat positif= régul adréssée au débirentier
-                    //Le débirentier = le propriétaire = la société Opale Business 2
-                    //$pendingInvoice->setTarget(PendingInvoice::TARGET_WARRANT);//1
-                    $data["target"]="Débirentier";
-                }else{
-                    //si résultat négatif= régul adressée au crédirentier
-                    //Le crédirentier
-                    //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
-                    $data["target"]="Crédirentier";
-                }
-                $pdf      = new Html2Pdf('P', 'A4', 'fr');
-                $fileName = $now_date->format('d-m-Y h:i:s')." Régul ".$property->getId()." ".explode("/", $property->getTitle())[0].".pdf";
-                try {
-                    $pdf->pdf->SetDisplayMode('fullpage');
-                   
-                    if($regul>0){
-                        //si résultat positif= régul adréssée au débirentier
-                        //Le débirentier = le propriétaire = la société Opale Business 2
-                        //$pendingInvoice->setTarget(PendingInvoice::TARGET_WARRANT);//1
-                        $pdf->writeHTML($this->twig->render('regul_annuelle/debit.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    }else{
-                        //si résultat négatif= régul adressée au crédirentier
-                        //Le crédirentier
-                        //$pendingInvoice->setTarget(PendingInvoice::TARGET_PROPERTY);//2
-                        $pdf->writeHTML($this->twig->render('regul_annuelle/credit.html.twig', ['pdf_logo_path' => $this->pdf_logo,'parameters' => $parameters, 'data' => $data]));
-                    }
-                    $pdf->output('/var/www/vhosts/adm.univers-viager.com/adm.univers-viager.com/pdf/'. $fileName, 'F');
-                    
-                    $file = new File();
-                    $file->setType(File::TYPE_DOCUMENT);
-                    $file->setName($fileName);
-                    $file->setDate($now_date);
-                    $file->setWarrant($property->getWarrant());
-                    $file->setDriveId($driveManager->addFile($file->getName(), $this->path ."/". $fileName, File::TYPE_DOCUMENT, $property->getWarrant()->getId()));
-                    $manager = $this->getDoctrine()->getManager();
-                    $manager->persist($file);
-                    $property->regul = Null;
-                    $property->date_reg_debut = Null;
-                    $property->date_reg_fin = Null;
-                    $manager->flush();
-
-                    $this->addFlash('success', 'Facture enregistrée');
-
-                } catch (Html2PdfException $e) {
-                    $pdf->clean();
-                    throw new Exception($e->getMessage());
-                }
-                /*$pendingInvoice->setCategory(Invoice::CATEGORY_MANUAL);
-                $pendingInvoice->setOptions([]);
-                $pendingInvoice->setLabel('Facture période du '.strftime("%B %Y", strtotime( $date_reg_debut->format('d-m-Y') )).' à '.strftime("%B %Y", strtotime( $date_reg_fin->format('d-m-Y') )));
-                $pendingInvoice->setPeriod(' '.strftime("%B %Y", strtotime( $date_reg_debut->format('d-m-Y') )).' à '.strftime("%B %Y", strtotime( $date_reg_fin->format('d-m-Y') )));
-                $pendingInvoice->setMontantht(abs($regul));
-                $pendingInvoice->setHonorary(0);
-                
-                $manager->persist($pendingInvoice);*/
-                
-            }
-            return $this->redirectToRoute('property_view',['propertyId' => $property->getId(),'onglet' => 'm_tabs_copro']);
-        }else if($form_copro->isSubmitted() and !$form_copro->isValid()){
-            $errors ='';
-            foreach ($form_copro as $fieldName => $formField) {
-                // each field has an array of errors
-                if(strlen($formField->getErrors())>=3){
-                    $errors .= 'Champ: '.$fieldName.'- Erreur: '.$formField->getErrors().'<br/>';
-                }
-            }
-            $this->addFlash('error', 'Problème lors de l\'enregistrement <br/>'.$errors);
-            return $this->redirectToRoute('property_view',['propertyId' => $property->getId(),'onglet' => 'm_tabs_copro']);
-
-        }
+       
         
         $startDate = \DateTime::createFromFormat('d-n-Y', "01-".date('m')."-".date('Y'));
         $startDate->setTime(0, 0 ,0);
@@ -604,46 +380,7 @@ class PropertyController extends AbstractController
         
         
         
-        if ($form_payment->isSubmitted() and $form_payment->isValid()) {
-            $manager = $this->getDoctrine()->getManager();
-            $data = $form_payment->getData();
-            $rum_unique=$data->getBankRum();
-            $qb5=$this->getDoctrine()->getManager()->createQueryBuilder()
-            ->select("p")
-            ->from('App\Entity\Property', 'p')
-            ->where('p.bank_rum LIKE :key')
-            ->setParameter('key', '%'.$rum_unique.'%');
-            $query5 = $qb5->getQuery();
-            // Execute Query
-            $properties_avec_meme_rum = $query5->getResult();
-            if($rum_unique && $properties_avec_meme_rum){
-                $this->addFlash('error', 'Problème lors de l\'enregistrement : le numéro de RUM existe déja.');
-                return $this->redirectToRoute('property_view',['propertyId' => $property->getId(),'onglet' => 'm_tabs_pay']);
-
-            }
-            if($property->initial_index_object){
-                $property->valeur_indexation_normale=$property->valeur_indice_reference_object->getValue();
-
-            }else{
-                $property->valeur_indexation_normale=0;
-
-            }
-            //$manager->persist($propertyComment);
-            $manager->flush();
-            $this->addFlash('success', 'Bien édité');
-            return $this->redirectToRoute('property_view',['propertyId' => $property->getId(),'onglet' => 'm_tabs_pay']);
-        }else if($form_payment->isSubmitted() and !$form_payment->isValid()){
-            $errors ='';
-            foreach ($form_payment as $fieldName => $formField) {
-                // each field has an array of errors
-                if(strlen($formField->getErrors())>=3){
-                    $errors .= 'Champ: '.$fieldName.'- Erreur: '.$formField->getErrors().'<br/>';
-                }
-            }
-            $this->addFlash('error', 'Problème lors de l\'enregistrement <br/>'.$errors);
-            return $this->redirectToRoute('property_view',['propertyId' => $property->getId(),'onglet' => 'm_tabs_pay']);
-
-        }
+        
         $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
         ->select("rec")
         ->from('App\Entity\Recap', 'rec')
@@ -658,7 +395,7 @@ class PropertyController extends AbstractController
         ->from('App\Entity\Invoice', 'inv')
         ->where('inv.property = :key')
         ->setParameter('key', $property)
-            ->orderBy('inv.id', 'DESC');
+            ->orderBy('inv.date', 'DESC');
         $query2 = $qb2->getQuery();
         // Execute Query
         $invoices_files = $query2->getResult();
@@ -667,23 +404,15 @@ class PropertyController extends AbstractController
         ->from('App\Entity\File', 'f')
         ->where('f.property = :key')
         ->setParameter('key', $property)
-            ->orderBy('f.id', 'DESC');
+            ->orderBy('f.date', 'DESC');
         $query22 = $qb22->getQuery();
         // Execute Query
         $generated_files = $query22->getResult();
         $tva = $this->getDoctrine()->getRepository(Parameter::class)->findOneBy(['name' => 'tva']);
-        $messages = $this->getDoctrine()
-        ->getRepository(Mail::class)
-        ->findAll();
+       
         return $this->render('property/view.html.twig', [
             'form'      => $form->createView(),
-            'form_comment'      => $form_comment->createView(),
-            'form_file'  => $form_file->createView(),
-            'form_copro'  => $form_copro->createView(),
             'form_buyer'  => ($property->getType() == Warrant::TYPE_SELLERS) ?$form_buyer->createView():null,
-            'messages'  => $messages,
-            'form_payment'  => $form_payment->createView(),
-            'form_mail'  => $form_mail->createView(),
             'property'  => $property,
             'generated_files'  => $generated_files,
             'indice_og2i'  => $indice_og2i,
@@ -691,7 +420,6 @@ class PropertyController extends AbstractController
             'recaps'  => $recaps,
             'invoices_files'  => $invoices_files,
             'invoices'  => $invs,
-            'comments'  => $comments,
             'tax'       => $tva->getValue(),
             'buyer_tab' => $request->get('buyer') !== null,
         ]);
@@ -1008,19 +736,42 @@ class PropertyController extends AbstractController
         $rdb=$request->get('rdb');
         //rdb*taux
         $taux_id=$request->get('taux');
+        if($taux_id==0){
+            return new JsonResponse(['formule'=> 'pas de taux','res' => 0,'taux'=>0,'rdb'=>$rdb ]);
+        }else{
+            $taux_hon = $this->getDoctrine()
+            ->getRepository(Honoraire::class)
+            ->find($taux_id);
+            $formule='rdb*taux';
+            $res=$taux_hon->getValeur()*$rdb/100;
+            if($res<$taux_hon->getMinimum()){
+                $res=$taux_hon->getMinimum();
+                $formule='rdb*taux (minoré à '.$taux_hon->getMinimum().')';
+            }
+        }
         
-        $taux_hon = $this->getDoctrine()
-        ->getRepository(Honoraire::class)
-        ->find($taux_id);
-         $formule='rdb*taux';
-        $res=$taux_hon->getValeur()*$rdb/100;
-		if($res<$taux_hon->getMinimum()){
-			$res=$taux_hon->getMinimum();
-			$formule='rdb*taux (minoré à '.$taux_hon->getMinimum().')';
-		}
+        
         
         return new JsonResponse(['formule'=> $formule,'res' => $res,'taux'=>$taux_hon->getValeur(),'rdb'=>$rdb ]);
         
+    }
+
+
+    /**
+     * @Route("/properties", name="properties")
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function index(Request $request)
+    {
+        $properties = $this->getDoctrine()
+        ->getRepository(Property::class)
+        ->findAll();
+        
+        return $this->render('property/list.html.twig', [
+            'properties' => $properties,
+        ]);
     }
 
     /**
@@ -1059,7 +810,7 @@ class PropertyController extends AbstractController
         ->getRepository(Property::class)
         ->find($request->get('propertyId'));
 
-        $route = $this->generateUrl('property_view', [ 'propertyId' =>$request->get('propertyId'),'onglet' => 'm_tabs_profil']);
+        $route = $this->generateUrl('property_view', [ 'propertyId' =>$request->get('propertyId')]);
         
 
         if (!empty($p )) {
@@ -1089,7 +840,7 @@ class PropertyController extends AbstractController
         ->getRepository(Property::class)
         ->find($request->get('propertyId'));
 
-        $route = $this->generateUrl('property_view', [ 'propertyId' =>$request->get('propertyId'),'onglet' => 'm_tabs_profil']);
+        $route = $this->generateUrl('property_view', [ 'propertyId' =>$request->get('propertyId')]);
         
 
         if (!empty($p )) {

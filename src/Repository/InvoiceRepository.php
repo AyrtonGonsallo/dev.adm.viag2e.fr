@@ -26,8 +26,9 @@ class InvoiceRepository extends ServiceEntityRepository
         if($val=="Tous"){
             return 6;
         }
-        else if($val=="Rente"){
+        else if($val=="Rentes"){
             return 0;
+        
         }else if($val=="Frais de co-pro"){
             return 1;
         }else if($val=="Ordures ménagères"){
@@ -40,6 +41,12 @@ class InvoiceRepository extends ServiceEntityRepository
         }
         else if($val=="Regule Manuelle"){
             return 5;
+        }
+        else if($val=="Honoraires"){
+            return 7;
+        }
+        else if($val=="Divers"){
+            return 8;
         }
     }
 
@@ -56,7 +63,7 @@ class InvoiceRepository extends ServiceEntityRepository
     }
 
 
-    public function findAllOrdered(int $page, int $max, array $data)
+    public function findAllOrdered(int $page, int $max, array $data, bool $isAdmin = false)
     {
         $query = $this->createQueryBuilder('i')
             ->orderBy('i.date', 'DESC');
@@ -75,13 +82,36 @@ class InvoiceRepository extends ServiceEntityRepository
                 ->setParameter('month', '%"month_n":"'.$data['month_concerned'].'%');
         }
 
-        if(!empty($data['Category']) && $this->get_category($data['Category'])!=6) {
-            $query->andWhere('i.category = :category')->setParameter('category', $this->get_category($data['Category']));
+        if(!empty($data['Category']) ) {
+
+             if (  !in_array($this->get_category($data['Category']), [0, 6, 7, 8], true)  ) {
+                // ton code
+                $query->andWhere('i.category = :category')->setParameter('category', $this->get_category($data['Category']));
+            }else if($this->get_category($data['Category']) == 7){//honoraires file2 not null
+                $query->andWhere('i.file2 IS NOT NULL');
+                $query->andWhere('i.category = :category')->setParameter('category', 0);
+            }
+            else if($this->get_category($data['Category']) == 0){//honoraires file2 not null
+                $query->andWhere('i.file IS NOT NULL');
+                $query->andWhere('i.category = :category')->setParameter('category', 0);
+            }
+            else if($this->get_category($data['Category']) == 8){//divers faire i.category in 2,3,4,5
+                $query
+                ->andWhere('i.category IN (:categories)')
+                ->setParameter('categories', [2, 3, 4, 5]);
+            }
+            
         }
 
         if(!empty($data['Status'])) {
             $query->andWhere('i.status = :status')->setParameter('status', $data['Status']);
         }
+        elseif (!$isAdmin) {
+            // Non-admin, aucun filtre fourni → limiter aux 2 statuts
+            $query->andWhere('i.status IN (:statuses)')
+            ->setParameter('statuses', [4, 2]);
+        }
+        
 
         if(!empty($data['Type'])) {
             $query->andWhere('i.type = :type')->setParameter('type', $data['Type']);
@@ -215,7 +245,7 @@ class InvoiceRepository extends ServiceEntityRepository
     }*/
     public function findAvoirsTogenerate(int $max)
 {
-   // $numbers = [5591, 5592, 5588, 5589, 5590, 5581, 5582, 5584, 5585, 5586, 5587, 5681, 5790, 5791, 5682];
+   // $numbers = [7348,7458,7580];
    
    $numbers = [7194,7197];
 
@@ -230,6 +260,28 @@ class InvoiceRepository extends ServiceEntityRepository
         ->getQuery()
         ->getResult();
 }
+
+public function findAvoirToGenerate(int $numero, int $type)
+{
+    $qb = $this->createQueryBuilder('i')
+        ->where('i.number LIKE :number')
+        ->andWhere('i.type = :t')
+        ->setParameter('number', '%' . $numero)
+        ->setParameter('t', 1)
+        ->setMaxResults(1);
+
+    if ($type === 1) {
+        // rente
+        $qb->andWhere('i.file IS NOT NULL');
+    } elseif ($type === 2) {
+        // honoraire
+        $qb->andWhere('i.file2 IS NOT NULL');
+    }
+
+    return $qb->getQuery()->getOneOrNullResult();
+}
+
+
     public function  findSimilarInvoice(String $numero)
     {
         return $this->createQueryBuilder('i')
@@ -358,6 +410,32 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function listByDate2IdVersion(array $ids): array
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.id IN (:ids)')
+            ->andWhere('i.type IN (:types)')
+            ->setParameter('ids', $ids)
+            ->setParameter('types', [
+                Invoice::TYPE_RECEIPT,
+                Invoice::TYPE_AVOIR
+            ])
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function listByDateNE2IdVersion(array $ids): array
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.id IN (:ids)')
+            ->andWhere('i.type = :type')
+            ->setParameter('ids', $ids)
+            ->setParameter('type', Invoice::TYPE_NOTICE_EXPIRY)
+            ->getQuery()
+            ->getResult();
+    }
+
 
     public function listByDateNE(DateTime $start, DateTime $end)
     {

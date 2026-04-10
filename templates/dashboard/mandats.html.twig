@@ -1,0 +1,99 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Accueil{% endblock %}
+
+{% block body %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="#" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+            
+
+
+    <div class="m-content">
+        <div class="row">
+           
+
+
+
+            <div class="col-xl-6">
+                <div class="m-portlet m-portlet--full-height ">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h3 class="m-portlet__head-text">            
+                                    Mandats à renouveler (1 mois avant péremption)
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-widget2">
+                            {% for property in mandat_a_renouveller %}
+                                <div class="m-widget2__item m-widget2__item--{{ randomColor() }}">
+                                    <div class="m-widget2__checkbox"></div>
+                                    <div class="m-widget2__desc">
+                                        <a href="{{ path('property_view', {'propertyId': property.id}) }}" class="m-widget2__text">
+                                            {{ property.title }} <i>({{ property.id }})</i> <small>({{ property.warrant.firstname }} {{ property.warrant.lastname }})</small>
+                                        </a><br />
+                                        <span class="m-widget2__user-name">
+                                        <span href="#" class="m-widget2__link">
+                                            Par {{ property.creationUser.firstname }} {{ property.creationUser.lastname }}
+                                        </span>
+                                    </span>
+                                    </div>
+                                    <div class="m-widget2__actions">
+                                        <div class="m-widget2__actions-nav">
+                                            <div class="m-dropdown m-dropdown--inline m-dropdown--arrow m-dropdown--align-right m-dropdown--align-push" m-dropdown-toggle="hover">
+                                                <a href="#" class="m-dropdown__toggle">
+                                                    <i class="la la-ellipsis-h"></i>
+                                                </a>
+                                                <div class="m-dropdown__wrapper">
+                                                    <span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
+                                                    <div class="m-dropdown__inner">
+                                                        <div class="m-dropdown__body">
+                                                            <div class="m-dropdown__content">
+                                                                <ul class="m-nav">
+                                                                    <li class="m-nav__item">
+                                                                        <a href="{{ path('warrant_view', {'type': property.warrant.typeString, 'warrantId': property.warrant.id}) }}" class="m-nav__link">
+                                                                            <i class="m-nav__link-icon flaticon-user"></i>
+                                                                            <span class="m-nav__link-text">Mandat</span>
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="text-center">
+                                    Aucun bien
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+{% block scripts %}
+
+
+{% endblock %}

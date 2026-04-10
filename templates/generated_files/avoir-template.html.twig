@@ -1,0 +1,106 @@
+<style type="text/css">
+    <!--
+    table { vertical-align: top; }
+    tr    { vertical-align: top; }
+    td    { vertical-align: top; }
+    -->
+</style>
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt">
+    <bookmark title="Facture" level="0" ></bookmark>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px">
+        <tr>
+            <td style="text-align: left; width: 50%;">
+                <img style="width: 150px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+                {{ parameters.address|raw }}<br />
+                {{ parameters.postalcode }} {{ parameters.city|upper }}<br /><br /><br /><br /><br /><br />
+                Téléphone: {{ parameters.phone }}<br />
+                Mail: {{ parameters.mail }}<br />
+                {{ parameters.site }}
+            </td>
+            <td style="width: 50%; padding-top: 25px;">
+                <span style="font-size: 15pt"><b> AVOIR {{ data.number }}</b></span><br />
+                Période <b>{{ data.period }} </b><br />
+                <small>{{ parameters.city|title }}, le {{ data.current_day }}</small>
+                <br /><br /><br /><br /><br /><br /><br />
+                <b>A l'attention de:</b><br />
+                
+                {% if data.recursion == constant('App\\Entity\\Invoice::RECURSION_QUARTERLY') %}
+                    {{ data.property.lastname }} {{ data.property.firstname }}<br />
+                    {{  data.property.address | raw  }}<br />
+
+                {% elseif data.recursion == constant('App\\Entity\\Invoice::RECURSION_OTP')  %} 
+                    {% if data.target == constant('App\\Entity\\PendingInvoice::TARGET_WARRANT') %}
+                        
+                            {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                            {{ data.warrant.address }}<br />
+                            {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                        
+                    {% elseif data.target == constant('App\\Entity\\PendingInvoice::TARGET_PROPERTY') %}
+                        {{ data.property.lastname }} {{ data.property.firstname }}<br />
+                        {{ data.property.address | raw }}<br />
+                        
+                    {% elseif data.target == 4 %}
+                        {{ data.debirentier.prenom_debirentier }} {{ data.debirentier.nom_debirentier }}<br />
+                        {{ data.debirentier.addresse_debirentier }}<br />
+                        {{ data.debirentier.code_postal_debirentier }} {{ data.debirentier.ville_debirentier }}
+                    {% else %}
+                    
+                        {{ data.property.buyerlastname }} {{ data.property.buyerfirstname }}<br />
+                        {{ data.property.buyeraddress }}<br />
+                        {{ data.property.buyerpostalcode }} {{ data.property.buyercity }}
+                    {% endif %}
+
+                {% elseif data.recursion == constant('App\\Entity\\Invoice::RECURSION_MONTHLY')  %} 
+                    {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
+                        {{ data.buyer.lastname }} {{ data.buyer.firstname }}<br />
+                        {{ data.buyer.address }}<br />
+                        {{ data.buyer.postalcode }} {{ data.buyer.city }}
+                    {% else %}
+                        {% if data.property.is_og2i %}
+                            {% if data.debirentier_different %}
+                                {{ data.debirentier.prenom_debirentier }} {{ data.debirentier.nom_debirentier }}<br />
+                                {{ data.debirentier.addresse_debirentier }}<br />
+                                {{ data.debirentier.code_postal_debirentier }} {{ data.debirentier.ville_debirentier }}
+                            {% else %}
+                                {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                                {{ data.warrant.address }}<br />
+                                {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                            {% endif %}
+                        {% else %}
+                        {% if data.debirentier_different %}
+                                {{ data.debirentier.prenom_debirentier }} {{ data.debirentier.nom_debirentier }}<br />
+                                {{ data.debirentier.addresse_debirentier }}<br />
+                                {{ data.debirentier.code_postal_debirentier }} {{ data.debirentier.ville_debirentier }}
+                            {% else %}
+                                {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                                {{ data.warrant.address }}<br />
+                                {{ data.warrant.postalcode }} {{ data.warrant.city }}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                
+                {% endif %}   
+            </td>
+        </tr>
+    </table>
+    <br />
+    <br />
+    
+   {{ data.form.texte |raw }}
+
+   
+
+</page>
+<page_footer>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 10px;">
+        <tr>
+            <td style="width: 100%;">
+                UNIVERS VIAGER - Siège social : 58 Rue Fondaudège 33000 BORDEAUX, SARL au capital de 5 000 €<br />
+                TVA FR27523654408 - Immatriculée au RCS Bordeaux N°523 654 408<br />
+                Garantie financière GALIAN 89 rue de la Boétie 75008 PARIS Montant : 120 000 €<br />
+                Carte Professionnelle Transaction et Gestion immobilière n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br />
+                « Notre agence ne détient aucun fonds pour le compte de ses clients »
+            </td>
+        </tr>
+    </table>
+</page_footer>

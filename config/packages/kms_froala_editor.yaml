@@ -1,0 +1,15 @@
+twig:
+    form_themes:
+        - '@KMSFroalaEditor/Form/froala_widget.html.twig'
+
+kms_froala_editor:
+    language: fr
+    toolbarInline: true
+    tableColors: [ "#FFFFFF", "#FF0000" ]
+    heightMin: 400
+    attribution: false
+    profiles:
+        profile_1:
+            heightMin: 500
+    pluginsDisabled:    ["save","spellChecker","video"]
+    spellcheck: false

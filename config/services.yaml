@@ -22,7 +22,7 @@ parameters:
     new_google_token: '%kernel.project_dir%/config/packages/google/token2.json'
     new_google_folder: '12CLwTvchn7qSsaqJPue1NbvTibCPpSGG'
 
-    mail_from: 'gestion@univers-viager.fr'
+    mail_from: 'userusernash@gmail.com'
 
     pdf_logo_path: '%kernel.project_dir%/public/img/logo_invoices.jpg'
     pdf_tmp_dir: '%kernel.project_dir%/pdf'

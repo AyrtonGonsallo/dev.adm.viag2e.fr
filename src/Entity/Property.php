@@ -17,11 +17,34 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class Property
 {
+
+    public const TYPE_MANDATAIRE_C = 1;
+    public const TYPE_MANDATAIRE_D = 2;
+    
+    public const TYPES_MANDATAIRES = [
+        self::TYPE_MANDATAIRE_C => 'Crédirentier',
+        self::TYPE_MANDATAIRE_D => 'Débirentier',
+    ];
+
+    public const TYPE_CIVILITE_MR = 1;
+    public const TYPE_CIVILITE_MME = 2;
+    public const TYPE_CIVILITE_MLE = 3;
+    public const TYPE_CIVILITE_A = 4;
+    
+    
+    public const TYPES_CIVILITE = [
+        self::TYPE_CIVILITE_A => 'Aucune',
+        self::TYPE_CIVILITE_MR => 'Monsieur',
+        self::TYPE_CIVILITE_MME => 'Madame',
+        self::TYPE_CIVILITE_MLE => 'Mademoiselle',
+    ];
+    
     public const LIFETIME_TYPE_VL = 1;
     public const LIFETIME_TYPE_VO = 2;
     public const LIFETIME_TYPE_BF_SALE = 3;
     public const LIFETIME_TYPE_FF_SALE = 4;
     public const LIFETIME_TYPE_NP = 5;
+    public const LIFETIME_TYPE_VgDUH = 6;
     
     public const LIFETIME_TYPES = [
         self::LIFETIME_TYPE_VO => 'VO',
@@ -29,6 +52,7 @@ class Property
         self::LIFETIME_TYPE_BF_SALE => 'VàTO',
         self::LIFETIME_TYPE_FF_SALE => 'VàTL',
         self::LIFETIME_TYPE_NP => 'NP',
+        self::LIFETIME_TYPE_VgDUH => 'VgDUH',
     ];
 
     public const HEATING_TYPE_ELECTRIC = 1;
@@ -42,6 +66,23 @@ class Property
         self::HEATING_TYPE_GAS => 'Chauffage au gaz',
         self::HEATING_TYPE_OTHER => 'Autre type de chauffage'
     ];
+
+    public const GOOD_TYPE_1 = 1;
+    public const GOOD_TYPE_2 = 2;
+
+    public const GOOD_TYPES = [
+        self::GOOD_TYPE_1 => 'Maison',
+        self::GOOD_TYPE_2 => 'Appartement',
+    ];
+
+    public const SELL_TYPE_1 = 1;
+    public const SELL_TYPE_2 = 2;
+
+    public const SELL_TYPES = [
+        self::SELL_TYPE_1 => 'type 1',
+        self::SELL_TYPE_2 => 'type 2',
+    ];
+    
     public const intitule_indice_initial_menages_urbains = 1;
     public const intitule_indice_initial_ensemble_des_menages = 2;
     public const intitule_indice_initial_irl = 3;
@@ -73,32 +114,32 @@ class Property
     private $title;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $address;
 
     /**
-     * @ORM\Column(type="string", length=10)
+     * @ORM\Column(type="string", length=10, nullable=true)
      */
     private $postal_code;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="string", length=100, nullable=true)
      */
     private $city;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="string", length=100, nullable=true)
      */
     private $country;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $firstname1;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $lastname1;
  /**
@@ -126,6 +167,22 @@ class Property
      * @ORM\Column(type="date")
      */
     public $date_duh;
+
+/**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $sell_type;
+
+    /**
+     * @ORM\Column(type="smallint",  nullable=true)
+     */
+    public $civilite1;
+
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    public $civilite2;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -199,7 +256,7 @@ class Property
     
      private $coordonnees_syndic;	
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="smallint", nullable=true)
      */
     private $property_type;
 
@@ -252,9 +309,13 @@ class Property
      */
     public $designation_du_bien;  
  /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=200, nullable=true)
      */
     public $ref_cadastrales;
+     /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    public $lots_propriete;
     /**
      * @ORM\Column(type="smallint")
      */
@@ -295,6 +356,11 @@ class Property
      * @ORM\ManyToOne(targetEntity="App\Entity\RevaluationHistory", inversedBy="properties_o")
      */
     public $valeur_indice_ref_og2_i_object;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    public $mandataire;
      /**
      * @ORM\Column(type="float")
      */
@@ -324,11 +390,11 @@ class Property
      */
     public $codes_syndic;
 /**
-     * @ORM\Column(type="date", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     public $date_reg_debut;
     /**
-     * @ORM\Column(type="date", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     public $date_reg_fin;
     /**
@@ -346,9 +412,9 @@ class Property
     private $abandonment_index;
 
     /**
-     * @ORM\Column(type="string", length=10)
+     * @ORM\Column(type="string", length=10, nullable=true)
      */
-    private $revaluation_date;
+    private ?string $revaluation_date = null;
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\File", mappedBy="property")
      */
@@ -409,51 +475,100 @@ class Property
      */
     private $end_date_management; // date de fin de contrat
 
-    /**
-     * @ORM\Column(type="string", length=10, nullable=true)
-     */
-    private $bank_establishment_code;
+    // ____ bank du 1er ___
 
     /**
      * @ORM\Column(type="string", length=10, nullable=true)
      */
-    private $bank_code_box;
-
-    /**
-     * @ORM\Column(type="string", length=30, nullable=true)
-     */
-    private $bank_account_number;
-
-    /**
-     * @ORM\Column(type="string", length=4, nullable=true)
-     */
-    private $bank_key;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $bank_domiciliation;
+    public $bank_establishment_code_1;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
      */
-    private $bank_iban;
+    public $bank_iban_1;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    public $bank_code_box_1;
+
+     /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    public $bank_bic_1;
+
+      /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    public $bank_rib_1;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $bank_bic;
+    public $bank_ics_1;
+
+    /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     */
+    public $bank_account_number_1;
+
+   /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    public $bank_rum_1;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $bank_domiciliation_1;
+
+    //  ___bank du 2 eme ___
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    public $bank_establishment_code_2;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    public $bank_iban_2;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    public $bank_code_box_2;
+
+     /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    public $bank_bic_2;
+
+      /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    public $bank_rib_2;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $bank_ics;
+    public $bank_ics_2;
 
     /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     */
+    public $bank_account_number_2;
+
+   /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $bank_rum;
+    public $bank_rum_2;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $bank_domiciliation_2;
+
+    
     /**
      * @ORM\Column(type="text", nullable=true)
      */
@@ -576,61 +691,61 @@ class Property
     private $last_receipt;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $honoraries_disabled;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $annuities_disabled;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $billing_disabled;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $show_duh;
      /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $clause_OG2I;	
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $no_indexation;	
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $indexation_OG2I;	
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $debirentier_different;
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $hide_export_monthly;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $hide_export_otp;
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     public $hide_honorary_export;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $hide_export_quarterly;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $active;
 
@@ -660,72 +775,205 @@ class Property
      */
     private $nom_debirentier;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $prenom_debirentier;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $addresse_debirentier;
    
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $code_postal_debirentier;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $ville_debirentier;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $pays_debirentier;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $telephone_debirentier;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $email_debirentier;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $nom_debirentier2;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $prenom_debirentier2;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $addresse_debirentier2;
    
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $code_postal_debirentier2;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $ville_debirentier2;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $pays_debirentier2;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $telephone_debirentier2;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $email_debirentier2;
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\PendingInvoice", mappedBy="property")
      */
     private $pendingInvoices;
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    public $civilite_debirentier;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    public $civilite_debirentier2;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    public $civilite_notaire;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $nom_notaire;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $prenom_notaire;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $addresse_notaire;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    public $code_postal_notaire;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $ville_notaire;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    public $telephone_notaire;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $email_notaire;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    public $adresse_similaire_credirentier;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    public $dernier_jour_paiement_rente;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    public $pas_de_baisse;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    public $date_remise_cles;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    public $pourcentage_revaluation_rente;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $syndic_nom;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $syndic_mail;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    public $syndic_phone;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $syndic_address;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    public $syndic_postal_code;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $syndic_ville;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $syndic_id;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    public $syndic_password;
+
+    /**
+     * @ORM\Column(type="float",  nullable=true)
+     */
+    public $syndic_quote_part;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    public $syndic_dernier_decompte;
+
+
+
+
+
+
+
+
+    
     
     public function __construct()
     {
@@ -772,8 +1020,8 @@ class Property
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('bank_iban', new Iban());
-        $metadata->addPropertyConstraint('bank_bic', new Bic());
+        $metadata->addPropertyConstraint('bank_iban_1', new Iban());
+        $metadata->addPropertyConstraint('bank_bic_1', new Bic());
         $metadata->addPropertyConstraint('buyer_bank_iban', new Iban());
         $metadata->addPropertyConstraint('buyer_bank_bic', new Bic());
     }
@@ -1058,12 +1306,12 @@ class Property
         return $this;
     }
 
-    public function getPropertyType(): ?string
+    public function getPropertyType(): ?int
     {
         return $this->property_type;
     }
 
-    public function setPropertyType(?string $property_type): self
+    public function setPropertyType(?int $property_type): self
     {
         $this->property_type = $property_type;
 
@@ -1233,7 +1481,7 @@ class Property
         return $this->revaluation_date;
     }
 
-    public function setRevaluationDate(string $revaluation_date): self
+    public function setRevaluationDate(?string $revaluation_date): self
     {
         $this->revaluation_date = $revaluation_date;
 
@@ -1336,113 +1584,6 @@ class Property
         return $this;
     }
 
-    public function getBankEstablishmentCode(): ?string
-    {
-        return $this->bank_establishment_code;
-    }
-
-    public function setBankEstablishmentCode(?string $bank_establishment_code): self
-    {
-        $this->bank_establishment_code = $bank_establishment_code;
-
-        return $this;
-    }
-
-    public function getBankCodeBox(): ?string
-    {
-        return $this->bank_code_box;
-    }
-
-    public function setBankCodeBox(?string $bank_code_box): self
-    {
-        $this->bank_code_box = $bank_code_box;
-
-        return $this;
-    }
-
-    public function getBankAccountNumber(): ?string
-    {
-        return $this->bank_account_number;
-    }
-
-    public function setBankAccountNumber(?string $bank_account_number): self
-    {
-        $this->bank_account_number = $bank_account_number;
-
-        return $this;
-    }
-
-    public function getBankKey(): ?string
-    {
-        return $this->bank_key;
-    }
-
-    public function setBankKey(?string $bank_key): self
-    {
-        $this->bank_key = $bank_key;
-
-        return $this;
-    }
-
-    public function getBankDomiciliation(): ?string
-    {
-        return $this->bank_domiciliation;
-    }
-
-    public function setBankDomiciliation(?string $bank_domiciliation): self
-    {
-        $this->bank_domiciliation = $bank_domiciliation;
-
-        return $this;
-    }
-
-    public function getBankIban(): ?string
-    {
-        return $this->bank_iban;
-    }
-
-    public function setBankIban(?string $bank_iban): self
-    {
-        $this->bank_iban = $bank_iban;
-
-        return $this;
-    }
-
-    public function getBankBic(): ?string
-    {
-        return $this->bank_bic;
-    }
-
-    public function setBankBic(?string $bank_bic): self
-    {
-        $this->bank_bic = $bank_bic;
-
-        return $this;
-    }
-
-    public function getBankIcs(): ?string
-    {
-        return $this->bank_ics;
-    }
-
-    public function setBankIcs(?string $bank_ics): self
-    {
-        $this->bank_ics = $bank_ics;
-
-        return $this;
-    }
-
-    public function getBankRum(): ?string
-    {
-        return $this->bank_rum;
-    }
-
-    public function setBankRum(?string $bank_rum): self
-    {
-        $this->bank_rum = $bank_rum;
-
-        return $this;
-    }
     public function getComment(): ?string
     {
         return $this->comment;
@@ -1550,7 +1691,6 @@ class Property
 
         return $this;
     }
-
     public function getBuyerMail1(): ?string
     {
         return $this->buyer_mail1;
@@ -1790,6 +1930,42 @@ class Property
 
         return $this;
     }
+
+    private function resolveCivilite(?int $value): ?string
+    {
+        return self::TYPES_CIVILITE[$value] ?? null;
+    }
+
+    public function getCivilite1Label(): ?string
+    {
+        return $this->resolveCivilite($this->civilite1);
+    }
+
+    public function getCivilite2Label(): ?string
+    {
+        return $this->resolveCivilite($this->civilite2);
+    }
+
+    public function getCiviliteDebirentierLabel(): ?string
+    {
+        return $this->resolveCivilite($this->civilite_debirentier);
+    }
+
+    public function getCiviliteDebirentier2Label(): ?string
+    {
+        return $this->resolveCivilite($this->civilite_debirentier2);
+    }
+
+    public function getCiviliteNotaireLabel(): ?string
+    {
+        return $this->resolveCivilite($this->civilite_notaire);
+    }
+
+
+
+
+
+
     //----------
     public function getCodePostalDebirentier2(): ?string
     {

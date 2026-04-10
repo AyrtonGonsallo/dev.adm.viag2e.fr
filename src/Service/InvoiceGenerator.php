@@ -227,6 +227,7 @@ class InvoiceGenerator
                     $fileName = "/avoir_{$data['number']}R-file1.pdf";
                     $pdf->writeHTML($this->twig->render('invoices/avoir_otp_1.html.twig', ['numero'=> "{$data['old_number']}",'pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
                     break;
+                    
 
                 case Invoice::RECURSION_QUARTERLY:
                     $fileName = "/avoir_quarterly{$data['number']}-file1.pdf";

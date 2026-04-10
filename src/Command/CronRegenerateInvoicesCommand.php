@@ -75,7 +75,7 @@ class CronRegenerateInvoicesCommand extends Command
         $this->mailer = $mailer;
         $this->params = $params;
         $this->twig = $this->container->get('twig');
-        $this->invoice_number = 5812;
+        $this->invoice_number = 7580;
         $this->pdf_dir = $this->params->get('pdf_tmp_dir');
         $this->pdf_logo = $this->params->get('pdf_logo_path');
 
@@ -131,10 +131,10 @@ class CronRegenerateInvoicesCommand extends Command
         $d = new DateTime('First day of next month');
 
         $this->date = [
-            'current_day'   => strftime('%A %e %B %Y'),
+            'current_day'   => utf8_encode(strftime('%A %e %B %Y')),
             'current_month' => date('m'),
             'max_days'      => cal_days_in_month(CAL_GREGORIAN, $d->format('m'), $d->format('Y')),
-            'month'         => strftime('%B', $d->getTimestamp()),
+            'month'         => utf8_encode(strftime('%B', $d->getTimestamp())),
             'month_n'       => $d->format('m'),
             'year'          => $d->format('Y'),
         ];
@@ -162,7 +162,7 @@ class CronRegenerateInvoicesCommand extends Command
           function processNumber(int $number)
           {
               static $assignedNumbers = []; // Keeps track of numbers and their corresponding results
-              static $nextNumber = 	7309; // Starting value for the first number
+              static $nextNumber = 	7580; // Starting value for the first number
           
               // Check if the number has already been assigned a value
               if (isset($assignedNumbers[$number])) {
@@ -182,7 +182,7 @@ class CronRegenerateInvoicesCommand extends Command
         
 
           
-        if (date('d') >= 20) {
+        if (date('d') <= 20) {
         
             
 
@@ -191,7 +191,7 @@ class CronRegenerateInvoicesCommand extends Command
             $quittances = $this->manager
                 ->getRepository(Invoice::class)
                 ->findAvoirsTogenerate(50);
-                $number=7309;
+                $number=7580;
             foreach ($quittances as $quittance) {
                 
                 $data=$quittance->getData();
@@ -341,7 +341,7 @@ code de janvier 2024
         $invoice2->setNumber($number);
         $data["number_int"]=$number;
         $data["number"]="AV".substr($data["number"],2,-4).$number;
-        $data["date"]["current_day"]=strftime('%A %e %B %Y');
+        $data["date"]["current_day"]=utf8_encode(strftime('%A %e %B %Y'));
         $data["date"]["current_month"]=date('m');
         $data["property"]['firstname' ] = $property->getFirstname1();
         $data["property"]['lastname'  ] = $property->getLastname1();
@@ -399,8 +399,13 @@ code de janvier 2024
             $filePath2= -1;
         }
         else{
-            $filePath = $this->generator->generateAvoirFile($data, $parameters);
-            $filePath2= -1;
+            if($data['amount']!=-1){
+                $filePath = $this->generator->generateAvoirFile($data, $parameters);
+                $filePath2= -1;
+            }else if($data['montantht']!=-1){
+                $filePath = -1;
+                $filePath2= $this->generator->generateAvoirFile2($data, $parameters);
+            } 
         }
         
 
@@ -410,7 +415,7 @@ code de janvier 2024
         if($cond_r_n){
             $file = new File();
             $file->setType(File::TYPE_INVOICE);
-            if($data['recursion'] ==Invoice::RECURSION_MONTHLY){
+            if($data['recursion'] ==Invoice::RECURSION_MONTHLY || $data['recursion'] ==Invoice::RECURSION_OTP || $data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                 $file->setName("{$data['number']} - R");
             }else{
                 $file->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$property->getId()}");
@@ -425,7 +430,7 @@ code de janvier 2024
         if($cond_h_n){
             $file2 = new File();
             $file2->setType(File::TYPE_INVOICE);
-            if($data['recursion'] ==Invoice::RECURSION_MONTHLY){
+            if($data['recursion'] ==Invoice::RECURSION_MONTHLY || $data['recursion'] ==Invoice::RECURSION_OTP || $data['recursion'] ==Invoice::RECURSION_QUARTERLY){
                 $file2->setName("{$data['number']} - H");
             }else{
                 $file2->setName("{$invoice->getTypeString()} {$data['date']['month_n']}-{$data['date']['year']} #{$invoice->getId()} - R file2");
@@ -434,7 +439,7 @@ code de janvier 2024
             /** @noinspection PhpUnhandledExceptionInspection */
             $file2->setDriveId($this->drive->addFile($file2->getName(), $filePath2, File::TYPE_INVOICE, $property->getWarrant()->getId()));
             $this->manager->persist($file2);
-            $io->note("Fichier avoir honoraire crée ".$filePath2);
+            $io->note("Fichier avoir {$data['number']} - H honoraire crée ".$filePath2);
         }
         //$invoice->setFile($file);
       
@@ -596,7 +601,7 @@ code de janvier 2024
         $data["number_int"]=$number;
         $data["number"]=substr($data["number"],0,-4).$number;
        
-        $data["date"]["current_day"]=strftime('%A %e %B %Y');
+        $data["date"]["current_day"]=utf8_encode(strftime('%A %e %B %Y'));
         $data["date"]["current_month"]=date('m');
         $data["property"]['firstname' ] = $property->getFirstname1();
         $data["property"]['lastname'  ] = $property->getLastname1();
@@ -837,7 +842,7 @@ code de janvier 2024
         $data["number_int"]=$number;
         $data["number"]=substr($data["number"],0,-4).$number;
        
-        $data["date"]["current_day"]=strftime('%A %e %B %Y');
+        $data["date"]["current_day"]=utf8_encode(strftime('%A %e %B %Y'));
         $data["date"]["current_month"]=date('m');
         $filePath = $this->generator->generateFile($data, $parameters);
         $filePath2= $this->generator->generateFile2($data, $parameters);

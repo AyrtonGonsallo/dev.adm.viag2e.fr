@@ -6,6 +6,7 @@ use App\Service\DriveManager;
 use DateTime;
 use App\Entity\BankExport;
 use App\Service\Bank;
+use App\Service\Logger;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Psr\Log\LoggerInterface;
 class BankController extends AbstractController
 {
     /**
@@ -127,6 +128,106 @@ class BankController extends AbstractController
 
         $export->setDate(new DateTime());
         $export->setPeriod($range);
+        $export->setType(BankExport::TYPE_MANUAL);
+        $manager = $this->getDoctrine()->getManager();
+        $manager->persist($export);
+
+
+        if($this->getParameter('kernel.environment') != 'prod' || true) { // Tmp GDrive fix
+            $export->setDriveId('notstored');
+            $manager->flush();
+
+            $response = new Response($xml);
+            $disposition = HeaderUtils::makeDisposition(
+                HeaderUtils::DISPOSITION_ATTACHMENT,
+                'export_'. date('d-m-Y') .'.xml'
+            );
+            $response->headers->set('Content-Disposition', $disposition);
+            return $response;
+        }
+
+        $export->setDriveId($drive->addExport($export->getName(), $xml));
+        $manager->flush();
+
+        return $this->redirectToRoute('file_export_download', ['fileId' => $export->getDriveId()]);
+    }
+
+
+    /**
+     * @Route("/bank/generate_by_ids", name="bank_generate_by_ids", methods={"POST"})
+     *
+     * @param Request $request
+     * @return Response
+     *
+     * @throws \Exception
+     */
+    public function generateBankFileByIDS(Request $request, DriveManager $drive)
+    {
+        $ids = $request->get('ids');
+
+        if (empty($ids)) {
+            throw new BadRequestHttpException('Missing parameter');
+        }
+
+   
+
+        $bank = new Bank($this->container);
+        $export = new BankExport();
+
+        $xml = $bank->generate_by_ids($ids, $export->getMessageId());
+
+        $export->setDate(new DateTime());
+        $export->setPeriod("");
+        $export->setType(BankExport::TYPE_MANUAL);
+        $manager = $this->getDoctrine()->getManager();
+        $manager->persist($export);
+
+
+        if($this->getParameter('kernel.environment') != 'prod' || true) { // Tmp GDrive fix
+            $export->setDriveId('notstored');
+            $manager->flush();
+
+            $response = new Response($xml);
+            $disposition = HeaderUtils::makeDisposition(
+                HeaderUtils::DISPOSITION_ATTACHMENT,
+                'export_'. date('d-m-Y') .'.xml'
+            );
+            $response->headers->set('Content-Disposition', $disposition);
+            return $response;
+        }
+
+        $export->setDriveId($drive->addExport($export->getName(), $xml));
+        $manager->flush();
+
+        return $this->redirectToRoute('file_export_download', ['fileId' => $export->getDriveId()]);
+    }
+
+
+     /**
+     * @Route("/bank/generate_fa_by_ids", name="bank_generate_fa_by_ids", methods={"POST"})
+     *
+     * @param Request $request
+     * @return Response
+     *
+     * @throws \Exception
+     */
+    public function generateBankFAFileByIDS(Request $request, DriveManager $drive,LoggerInterface $logger)
+    {
+        $ids = $request->get('ids');
+        Logger::init($logger); // une seule fois
+        if (empty($ids)) {
+            throw new BadRequestHttpException('Missing parameter');
+        }
+
+   
+
+        $bank = new Bank($this->container);
+        $export = new BankExport();
+
+        $xml = $bank->generate_fa_by_ids($ids, $export->getMessageId());
+
+        $export->setDate(new DateTime());
+        $export->setPeriod("");
         $export->setType(BankExport::TYPE_MANUAL);
         $manager = $this->getDoctrine()->getManager();
         $manager->persist($export);

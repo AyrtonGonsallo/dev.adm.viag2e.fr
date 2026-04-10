@@ -20,7 +20,7 @@ class Rappel
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="smallint")
      */
     private $type;
 
@@ -55,10 +55,10 @@ class Rappel
     public const REMIND_TYPE_YEAR = 4;
 
     public const REMIND_TYPES = [ 
-        self::REMIND_TYPE_MONTH => 'Mensuel', // affiche chaque mois
-        self::REMIND_TYPE_START_TRIMESTER => 'Debut de trimestre', // affiche si on est en  janv, avril, juill, oct
-        self::REMIND_TYPE_END_TRIMESTER => 'Fin de trimestre', //affiche si on est en mars juin, sept, déc
-        self::REMIND_TYPE_YEAR => 'Annuel' //affiche une fois par an
+        self::REMIND_TYPE_MONTH => 'Rappels mensuels', // affiche chaque mois
+        self::REMIND_TYPE_START_TRIMESTER => 'Rappels débuts de trimestres (janv, avril, juill, oct)', // affiche si on est en  janv, avril, juill, oct
+        self::REMIND_TYPE_END_TRIMESTER => 'Rappels fins de trimestres (mars, juin, sept, déc)', //affiche si on est en mars juin, sept, déc
+        self::REMIND_TYPE_YEAR => 'Rappels annuels' //affiche une fois par an
     ];
 
     public function __construct()
@@ -72,12 +72,12 @@ class Rappel
         return $this->id;
     }
 
-    public function getType(): ?string
+    public function getType(): ?int
     {
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(int $type): self
     {
         $this->type = $type;
 
@@ -170,6 +170,11 @@ class Rappel
     }
 
    
+    public function getTypeString(): string
+    {
+        $type = $this->getType();
+        return self::REMIND_TYPES[$type] ?? 'Inconnu';
+    }
 
 
 

@@ -130,6 +130,14 @@ pour faire les tests sur les charges de copro
             ->getResult();
     }
 
+    public function findAll()
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findNextEndings()
     {
         return $this->createQueryBuilder('p')

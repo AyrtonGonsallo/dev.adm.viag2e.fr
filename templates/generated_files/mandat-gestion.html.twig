@@ -1,0 +1,245 @@
+
+{% extends 'layout.html.twig' %}
+{% import "macros/forms.html.twig" as mforms %}
+
+{% block title %}Viag2e | Générer un mandat de gestion pour le bien #{{ property.id }} ({{ property.title }}){% endblock %}
+
+
+{% block body %}
+    {% if message %}
+            <div class="m-alert m-alert--icon alert alert-success" role="alert">
+                <div class="m-alert__icon">
+                    <i class="la la-check"></i>
+                </div>
+                <div class="m-alert__text">
+                    <strong>{{ message }} </strong> 
+                </div>
+            </div>
+        {% endif %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="{{ path('property_view', {propertyId: property.id}) }}" class="m-nav__link">
+                            <span class="m-nav__link-text">mandat de gestion pour le bien #{{ property.id }} ({{ property.title }})</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Générer un mandat de gestion
+                        </h3>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <div>
+
+                    <div class="">
+                        <strong>Variables disponibles :</strong><br><br>
+
+                        {% set tags = [
+                            'mois_indexation',
+                            'indice_de_base',
+                            'nouvel_indice',
+                            'civilite_destinataire',
+                            'nom_destinataire',
+                            'prenom_destinataire',
+                            'nom_du_bien',
+                            'adresse_du_bien',
+                            'montant_rente_initiale',
+                            'montant_rente_indexation_normale',
+                            'montant_rente_indexation_og2i',
+                            'montant_honoraires_indexation_og2i',
+                            'formule_indexation_og2i',
+                            'texte_indexation_honoraires',
+                            'date_prochaine_revision',
+                            'documents_a_fournir_indexation',
+                            'date_duh'
+                        ] %}
+
+                        {% for tag in tags %}
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-primary copy-tag"
+                                data-tag="[{{ tag }}]"
+                                style="margin: 3px"
+                            >
+                                [{{ tag }}]
+                            </button>
+                        {% endfor %}
+                    </div>
+
+                    <div id="copy-feedback" class="text-success mt-2" style="display:none;">
+                        ✔ Variable copiée
+                    </div>
+
+                </div>
+                {{ form_start(form) }}
+                    <div class="form-group row">
+                        <div class="col-lg-6">
+                            <label for="form-destinataire" class="col-4 col-form-label">Destinataire</label>
+                            <div class="col-12">
+                                <span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+                                    <label>
+                                        {{ form_widget(form.destinataire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-destinataire', 'label': false}) }}
+                                        <span></span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+
+               
+                        
+
+                        
+                        <div class="col-lg-12">
+                            <label for="form_texte" class="col-12 col-form-label">Texte <span class="m--font-danger">*</span></label>
+                            <div class="col-12">
+                                {{ form_row(form.texte, {'attr': {'class': 'form-control m-input'}, 'id': 'form_texte', 'label': false}) }}
+                            </div>
+                        </div>
+
+                       <div class="col-lg-6">
+                            <label for="form-status" class="col-12 col-form-label">Statut <span class="m--font-danger">*</span></label>
+                            <div class="col-12">
+                                <div id="form_status">
+                                    {% for child in form.status %}
+                                        <div class="form-check">
+                                            {{ form_widget(child, { attr: { class: 'form-check-input' } }) }}
+                                            {{ form_label(child, null, { label_attr: { class: 'form-check-label' } }) }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            
+                            </div>
+                        </div>
+
+                     
+                          
+                    </div> 
+                    
+                    <div class="form-group row">
+                        <div class="col-lg-2">
+                            <input class="btn btn-outline-success btn-block" type="submit" value="Générer" />
+                        </div>
+                    </div>
+
+                    {{ form_rest(form) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+
+
+         <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Liste des fichiers
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <table class="m-datatable-files" id="html_table" width="100%">
+                    <thead>
+                    <tr>
+                        <th title="Date" data-field="Date">Date</th>
+                        <th title="Nom" data-field="Name">Nom</th>
+                        <th title="Number" data-field="Number">N° Fact</th>
+                        <th title="Type" data-field="Type">Type</th>
+                        <th data-field="Download"></th>
+                        <th data-field="Delete"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% if generated_files %}
+                            {% for generated_file in generated_files %}
+                                {% if generated_file %}
+                                    <tr>
+                                        <td>{{ generated_file.date |date('d-M-Y H:m:s')}}</td>
+                                        <td>{{ generated_file.name }}</td>
+                                        <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') and generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}</td>
+                                        <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
+                                        <td><a href="{{ path('file_download_local', { id: generated_file.id }) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
+                                        <td>{% if generated_file.invoice is empty %}<a class="delete_link" onclick="return confirm('Supprimer ce fichier ?')" href="{{ path('file_delete_by_id', {'fileId': generated_file.id}) }}" ><i class="la la-remove"></i> Supprimer</a>{% endif %}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}     
+                        {% elseif not generated_files  %}
+                            <tr>
+                                <td align="center" colspan="4">Aucun Fichier</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+<script type="text/javascript">
+    if($("#form-type").val()==1){
+        $("#tva").hide();
+    }
+
+    $('#form-type').on('change', function() {
+        if($(this).val()==1){
+            $("#tva").hide();
+        }
+        if($(this).val()==2){
+            $("#tva").show();
+        }
+    });
+    $(document).on('click', '.copy-tag', function () {
+        let tag = $(this).data('tag');
+
+        navigator.clipboard.writeText(tag).then(function () {
+            $('#copy-feedback').fadeIn(200).delay(800).fadeOut(200);
+        });
+    });
+
+    
+
+</script>
+<!-- Place the first <script> tag in your HTML's <head> -->
+<script src="https://cdn.tiny.cloud/1/p4wkwvgll228jmxx89p4r903m5yzetj7umznbi5dpiixau1e/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script>
+
+<!-- Place the following <script> and <textarea> tags your HTML's <body> -->
+<script>
+  tinymce.init({
+    selector: 'textarea',
+   
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' },
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+    uploadcare_public_key: 'dbc72796df3904e846bd',
+  });
+</script>
+
+{% endblock %}
+

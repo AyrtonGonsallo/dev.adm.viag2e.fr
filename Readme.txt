@@ -270,3 +270,27 @@ SELECT id,title,revaluation_date,date_maj_indice_ref,active FROM `property` WHER
 verifiez le taux d'honoraire du bien 110 il cause une panne
 marquer l'indexation du 123 comme faite
 ablard 164
+
+
+marketplace
+https://packagist.org/packages/froala/wysiwyg-editor
+
+installer des plugins 
+1) composer require kms/froala-editor-bundle dans cmd
+2) regarder bundles.php
+7) installer assets 
+
+enlever 
+composer remove friendsofsymfony/ckeditor-bundle
+
+php bin/console assets:install public
+
+
+si revaluationDate initial_index_object mois_indice_initial est pas valide desactiver no_indexation
+si honorary_rates_object est pas valide alors honoraries_disabled true
+si initialAmount  est pas valide  alors annuities_disabled billing_disabled honoraries_disabled no_indexation
+
+pour les mails du dev mettre l'adresse de destination dans \viagers\config\packages\dev\swiftmailer.yaml
+
+
+si proble json mal formatted utiliser utf8_encode( pour strftime()

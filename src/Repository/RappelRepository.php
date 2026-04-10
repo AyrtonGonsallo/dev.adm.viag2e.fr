@@ -65,7 +65,7 @@ class RappelRepository extends ServiceEntityRepository
         ->where('r.status = 0')
         ->andWhere('r.nextdisplay >= :today')
         ->setParameter('today', $today->format('Y-m-d'))
-        ->orderBy('r.id', 'DESC')
+        ->orderBy('r.expiry', 'ASC')
         ->getQuery()
         ->getResult();
 
@@ -73,6 +73,7 @@ class RappelRepository extends ServiceEntityRepository
 
     foreach ($rappels as $rappel) {
         $type = $rappel->getType();
+        $typeString = $rappel->getTypeString();
         $next = $rappel->getNextdisplay();
 
         switch ($type) {
@@ -83,25 +84,115 @@ class RappelRepository extends ServiceEntityRepository
                 (int)$next->format('n') === $month &&
                 (int)$next->format('Y') === $year
                 ) {
-                    $result[] = $rappel;
+                    if (!isset($result[$typeString])) {
+                        $result[$typeString] = [];
+                    }
+                    $result[$typeString][] = $rappel;
                 }
                 break;
 
             case Rappel::REMIND_TYPE_START_TRIMESTER:
                 if (in_array($month, [1, 4, 7, 10]) && ($next >= $quarterStart && $next <= $quarterEnd) ) {
-                    $result[] = $rappel;
+                    if (!isset($result[$typeString])) {
+                        $result[$typeString] = [];
+                    }
+                    $result[$typeString][] = $rappel;
                 }
                 break;
 
             case Rappel::REMIND_TYPE_END_TRIMESTER:
                 if (in_array($month, [3, 6, 9, 12]) && ($next >= $quarterStart && $next <= $quarterEnd)) {
-                    $result[] = $rappel;
+                    if (!isset($result[$typeString])) {
+                        $result[$typeString] = [];
+                    }
+                    $result[$typeString][] = $rappel;
                 }
                 break;
 
             case Rappel::REMIND_TYPE_YEAR:
                 if ((int)$next->format('Y') === $year) {
-                    $result[] = $rappel;
+                    if (!isset($result[$typeString])) {
+                        $result[$typeString] = [];
+                    }
+                    $result[$typeString][] = $rappel;
+                }
+                break;
+        }
+    }
+
+    return $result;
+}
+
+
+
+public function findMaxValidToday(int $limit)
+{
+    $today = new \DateTime();
+    $month = (int)$today->format('n');
+    $year  = (int)$today->format('Y');
+    $quarter = (int) ceil($month / 3);
+    $now = new \DateTime();
+
+    $quarterStart = new \DateTime(sprintf('%d-%02d-01',
+        $now->format('Y'),
+        ($quarter - 1) * 3 + 1
+    ));
+
+    $quarterEnd = (clone $quarterStart)
+        ->modify('+3 months')
+        ->modify('-1 day');
+
+    $rappels = $this->createQueryBuilder('r')
+        ->where('r.status = 0')
+        ->andWhere('r.nextdisplay >= :today')
+        ->setParameter('today', $today->format('Y-m-d'))
+        ->orderBy('r.expiry', 'ASC')
+        ->getQuery()
+        ->getResult();
+
+    $result = [];
+
+    foreach ($rappels as $rappel) {
+
+        $type = $rappel->getType();
+        $typeString = $rappel->getTypeString();
+        $next = $rappel->getNextdisplay();
+
+        if (!isset($result[$typeString])) {
+            $result[$typeString] = [];
+        }
+
+        // limite par type
+        if (count($result[$typeString]) >= $limit) {
+            continue;
+        }
+
+        switch ($type) {
+
+            case Rappel::REMIND_TYPE_MONTH:
+                if (
+                    (int)$next->format('n') === $month &&
+                    (int)$next->format('Y') === $year
+                ) {
+                    $result[$typeString][] = $rappel;
+                }
+                break;
+
+            case Rappel::REMIND_TYPE_START_TRIMESTER:
+                if (in_array($month, [1, 4, 7, 10]) && ($next >= $quarterStart && $next <= $quarterEnd)) {
+                    $result[$typeString][] = $rappel;
+                }
+                break;
+
+            case Rappel::REMIND_TYPE_END_TRIMESTER:
+                if (in_array($month, [3, 6, 9, 12]) && ($next >= $quarterStart && $next <= $quarterEnd)) {
+                    $result[$typeString][] = $rappel;
+                }
+                break;
+
+            case Rappel::REMIND_TYPE_YEAR:
+                if ((int)$next->format('Y') === $year) {
+                    $result[$typeString][] = $rappel;
                 }
                 break;
         }

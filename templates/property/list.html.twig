@@ -1,0 +1,151 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Viag2e | Biens{% endblock %}
+
+{% block body %}
+{% set isAdmin = is_granted('ROLE_ADMIN') %}
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ path('dashboard') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="#" class="m-nav__link">
+                            <span class="m-nav__link-text">Liste des dossiers</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-content">
+        <div class="m-portlet m-portlet--mobile">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Liste des dossiers
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <ul class="nav nav-tabs  m-tabs-line m-tabs-line--brand" role="tablist">
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link active" data-toggle="tab" href="#m_tabs_properties" role="tab"><i class="flaticon-home-2"></i> Dossiers</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    
+                    <div class="tab-pane  active" id="m_tabs_properties" role="tabpanel">
+                        <div class="m-form m-form--label-align-right m--margin-top-20 m--margin-bottom-30">
+                            <div class="row align-items-center">
+                                <div class="col-xl-8 order-2 order-xl-1">
+                                    <div class="form-group m-form__group row align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="m-form__group m-form__group--inline">
+                                                <div class="m-form__label">
+                                                    <label class="m-label m-label--single" for="m_form_properties_active">Actif:</label>
+                                                </div>
+                                                <div class="m-form__control">
+                                                    <select class="form-control m-bootstrap-select" id="m_form_properties_active">
+                                                        <option value="">Tous</option>
+                                                        <option value="Oui" selected>Oui</option>
+                                                        <option value="Non">Non</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="d-md-none m--margin-bottom-10"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="m-input-icon m-input-icon--left">
+                                                <input type="text" class="form-control m-input" placeholder="Recherche..." id="generalSearchProperties">
+                                                <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                    <span><i class="la la-search"></i></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="m-datatable-properties kt-datatable" id="html_table2" width="100%">
+                            <thead>
+                            <tr>
+                                <th title="PropID" data-field="PropID">ID</th>
+                                <th title="Titre" data-field="PropTitle">Titre</th>
+                                {% if isAdmin %}
+                                <th title="ID Client" data-field="PropCustID">ID Client</th>
+                                {% endif %}
+                                <th title="Numéro de client" data-field="PropCustomerID">N° de mandant </th>
+                                <th title="Prénom" data-field="PropFirstname">Prénom</th>
+                                <th title="Nom" data-field="PropLastname">Nom ou Raison Sociale</th>
+                                <th title="Actif" data-field="PropActive">Active</th>
+                                {% if isAdmin %}
+                                <th title="Facturation" data-field="PropFact">Facturation</th>
+                                {% endif %}
+                                <th title="Profil" data-field="PropProfil"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for property in properties %}
+                                <tr>
+                                    <td>{{ property.id }}</td>
+                                    <td>{{ property.title }}</td>
+                                    {% if isAdmin %}
+                                    <td>{{ property.warrant.id }}</td>
+                                    {% endif %}
+                                    <td>{{ property.warrant.clientId }} - {{ property.warrant.firstname }} {{ property.warrant.lastName }}</td>
+                                    <td>{{ property.firstname1 }}</td>
+                                    <td>{{ property.lastname1 }}</td>
+                                    <td>{% if property.active %}Oui{% else %}Non{% endif %}</td>
+                                    {% if isAdmin %}
+                                    <td>{% if property.billingDisabled %}<i class="flaticon-doc m--font-danger" title="Facturation désactivée"></i>{% else %}<i class="flaticon-doc m--font-success" title="Facturation activée"></i>{% endif %}</td>
+                                    {% endif %}
+                                    <td>
+                                        <a href="{{ path('property_view', {propertyId: property.id}) }}">Voir le bien</a><br>
+                                        {% if property.warrant and property.warrant.typeString %}
+                                            <a href="{{ path('warrant_view', {
+                                                type: property.warrant.typeString,
+                                                warrantId: property.warrant.id
+                                            }) }}">
+                                                Accès au mandat
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                    
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    
+                    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    
+{% endblock %}
+
+{% block scripts %}
+    {{ encore_entry_script_tags('html-table.warrants') }}
+    {{ encore_entry_script_tags('warrant') }}
+    <script type="text/javascript">
+        
+    </script>
+{% endblock %}
+{% block styles %}
+    {{ encore_entry_link_tags('warrant') }}
+{% endblock %}

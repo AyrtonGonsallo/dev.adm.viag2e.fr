@@ -50,7 +50,7 @@ class DashboardController extends AbstractController
 
         $invoicesToPay = $manager
             ->getRepository(Invoice::class)
-            ->findInvoicesToPay(15);
+            ->findInvoicesToPay(3);
 
         $qb=$this->getDoctrine()->getManager()->createQueryBuilder()
         ->select("p")
@@ -80,7 +80,8 @@ class DashboardController extends AbstractController
         ->where('p.date_assurance_habitation < :date')
         ->andWhere('p.active = 1')
         ->setParameter('date', $now_date)
-            ->orderBy('p.date_assurance_habitation', 'ASC');
+        ->orderBy('p.date_assurance_habitation', 'ASC')
+        ->setMaxResults(3);
         $query3 = $qb3->getQuery();
         // Execute Query
         $fin_assurances_habitation = $query3->getResult();
@@ -91,7 +92,8 @@ class DashboardController extends AbstractController
         ->where('p.date_chaudiere < :date')
         ->andWhere('p.active = 1')
         ->setParameter('date', $now_date)
-            ->orderBy('p.date_chaudiere', 'ASC');
+            ->orderBy('p.date_chaudiere', 'ASC')
+        ->setMaxResults(2);
         $query4 = $qb4->getQuery();
         // Execute Query
         $fin_assurances_chaudiere = $query4->getResult();
@@ -102,7 +104,8 @@ class DashboardController extends AbstractController
         ->where('p.date_cheminee < :date')
         ->andWhere('p.active = 1')
         ->setParameter('date', $now_date)
-            ->orderBy('p.date_cheminee', 'ASC');
+            ->orderBy('p.date_cheminee', 'ASC')
+        ->setMaxResults(2);
         $query5 = $qb5->getQuery();
         // Execute Query
         $fin_assurances_cheminee = $query5->getResult();
@@ -113,7 +116,8 @@ class DashboardController extends AbstractController
         ->where('p.date_climatisation < :date')
         ->andWhere('p.active = 1')
         ->setParameter('date', $now_date)
-            ->orderBy('p.date_climatisation', 'ASC');
+            ->orderBy('p.date_climatisation', 'ASC')
+        ->setMaxResults(2);
         $query2 = $qb2->getQuery();
         // Execute Query
         $fin_assurances_clim_pompe = $query2->getResult();
@@ -131,7 +135,8 @@ class DashboardController extends AbstractController
             ->andWhere('p.active = 1')
             ->setParameter('now', $now)
             ->setParameter('limit', $oneMonthLater)
-            ->orderBy('p.end_date_management', 'ASC');
+            ->orderBy('p.end_date_management', 'ASC')
+        ->setMaxResults(2);
 
         $query6 = $qb6->getQuery();
 
@@ -141,7 +146,7 @@ class DashboardController extends AbstractController
         
         $rappels_valides = $manager
             ->getRepository(Rappel::class)
-            ->findValidToday();
+            ->findMaxValidToday(2);
 
         $counts = new stdClass();
         $counts->warrants_b = $manager->getRepository(Parameter::class)->findOneBy(['name' => 'count_warrants_b'])->getValue();
@@ -383,6 +388,275 @@ class DashboardController extends AbstractController
 
         $this->addFlash('success', 'Rappel supprimé');
         return $this->redirectToRoute('dashboard');
+    }
+
+
+    /**
+     * @Route("/all_expiring_warrants_view", name="all_expiring_warrants_view")
+     * @param Request $request
+     * @return Response
+     */
+    public function all_expiring_warrants_view(Request $request)
+    {
+       
+
+        $em = $this->getDoctrine()->getManager();
+
+        $now = new \DateTime();
+        $oneMonthLater = (clone $now)->modify('+1 month');
+
+        $qb6 = $em->createQueryBuilder()
+            ->select('p')
+            ->from('App\Entity\Property', 'p')
+            ->where('p.end_date_management BETWEEN :now AND :limit')
+            ->andWhere('p.active = 1')
+            ->setParameter('now', $now)
+            ->setParameter('limit', $oneMonthLater)
+            ->orderBy('p.end_date_management', 'ASC');
+
+        $query6 = $qb6->getQuery();
+
+        // Execute Query
+        $mandat_a_renouveller = $query6->getResult();
+
+
+
+        return $this->render('dashboard/mandats.html.twig', [
+            'mandat_a_renouveller' => $mandat_a_renouveller,
+        ]);
+    }
+
+
+    /**
+     * @Route("/all_insurances_view", name="all_insurances_view")
+     * @param Request $request
+     * @return Response
+     */
+    public function all_insurances_view(Request $request)
+    {
+       
+        $now_date=new DateTime();
+         $qb3=$this->getDoctrine()->getManager()->createQueryBuilder()
+        ->select("p")
+        ->from('App\Entity\Property', 'p')
+        ->where('p.date_assurance_habitation < :date')
+        ->andWhere('p.active = 1')
+        ->setParameter('date', $now_date)
+            ->orderBy('p.date_assurance_habitation', 'ASC');
+        $query3 = $qb3->getQuery();
+        // Execute Query
+        $fin_assurances_habitation = $query3->getResult();
+
+        $qb4=$this->getDoctrine()->getManager()->createQueryBuilder()
+        ->select("p")
+        ->from('App\Entity\Property', 'p')
+        ->where('p.date_chaudiere < :date')
+        ->andWhere('p.active = 1')
+        ->setParameter('date', $now_date)
+            ->orderBy('p.date_chaudiere', 'ASC');
+        $query4 = $qb4->getQuery();
+        // Execute Query
+        $fin_assurances_chaudiere = $query4->getResult();
+
+        $qb5=$this->getDoctrine()->getManager()->createQueryBuilder()
+        ->select("p")
+        ->from('App\Entity\Property', 'p')
+        ->where('p.date_cheminee < :date')
+        ->andWhere('p.active = 1')
+        ->setParameter('date', $now_date)
+            ->orderBy('p.date_cheminee', 'ASC');
+        $query5 = $qb5->getQuery();
+        // Execute Query
+        $fin_assurances_cheminee = $query5->getResult();
+
+        $qb2=$this->getDoctrine()->getManager()->createQueryBuilder()
+        ->select("p")
+        ->from('App\Entity\Property', 'p')
+        ->where('p.date_climatisation < :date')
+        ->andWhere('p.active = 1')
+        ->setParameter('date', $now_date)
+            ->orderBy('p.date_climatisation', 'ASC');
+        $query2 = $qb2->getQuery();
+        // Execute Query
+        $fin_assurances_clim_pompe = $query2->getResult();
+
+
+
+        return $this->render('dashboard/assurances.html.twig', [
+            'fin_assurances_habitation' => $fin_assurances_habitation,
+            'fin_assurances_chaudiere' => $fin_assurances_chaudiere,
+            'fin_assurances_cheminee' => $fin_assurances_cheminee,
+            'fin_assurances_clim_pompe' => $fin_assurances_clim_pompe,
+        ]);
+    }
+
+
+    /**
+     * @Route("/all_news_view", name="all_news_view")
+     * @param Request $request
+     * @return Response
+     */
+    public function all_news_view(Request $request)
+    {
+       
+      
+        $manager = $this->getDoctrine()->getManager();
+        $rappels_valides = $manager
+            ->getRepository(Rappel::class)
+            ->findValidToday();
+
+         $defaultData2 = ['message' => 'Type your message here'];
+         $rappel_form = $this->createFormBuilder($defaultData2)
+        ->add('texte', TextType::class, array('required' => true,
+            'attr' => array('placeholder' => 'Objet', ),
+        ))
+        ->add('type', ChoiceType::class, ['choices' => array_flip(Rappel::REMIND_TYPES), 'choice_translation_domain' => false])
+        ->add('date_rappel_mensuel_trimestre', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy', 'years' => range(date('Y'), date('Y')+10),'data' => new \DateTime(),])
+        ->add('date_rappel_annuel', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy', 'years' => range(date('Y'), date('Y')+10),'data' => new \DateTime(),])
+        ->getForm();
+
+            $rappel_form->handleRequest($request);
+
+        if ($rappel_form->isSubmitted() && $request->request->has('rappel_submit') && $rappel_form->isValid()) {
+            $data = $rappel_form->getData();
+            $rappel = new Rappel();
+            $rappel->setType($data["type"]);
+            $rappel->setTexte($data["texte"]);
+            // Récupérer l'objet DateTime (même si l'année est cachée)
+
+            $now = new \DateTime();
+
+
+            switch ($data['type']) {
+
+                /* =======================
+                * 1️⃣ MENSUEL
+                * ======================= */
+                case Rappel::REMIND_TYPE_MONTH:
+                    // Dernier jour du mois courant
+                    $nextdisplay = (clone $now)
+                        ->modify('last day of this month')
+                        ->setTime(0, 0, 0);
+                    break;
+
+
+                /* =======================
+                * 2️⃣ DÉBUT DE TRIMESTRE
+                * (janv / avril / juill / oct)
+                * ======================= */
+                case Rappel::REMIND_TYPE_START_TRIMESTER:
+
+                    $month = (int) $now->format('n');
+                    $year  = (int) $now->format('Y');
+
+                    if ($month <= 3) {
+                        $lastMonth = 3;
+                    } elseif ($month <= 6) {
+                        $lastMonth = 6;
+                    } elseif ($month <= 9) {
+                        $lastMonth = 9;
+                    } else {
+                        $lastMonth = 12;
+                    }
+
+                    $lastDay = cal_days_in_month(CAL_GREGORIAN, $lastMonth, $year);
+                    $nextdisplay = new \DateTime(sprintf('%d-%02d-%02d', $year, $lastMonth, $lastDay));
+                    break;
+
+
+                /* =======================
+                * 3️⃣ FIN DE TRIMESTRE
+                * (mars / juin / sept / déc)
+                * ======================= */
+                case Rappel::REMIND_TYPE_END_TRIMESTER:
+
+                    $month = (int) $now->format('n');
+                    $year  = (int) $now->format('Y');
+
+                    if ($month <= 3) {
+                        $lastMonth = 3;
+                    } elseif ($month <= 6) {
+                        $lastMonth = 6;
+                    } elseif ($month <= 9) {
+                        $lastMonth = 9;
+                    } else {
+                        $lastMonth = 12;
+                    }
+
+                    $lastDay = cal_days_in_month(CAL_GREGORIAN, $lastMonth, $year);
+                    $nextdisplay = new \DateTime(sprintf('%d-%02d-%02d', $year, $lastMonth, $lastDay));
+                    break;
+
+
+                /* =======================
+                * 4️⃣ ANNUEL
+                * ======================= */
+                case Rappel::REMIND_TYPE_YEAR:
+                    // Dernier jour de l'année courante
+                    $nextdisplay = new \DateTime($now->format('Y') . '-12-31');
+                    break;
+
+
+                default:
+                    $nextdisplay = clone $now;
+            }
+
+
+            
+            if($data["type"]<=3){
+                $dateRappel = $data['date_rappel_mensuel_trimestre'];
+                // Convertir en string jour
+                $jourMois = $dateRappel->format('d'); // ex: "01"
+            }else{
+                $dateRappel = $data['date_rappel_annuel'];
+                // Convertir en string jour-mois
+                $jourMois = $dateRappel->format('d-m'); // ex: "01-11"
+            }
+
+            $rappel->setNextdisplay($nextdisplay);
+            $rappel->setExpiry($jourMois);
+            $rappel->setDate($now);
+            $rappel->setStatus(false);
+            $manager->persist($rappel);
+            $manager->flush();
+            $this->addFlash('success', 'Rappel ajouté');
+            return $this->redirectToRoute('dashboard');
+        }else if ($rappel_form->isSubmitted() && $request->request->has('rappel_submit') && ! $rappel_form->isValid()) {
+            $this->addFlash('danger', 'Une erreur a eu lieu pendant l\'ajout du rappel');
+        }
+
+
+
+        return $this->render('dashboard/actualites.html.twig', [
+            'rappels_valides' => $rappels_valides,
+            'rappel_form' => $rappel_form->createView(),
+        ]);
+    }
+
+// $P$Bbikyp2ddaQ3sgZebDTOoUh6bqP4Bm/
+    /**
+     * @Route("/all_invoices_view", name="all_invoices_view")
+     * @param Request $request
+     * @return Response
+     */
+    public function all_invoices_view(Request $request)
+    {
+       
+
+        $now_date=new DateTime();
+        $manager = $this->getDoctrine()->getManager();
+
+      
+
+        $invoicesToPay = $manager
+            ->getRepository(Invoice::class)
+            ->findInvoicesToPay(133);
+
+
+
+        return $this->render('dashboard/factures.html.twig', [
+            'invoicesToPay' => $invoicesToPay,
+        ]);
     }
 
 
