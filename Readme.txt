@@ -294,3 +294,8 @@ pour les mails du dev mettre l'adresse de destination dans \viagers\config\packa
 
 
 si proble json mal formatted utiliser utf8_encode( pour strftime()
+
+
+
+
+

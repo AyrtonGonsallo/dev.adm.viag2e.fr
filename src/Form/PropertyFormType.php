@@ -44,7 +44,7 @@ class PropertyFormType extends AbstractType
             ->add('civilite1', ChoiceType::class, ['choices' => array_flip(Property::TYPES_CIVILITE), 'choice_translation_domain' => false])
             ->add('firstname1', TextType::class,['required' => false])
             ->add('lastname1', TextType::class,['required' => false])
-            ->add('dateofbirth1', BirthdayType::class, ['required' => false,'format' => 'dd-MMM-yyyy'])
+            //->add('dateofbirth1', BirthdayType::class, ['required' => false,'format' => 'dd-MMM-yyyy'])
             ->add('mail1', EmailType::class, ['required' => false])
             ->add('buyer_phone1', TextType::class, ['required' => false])
             ->add('adresse_credirentier1', TextType::class, ['required' => false])
@@ -54,7 +54,7 @@ class PropertyFormType extends AbstractType
             ->add('civilite2', ChoiceType::class, ['required' => false,'choices' => array_flip(Property::TYPES_CIVILITE), 'choice_translation_domain' => false])
             ->add('firstname2', TextType::class, ['required' => false])
             ->add('lastname2', TextType::class, ['required' => false])
-            ->add('dateofbirth2', BirthdayType::class, ['required' => false,'format' => 'dd-MMM-yyyy'])
+           // ->add('dateofbirth2', BirthdayType::class, ['required' => false,'format' => 'dd-MMM-yyyy'])
             ->add('mail2', EmailType::class, ['required' => false])
             ->add('buyer_phone2', TextType::class, ['required' => false])
             ->add('adresse_credirentier2', TextType::class, ['required' => false])
@@ -110,7 +110,7 @@ class PropertyFormType extends AbstractType
             ->add('telephone_notaire', TextType::class, ['required' => false])
             ->add('email_notaire', TextType::class, ['required' => false])
             ->add('ref_cadastrales', TextType::class, ['required' => false])
-            ->add('lots_propriete', TextType::class, ['required' => false])
+            ->add('lots_copropriete', TextType::class, ['required' => false])
 
             ->add('propertyType', ChoiceType::class, ['choices' => array_flip(Property::GOOD_TYPES), 'choice_translation_domain' => false])
               ->add('assurance_habitation', CheckboxType::class, ['required' => false])
@@ -134,6 +134,7 @@ class PropertyFormType extends AbstractType
             ->add('mois_indice_initial', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy','years' => range(date("Y")-22, date("Y")) ])
             ->add('initial_index_object', EntityType::class, [
                 'required' => false,
+                'disabled' => true,
                 'class' => RevaluationHistory::class,
                 'query_builder' => function (EntityRepository $er)  use($options){
                     

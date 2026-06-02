@@ -23,7 +23,7 @@
     <div class="m-content">
         <div class="row">
             
-            <div class="col-xl-6">
+            <div class="col-xl-12">
                 <div class="m-portlet m-portlet--full-height ">
                     <div class="m-portlet__head">
                         <div class="m-portlet__head-caption">
@@ -37,38 +37,121 @@
                     <div class="m-portlet__body">
                         <div class="m-widget2">
 
-                            {% if rappels_valides is not empty %}
-                                {% for type, rappels in rappels_valides %}
-                                    <h5>{{ type}}</h5> {# ou directement: Rappel::REMIND_TYPES[type] si tu passes le tableau #}
+                            
 
-                                    {% for rappel in rappels %}
-                                        <div class="rappel-item">
-                                            {{ rappel.getTypeString }} – 
-                                            Le {{ rappel.expiryLabel }} : {{ rappel.texte }}
 
-                                            <!-- CHECK -->
-                                            <a href="{{ path('rappel_check', {id: rappel.id}) }}"
-                                            title="Marquer comme fait"
-                                            class="check"
-                                            onclick="return confirm('Marquer ce rappel comme effectué ?');">
-                                                <i class="la la-check text-success"></i>
-                                            </a>
+                            <ul class="nav nav-tabs  m-tabs-line m-tabs-line--brand" role="tablist">
+                                <li class="autres_tabs nav-item m-tabs__item">
+                                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#m_tabs_daily" role="tab"> Actualités courantes</a>
+                                </li>
+                                <li id="lien_pay" class="autres_tabs nav-item m-tabs__item">
+                                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_all" role="tab"> Toutes les actualités</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="m_tabs_daily" role="tabpanel">
+                                    {% if rappels_valides is not empty %}
+                                        <div class="row">
+                                            {% for type, rappels in rappels_valides %}
+                                                
+                                                <div class="col-xl-6">
+                                                    <h5>{{ type}}</h5> {# ou directement: Rappel::REMIND_TYPES[type] si tu passes le tableau #}
 
-                                            <!-- DELETE -->
-                                            <a href="{{ path('rappel_delete', {id: rappel.id}) }}"
-                                            title="Supprimer"
-                                            class="delete"
-                                            onclick="return confirm('Supprimer définitivement ce rappel ?');">
-                                                <i class="la la-trash text-danger"></i>
-                                            </a>
+                                                    {% for rappel in rappels %}
+                                                        <div class="rappel-item">
+                                                            {{ rappel.getTypeString }} – 
+                                                            Le {{ rappel.expiryLabel }} : {{ rappel.texte }}
+
+                                                            <!-- CHECK -->
+                                                            <a href="{{ path('rappel_check', {id: rappel.id}) }}"
+                                                            title="Marquer comme fait"
+                                                            class="check"
+                                                            onclick="return confirm('Marquer ce rappel comme effectué ?');">
+                                                                <i class="la la-check text-success"></i>
+                                                            </a>
+
+                                                            <!-- DELETE -->
+                                                            <a href="{{ path('rappel_delete', {id: rappel.id}) }}"
+                                                            title="Supprimer"
+                                                            class="delete"
+                                                            onclick="return confirm('Supprimer définitivement ce rappel ?');">
+                                                                <i class="la la-trash text-danger"></i>
+                                                            </a>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endfor %}
                                         </div>
-                                    {% endfor %}
-                                {% endfor %}
-                            {% else %}
-                                <div class="text-center">
-                                    Aucun rappel
+                                    {% else %}
+                                        <div class="text-center">
+                                            Aucun rappel
+                                        </div>
+                                    {% endif %}
+
                                 </div>
-                            {% endif %}
+                        
+                                <div class="tab-pane" id="m_tabs_all" role="tabpanel">
+                                    {% if all_rappels is not empty %}
+                                        <div class="row">
+                                            {% for type, entries in all_rappels %}
+
+                                                <div class="col-xl-6">
+                                                    <h5>{{ type }}</h5>
+
+                                                    {% for entry in entries %}
+                                                        {# entry.rappel  => objet Rappel       #}
+                                                        {# entry.isValid => bool               #}
+                                                        {# entry.reason  => string explication #}
+
+                                                        <div class="rappel-item {{ entry.isValid ? 'border-success' : 'border-warning' }}">
+
+                                                            {# -- Badge validité -- #}
+                                                            {% if entry.isValid %}
+                                                                <span class="badge badge-success" title="{{ entry.reason }}">
+                                                                    À faire
+                                                                </span>
+                                                            {% else %}
+                                                                <span class="badge badge-warning" title="{{ entry.reason }}">
+                                                                    Hors periode
+                                                                </span>
+                                                            {% endif %}
+
+                                                            {# -- Contenu du rappel -- #}
+                                                            {{ entry.rappel.typeString }} –
+                                                            Le {{ entry.rappel.expiryLabel }} : {{ entry.rappel.texte }}
+
+                                                            {# -- Raison (optionnel, en petit texte) -- #}
+                                                            <small class="text-muted d-block">{{ entry.reason }}</small>
+
+                                                            {# -- Actions -- #}
+                                                            <a href="{{ path('rappel_check', {id: entry.rappel.id}) }}"
+                                                            title="Marquer comme fait"
+                                                            class="check"
+                                                            onclick="return confirm('Marquer ce rappel comme effectué ?');">
+                                                                <i class="la la-check text-success"></i>
+                                                            </a>
+
+                                                            <a href="{{ path('rappel_delete', {id: entry.rappel.id}) }}"
+                                                            title="Supprimer"
+                                                            class="delete"
+                                                            onclick="return confirm('Supprimer définitivement ce rappel ?');">
+                                                                <i class="la la-trash text-danger"></i>
+                                                            </a>
+
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="text-center">
+                                            Aucun rappel
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                            </div>
 
 
 

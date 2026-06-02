@@ -226,7 +226,6 @@ class TextReplacer
                         "fd_next_month_d_m_y" => utf8_encode(strftime("%d %B %Y", strtotime( $date_fdnm->format('d-m-Y') ))),
                         "fd_next_month_m_y" => utf8_encode(strftime("%B %Y", strtotime( $date_fdnm->format('d-m-Y') ))),
                         "nom_compte" => explode("/", $property->getTitle())[0],
-                        
                         "date_indice_base" =>  utf8_encode(strftime("%B %Y", strtotime( $property->initial_index_object->getDate()->format('d-m-Y') ))),
                         "montant_indice_base" => $property->initial_index_object->getValue(),
                         "date_indice_actuel" =>  utf8_encode(strftime("%B %Y", strtotime( $indice_m_u->getDate()->format('d-m-Y') ))),
@@ -257,6 +256,7 @@ class TextReplacer
                 $mois_indexation = utf8_encode(strftime("%B %Y", strtotime( $date_fdnm->format('d-m-Y') )));
                 $nom_du_bien = $property->getTitle();
                 $adresse_du_bien = $property->getGoodAddress();
+                $taux_honn = $property->honorary_rates_object->getValeur();
                 $montant_initial = $property->getInitialAmount();
                 $indice_de_base = "Pour rappel, l’indice de base est celui du mois de ".$data['date_indice_base']." (valeur : ".$data['montant_indice_base'].") ";
                 $nouvel_indice = "le nouvel indice du mois de ".$data['date_indice_actuel']." est de ".$data['montant_indice_actuel'];
@@ -291,14 +291,8 @@ class TextReplacer
                             ."x (1 + plafonnement ({$data['plaff_val']}) / 100).<br /><br />";
                     }
 
-                    $montant_rente_indexation_og2i ="Le nouveau montant de la rente viagère sera ainsi porté à {$data['rente']} €</b> pour le virement de la rente du mois de {$data['date_virement']}.";
-                    $montant_honoraires_indexation_og2i = "Les honoraires de gestion passent eux à ".$data['honoraires']." € TTC.";
-                    $texte = str_replace(
-                        '[formule_indexation_og2i]',
-                        $formule_indexation_og2i,
-                        $texte
-                    );
-                    
+                    $montant_rente_indexation_og2i ="<b>Le nouveau montant de la rente viagère sera ainsi porté à {$data['rente']} €</b> pour le virement de la rente du mois de {$data['date_virement']}.";
+                    $montant_honoraires_indexation_og2i = "<b>Les honoraires de gestion passent eux à ".$data['honoraires']." € TTC.</b>";
                     $texte = str_replace(
                         '[formule_indexation_og2i]',
                         $formule_indexation_og2i,
@@ -310,18 +304,33 @@ class TextReplacer
                         $texte
                     );
                     $texte = str_replace(
+                        '[nv_montant]',
+                        $data['rente'],
+                        $texte
+                    );
+                    $texte = str_replace(
+                        '[taux_honn]',
+                        $taux_honn,
+                        $texte
+                    );
+                    $texte = str_replace(
                         '[montant_honoraires_indexation_og2i]',
                         $montant_honoraires_indexation_og2i,
                         $texte
                     );
                 }else{
-                    $texte_indexation_honoraires = "Les honoraires de gestion passent eux à ".$data['honoraires']." € TTC.";
-                    $montant_rente_indexation_normale = "Le nouveau montant de la rente viagère sera ainsi porté à ".$data['rente']." € pour le virement  de la rente du mois de ".$data['date_virement'];
+                    $texte_indexation_honoraires = "<b>Les honoraires de gestion passent eux à ".$data['honoraires']." € TTC.</b>";
+                    $montant_rente_indexation_normale = "<b>Le nouveau montant de la rente viagère sera ainsi porté à ".$data['rente']." €</b> pour le virement  de la rente du mois de ".$data['date_virement'];
                     $Valeur_indice_reference = $data['montant_indice_base']." de ".$data['date_indice_base'];
 
                     $texte = str_replace(
                         '[texte_indexation_honoraires]',
                         $texte_indexation_honoraires,
+                        $texte
+                    );
+                    $texte = str_replace(
+                        '[taux_honn]',
+                        $taux_honn,
                         $texte
                     );
 
@@ -527,16 +536,20 @@ class TextReplacer
                 $target_address2 = "";
                 $target_postal1 = "";
                 $target_ville1 = "";
+                $target_telephone1 = "";
+                $target_telephone2 = "";
 
                 
 
                 $nom_notaire = $property->nom_notaire;
                 $prenom_notaire = $property->prenom_notaire;
                 $adresse_notaire = $property->addresse_notaire;
+                $ref_cadastrales = $property->ref_cadastrales;
+                $lots_copropriete = $property->lots_copropriete;
                 $code_postal_notaire = $property->code_postal_notaire;
                 $ville_notaire = $property->ville_notaire;
                 $date_acte = $property->date_duh->format('d/m/Y');
-                $date_remise_clefs = $property->date_remise_cles->format('d/m/Y');
+                $date_remise_clefs = ($property->date_remise_cles)?$property->date_remise_cles->format('d/m/Y'):null;
                 $pourcentage_revalorisation_rente = $property->pourcentage_revaluation_rente;
 
                 $adresse_bien = $property->getGoodAddress();
@@ -558,6 +571,8 @@ class TextReplacer
                         $target_prenom2 = $property->getLastname2();
                         $target_address2= $property->getAdresseCredirentier2();
                         $target_ville1 = $property->getVilleCredirentier1();
+                        $target_telephone1 = $property->getBuyerPhone1();
+                        $target_telephone2 = $property->getBuyerPhone2();
                         
                         break;
                     case 'Débirentier':
@@ -566,11 +581,13 @@ class TextReplacer
                         $target_prenom1 = $property->getPrenomDebirentier();
                         $target_address1 = $property->getAddresseDebirentier();
                         $target_postal1 = $property->getCodePostalDebirentier();
-                        $target_civilite2 = $property->civilite_debirentier2;
+                        $target_civilite2 = $property->getCiviliteDebirentier2Label();
                         $target_nom2 = $property->getNomDebirentier2();
                         $target_prenom2 = $property->getPrenomDebirentier2();
                         $target_address2 = $property->getAddresseDebirentier2();
                         $target_ville1 = $property->getVilleDebirentier2();
+                        $target_telephone1 = $property->getTelephoneDebirentier();
+                        $target_telephone2 = $property->getTelephoneDebirentier2();
                         
                         break;
                     case 'Mandant':
@@ -584,6 +601,8 @@ class TextReplacer
                         $target_prenom2 = "";
                         $target_address2 = "";
                         $target_ville1 = $property->getWarrant()->getCity();
+                        $target_telephone1 = $property->getWarrant()->getPhone1();
+                        $target_telephone2 = $property->getWarrant()->getPhone2();
                         
                         break;
                     
@@ -592,6 +611,145 @@ class TextReplacer
                         $target_civilite2 = "";
                         break;
                 }
+                $credirentier_civilite1 = $property->getCivilite1Label();
+                $credirentier_nom1 = $property->getFirstname1();
+                $credirentier_prenom1 = $property->getLastname1();
+                $credirentier_mail1 = $property->getMail1();
+                $credirentier_address1 = $property->getAdresseCredirentier1();
+                $credirentier_postal1 = $property->getCodePostalCredirentier1();
+                $credirentier_civilite2 = $property->getCivilite2Label();
+                $credirentier_nom2 = $property->getFirstname2();
+                $credirentier_prenom2 = $property->getLastname2();
+                $credirentier_mail2 = $property->getMail2();
+                $credirentier_address2 = $property->getAdresseCredirentier2();
+                $credirentier_ville1 = $property->getVilleCredirentier1();
+                $credirentier_telephone1 = $property->getBuyerPhone1();
+                $credirentier_telephone2 = $property->getBuyerPhone2();
+                $debirentier_civilite1 = $property->getCiviliteDebirentierLabel();
+                $debirentier_nom1 = $property->getNomDebirentier();
+                $debirentier_mail1 = $property->getEmailDebirentier();
+                $debirentier_mail2 = $property->getEmailDebirentier2();
+                $debirentier_prenom1 = $property->getPrenomDebirentier();
+                $debirentier_address1 = $property->getAddresseDebirentier();
+                $debirentier_postal1 = $property->getCodePostalDebirentier();
+                $debirentier_civilite2 = $property->getCiviliteDebirentier2Label();
+                $debirentier_nom2 = $property->getNomDebirentier2();
+                $debirentier_prenom2 = $property->getPrenomDebirentier2();
+                $debirentier_address2 = $property->getAddresseDebirentier2();
+                $debirentier_ville1 = $property->getVilleDebirentier2();
+                $debirentier_telephone1 = $property->getTelephoneDebirentier();
+                $debirentier_telephone2 = $property->getTelephoneDebirentier2();
+                $mandant_civilite1 = '';
+                $mandant_civilite2 = '';
+                $mandant_nom1 = $property->getWarrant()->getFirstname();
+                $mandant_prenom1 = $property->getWarrant()->getLastname();
+                $mandant_address1 = $property->getWarrant()->getAddress();
+                $mandant_postal1 = $property->getWarrant()->getPostalCode();
+                $mandant_ville1 = $property->getWarrant()->getCity();
+                $mandant_mail1 = $property->getWarrant()->getMail1();
+                $mandant_mail2 = $property->getWarrant()->getMail2();
+                $mandant_telephone1 = $property->getWarrant()->getPhone1();
+                $mandant_telephone2 = $property->getWarrant()->getPhone2();
+                
+                $infos_cred2 = '';
+                $infos_cred2_mand_gestion = '';
+
+
+                $man_gestion_cred2 = '';
+                $man_gestion_deb2 = '';
+
+
+                if ($credirentier_civilite2 || $credirentier_prenom2 || $credirentier_nom2) {
+
+                    $infos_cred2 = sprintf(
+                        ',<br><b>%s %s %s</b>',
+                        $credirentier_civilite2,
+                        $credirentier_nom2,
+                        $credirentier_prenom2
+                    );
+
+                    $infos_cred2_mand_gestion = sprintf(
+                        '%s, %s, %s',
+                        $credirentier_civilite2,
+                        $credirentier_nom2,
+                        $credirentier_prenom2
+                    );
+
+                    $man_gestion_cred2 = sprintf(
+                        '<b>%s, %s, %s</b>',
+                        $credirentier_civilite2,
+                        $credirentier_nom2,
+                        $credirentier_prenom2
+                    );
+
+                
+                }
+                if ($debirentier_civilite2 || $debirentier_prenom2 || $debirentier_nom2) {
+
+                    $man_gestion_deb2 = sprintf(
+                        '<b>%s, %s, %s</b>',
+                        $debirentier_civilite2,
+                        $debirentier_nom2,
+                        $debirentier_prenom2
+                    );
+
+                }
+
+                if ($credirentier_address2 && $infos_cred2_mand_gestion) {
+                    $infos_cred2_mand_gestion .= " demeurant au $credirentier_address2";
+                }
+                if ($credirentier_address2 && $infos_cred2) {
+                    $infos_cred2 .= " demeurant au $credirentier_address2";
+                }
+                if ($credirentier_address2 && $man_gestion_cred2) {
+                    $man_gestion_cred2 .= " demeurant au $credirentier_address2";
+                }
+                if ($debirentier_address2 && $man_gestion_deb2) {
+                    $man_gestion_deb2 .= " demeurant au $debirentier_address2";
+                }
+                if ($credirentier_telephone2 && $man_gestion_cred2) {
+                    $man_gestion_cred2 .= "<br>Téléphone : $credirentier_telephone2";
+                }
+                if ($debirentier_telephone2 && $man_gestion_deb2) {
+                    $man_gestion_deb2 .= "<br>Téléphone : $debirentier_telephone2";
+                }
+                if ($credirentier_mail2 && $man_gestion_cred2) {
+                    $man_gestion_cred2 .= "<br>Email : $credirentier_mail2";
+                }
+                if ($debirentier_mail2 && $man_gestion_deb2) {
+                    $man_gestion_deb2 .= "<br>Email : $debirentier_mail2";
+                }
+
+                $client_texte = str_replace(
+                [
+                    '[credirentier_civilite1]', '[credirentier_civilite2]','[infos_cred2]','[infos_cred2_mand_gestion]', '[credirentier_nom1]', '[credirentier_nom2]',
+                    '[credirentier_prenom1]', '[credirentier_prenom2]', '[credirentier_address1]', '[credirentier_address2]',
+                    '[credirentier_postal1]', '[credirentier_ville1]', '[credirentier_telephone1]', '[credirentier_telephone2]',
+                    '[debirentier_civilite1]', '[debirentier_civilite2]', '[debirentier_nom1]', '[debirentier_nom2]',
+                    '[debirentier_prenom1]', '[debirentier_prenom2]', '[debirentier_address1]', '[debirentier_address2]',
+                    '[debirentier_postal1]', '[debirentier_ville1]', '[debirentier_telephone1]', '[debirentier_telephone2]',
+                    '[mandant_civilite1]', '[mandant_civilite2]', '[mandant_nom1]', 
+                    '[mandant_prenom1]',  '[mandant_address1]', 
+                    '[mandant_postal1]', '[mandant_ville1]', '[mandant_telephone1]', '[mandant_telephone2]',
+                    '[credirentier_mail1]','[credirentier_mail2]','[debirentier_mail1]','[debirentier_mail2]',
+                    '[mandant_mail1]','[mandant_mail2]','[man_gestion_deb2]','[man_gestion_cred2]',
+                ],
+                [
+                    $credirentier_civilite1, $credirentier_civilite2, $infos_cred2, $infos_cred2_mand_gestion, $credirentier_nom1, $credirentier_nom2,
+                    $credirentier_prenom1, $credirentier_prenom2, $credirentier_address1, $credirentier_address2,
+                    $credirentier_postal1, $credirentier_ville1, $credirentier_telephone1, $credirentier_telephone2,
+                    $debirentier_civilite1, $debirentier_civilite2, $debirentier_nom1, $debirentier_nom2,
+                    $debirentier_prenom1, $debirentier_prenom2, $debirentier_address1, $debirentier_address2,
+                    $debirentier_postal1, $debirentier_ville1, $debirentier_telephone1, $debirentier_telephone2,
+                    $mandant_civilite1, $mandant_civilite2, $mandant_nom1, 
+                    $mandant_prenom1,  $mandant_address1,
+                    $mandant_postal1, $mandant_ville1, $mandant_telephone1, $mandant_telephone2,
+                    $credirentier_mail1, $credirentier_mail2, $debirentier_mail1, $debirentier_mail2,
+                    $mandant_mail1, $mandant_mail2, $man_gestion_deb2, $man_gestion_cred2
+
+                ],
+                $client_texte
+            );
                
 
                 $client_texte = str_replace(
@@ -606,6 +764,26 @@ class TextReplacer
                             $client_texte
                         );
                         $client_texte = str_replace(
+                            '[ref_cadastrales]',
+                            $ref_cadastrales,
+                            $client_texte
+                        );
+                        $client_texte = str_replace(
+                            '[target_telephone1]',
+                            $target_telephone1,
+                            $client_texte
+                        );
+                        $client_texte = str_replace(
+                            '[target_telephone2]',
+                            $target_telephone2,
+                            $client_texte
+                        );
+                        $client_texte = str_replace(
+                            '[lots_copropriete]',
+                            $lots_copropriete,
+                            $client_texte
+                        );
+                        $client_texte = str_replace(
                             '[target_nom1]',
                             $target_nom1,
                             $client_texte
@@ -617,7 +795,17 @@ class TextReplacer
                         );
                         $client_texte = str_replace(
                             '[target_civilite2]',
-                            $target_civilite2,
+                            ($target_civilite2 || $target_nom2 || $target_prenom2)?(' ,<br>'.$target_civilite2):'',
+                            $client_texte
+                        );
+                        $client_texte = str_replace(
+                            '[target_address1]',
+                            $target_address1,
+                            $client_texte
+                        );
+                        $client_texte = str_replace(
+                            '[target_address2]',
+                            $target_address2,
                             $client_texte
                         );
                         $client_texte = str_replace(
@@ -699,6 +887,215 @@ class TextReplacer
                         );
                 
                 return $client_texte;
+    }
+
+    public function get_datas( Property $property)
+    {
+        if($property->getClauseOG2I()){
+                    
+                   
+            $month_og2i=$property->valeur_indice_ref_og2_i_object->getDate()->format('m');
+            $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month_og2i."-".date('Y'));
+            $endDate_og2i->setTime(0, 0, 0);
+            // recuperer Valeur Indice de référence* (indexation)
+            
+            $qb4=$this->manager->createQueryBuilder()
+            ->select("rh")
+            ->from('App\Entity\RevaluationHistory', 'rh')
+            ->where('rh.type LIKE :key and rh.date <= :end')
+            ->andWhere('rh.date like  :endmonth')
+            ->setParameter('key', 'OGI')
+            ->setParameter('end', $endDate_og2i)
+            ->setParameter('endmonth',  "%-%".$month_og2i."-%")
+                ->orderBy('rh.date', 'DESC');
+            $query = $qb4->getQuery();
+            // Execute Query
+            if($query->getResult()){
+                $indice_og2i = $query->getResult()[0];
+            }else{
+                $indice_og2i = (object) array('value' => 0,'id'=>0);
+            }
+            $mi = $property->getInitialAmount();
+
+            $rdb=round(($property->valeur_indice_ref_og2_i_object->getValue()*$mi)/$property->initial_index_object->getValue(),2);
+            $res=($indice_og2i->getValue() *$rdb)/$property->valeur_indice_ref_og2_i_object->getValue();
+            $plaff=$property->plafonnement_index_og2_i;
+            $plaff_v=(1+($plaff/100))*$rdb;
+
+            if($res<$mi){
+                $rente = $mi;
+                $is_plaff=false;
+            }
+            else if(!$plaff || $plaff<=0){
+                $rente=round($res,2);
+                $is_plaff=false;
+            }
+            else if($res<$plaff_v){
+                $rente=round($res,2);
+                $is_plaff=false;
+            }else{
+                $rente=round($plaff_v,2);
+                $is_plaff=true;
+            }
+            $honoraires = round($rente*$property->honorary_rates_object->getValeur()/100,2);
+
+            $honoraires = round($rente*$property->honorary_rates_object->getValeur()/100,2);
+            if($honoraires<$property->honorary_rates_object->getMinimum() && $property->honorary_rates_object){
+                $honoraires=$property->honorary_rates_object->getMinimum();  
+            }
+            $ia = $property->getInitialAmount();
+            $is_plaff = $is_plaff;
+            $plaff_val = $property->plafonnement_index_og2_i;
+            $rdb = $rdb;
+            $res = $res;
+            $rente = $rente;
+            $honoraires = $honoraires;
+                 
+        }else{
+            
+            $month_m_u=$property->initial_index_object->getDate()->format('m');
+            $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
+            $endDate_m_u->setTime(0, 0, 0);
+            // recuperer Valeur Indice de référence* (indexation)
+            
+            $qb4=$this->manager->createQueryBuilder()
+            ->select("rh")
+            ->from('App\Entity\RevaluationHistory', 'rh')
+            ->where('rh.type LIKE :key')
+            ->andWhere('rh.date <= :end')
+            ->andWhere('rh.date like  :endmonth')
+            ->setParameter('key', $this->get_label($property->getIntitulesIndicesInitial()))
+            ->setParameter('endmonth',  "%-%".$month_m_u."-%")
+            ->setParameter('end', $endDate_m_u)
+                ->orderBy('rh.date', 'DESC');
+            $query4 = $qb4->getQuery();
+            // Execute Query
+            if($query4->getResult()){
+                $indice_m_u = $query4->getResult()[0]; 
+                $property->valeur_indice_reference_object=$query4->getResult()[0];
+            }else{
+                $indice_m_u = (object) array('value' => 0,'id'=>0);
+            }
+
+            $honorary= ($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100;
+            if($property->honorary_rates_object && $honorary<$property->honorary_rates_object->getMinimum()){
+                $honorary=$property->honorary_rates_object->getMinimum();
+
+            }
+            $ia = $property->getInitialAmount();
+            $rente = round($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()),2);
+            $honoraires = round($honorary,2);
+            
+            
+
+        }
+
+        $taux_honn = $property->honorary_rates_object->getValeur();
+        $ref_cadastrales = $property->ref_cadastrales;
+        $lots_copropriete  = $property->lots_copropriete;
+        $credirentier_civilite1 = $property->getCivilite1Label();
+        $credirentier_nom1 = $property->getFirstname1();
+        $credirentier_prenom1 = $property->getLastname1();
+        $credirentier_mail1 = $property->getMail1();
+        $credirentier_address1 = $property->getAdresseCredirentier1();
+        $credirentier_postal1 = $property->getCodePostalCredirentier1();
+        $credirentier_civilite2 = $property->getCivilite2Label();
+        $credirentier_nom2 = $property->getFirstname2();
+        $credirentier_prenom2 = $property->getLastname2();
+        $credirentier_mail2 = $property->getMail2();
+        $credirentier_address2 = $property->getAdresseCredirentier2();
+        $credirentier_ville1 = $property->getVilleCredirentier1();
+        $credirentier_telephone1 = $property->getBuyerPhone1();
+        $credirentier_telephone2 = $property->getBuyerPhone2();
+        $debirentier_civilite1 = $property->getCiviliteDebirentierLabel();
+        $debirentier_nom1 = $property->getNomDebirentier();
+        $debirentier_mail1 = $property->getEmailDebirentier();
+        $debirentier_mail2 = $property->getEmailDebirentier2();
+        $debirentier_prenom1 = $property->getPrenomDebirentier();
+        $debirentier_address1 = $property->getAddresseDebirentier();
+        $debirentier_postal1 = $property->getCodePostalDebirentier();
+        $debirentier_civilite2 = $property->getCiviliteDebirentier2Label();
+        $debirentier_nom2 = $property->getNomDebirentier2();
+        $debirentier_prenom2 = $property->getPrenomDebirentier2();
+        $debirentier_address2 = $property->getAddresseDebirentier2();
+        $debirentier_ville1 = $property->getVilleDebirentier2();
+        $debirentier_telephone1 = $property->getTelephoneDebirentier();
+        $debirentier_telephone2 = $property->getTelephoneDebirentier2();
+        $mandant_civilite1 = '';
+        $mandant_civilite2 = '';
+        $mandant_nom1 = $property->getWarrant()->getFirstname();
+        $mandant_prenom1 = $property->getWarrant()->getLastname();
+        $mandant_address1 = $property->getWarrant()->getAddress();
+        $mandant_postal1 = $property->getWarrant()->getPostalCode();
+        $mandant_ville1 = $property->getWarrant()->getCity();
+        $mandant_mail1 = $property->getWarrant()->getMail1();
+        $mandant_mail2 = $property->getWarrant()->getMail2();
+        $mandant_telephone1 = $property->getWarrant()->getPhone1();
+        $mandant_telephone2 = $property->getWarrant()->getPhone2();
+
+        $res = [
+            // Crédirentier
+            'credirentier_civilite1' => $credirentier_civilite1,
+            'credirentier_civilite2' => $credirentier_civilite2,
+            'credirentier_nom1' => $credirentier_nom1,
+            'credirentier_nom2' => $credirentier_nom2,
+            'credirentier_prenom1' => $credirentier_prenom1,
+            'credirentier_prenom2' => $credirentier_prenom2,
+            'credirentier_address1' => $credirentier_address1,
+            'credirentier_address2' => $credirentier_address2,
+            'credirentier_postal1' => $credirentier_postal1,
+            'credirentier_ville1' => $credirentier_ville1,
+            'credirentier_telephone1' => $credirentier_telephone1,
+            'credirentier_telephone2' => $credirentier_telephone2,
+            'credirentier_mail1' => $credirentier_mail1,
+            'credirentier_mail2' => $credirentier_mail2,
+            
+            // Débirentier
+            'debirentier_civilite1' => $debirentier_civilite1,
+            'debirentier_civilite2' => $debirentier_civilite2,
+            'debirentier_nom1' => $debirentier_nom1,
+            'debirentier_nom2' => $debirentier_nom2,
+            'debirentier_prenom1' => $debirentier_prenom1,
+            'debirentier_prenom2' => $debirentier_prenom2,
+            'debirentier_address1' => $debirentier_address1,
+            'debirentier_address2' => $debirentier_address2,
+            'debirentier_postal1' => $debirentier_postal1,
+            'debirentier_ville1' => $debirentier_ville1,
+            'debirentier_telephone1' => $debirentier_telephone1,
+            'debirentier_telephone2' => $debirentier_telephone2,
+            'debirentier_mail1' => $debirentier_mail1,
+            'debirentier_mail2' => $debirentier_mail2,
+            
+            // Mandant
+            'mandant_civilite1' => $mandant_civilite1,
+            'mandant_civilite2' => $mandant_civilite2,
+            'mandant_nom1' => $mandant_nom1,
+            'mandant_prenom1' => $mandant_prenom1,
+            'mandant_address1' => $mandant_address1,
+            'mandant_postal1' => $mandant_postal1,
+            'mandant_ville1' => $mandant_ville1,
+            'mandant_telephone1' => $mandant_telephone1,
+            'mandant_telephone2' => $mandant_telephone2,
+            'mandant_mail1' => $mandant_mail1,
+            'mandant_mail2' => $mandant_mail2,
+            
+            // Autres
+            'ref_cadastrales' => $ref_cadastrales,
+            'lots_propriete' => $lots_copropriete,
+            'taux_honn' => $taux_honn,
+            'honoraires' => $honoraires,
+            'rente' => $rente,
+            'nv_montant' => $rente,
+            'Montant_des_honoraires' => $honoraires,
+            'adresse_bien' => $property->getAddress(),
+            
+        
+        ];
+
+
+        return $res;
+
+                        
     }
 
   

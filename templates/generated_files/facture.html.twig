@@ -158,7 +158,6 @@
                         <th title="Number" data-field="Number">N° Fact</th>
                         <th title="Type" data-field="Type">Type</th>
                         <th data-field="Download"></th>
-                        <th data-field="Delete"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -168,10 +167,10 @@
                                     <tr>
                                         <td>{{ generated_file.date |date('d-M-Y H:m:s')}}</td>
                                         <td>{{ generated_file.name }}</td>
-                                        <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') and generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}</td>
-                                        <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
+                                        <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_FACTURE_MANUELLE') and generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}</td>
+                                        <td>Facture manuelle</td>
                                         <td><a href="{{ path('file_download_local', { id: generated_file.id }) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
-                                        <td>{% if generated_file.invoice is empty %}<a class="delete_link" onclick="return confirm('Supprimer ce fichier ?')" href="{{ path('file_delete_by_id', {'fileId': generated_file.id}) }}" ><i class="la la-remove"></i> Supprimer</a>{% endif %}</td>
+                                       
                                     </tr>
                                 {% endif %}
                             {% endfor %}     

@@ -111,7 +111,7 @@ complémentaires et vous prions de croire en l’expression de nos sincères sal
                     <td style="width: 30%;border: solid 1px black; ">
                         {% if f.property.date_maj_indice_ref > date('first day of this month') %}
                             Indexation
-                        {% elseif f.property.date_duh > date('first day of last month') %}
+                        {% elseif f.property.date_duh > date('first day of this month') %}
                             Nouveau bien
                         {% endif %}
                     </td>

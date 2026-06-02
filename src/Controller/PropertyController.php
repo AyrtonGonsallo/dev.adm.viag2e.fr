@@ -210,6 +210,19 @@ class PropertyController extends AbstractController
             ->getRepository(Property::class)
             ->find($request->get('propertyId'));
 
+
+        $properties = $this->getDoctrine()->getManager()
+            ->getRepository(Property::class)
+            ->findAll();
+        foreach ($properties as $property22) {
+            if($property22->getWarrant()->getId()==16){
+                $property22->mandataire = 2;
+            }else{
+                $property22->mandataire = 1;
+            }
+
+        }
+        $this->getDoctrine()->getManager()->flush();
           
 
 

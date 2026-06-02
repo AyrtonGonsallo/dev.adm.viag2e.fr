@@ -75,7 +75,7 @@ class CronRegenerateInvoicesCommand extends Command
         $this->mailer = $mailer;
         $this->params = $params;
         $this->twig = $this->container->get('twig');
-        $this->invoice_number = 7580;
+        $this->invoice_number = 8012;
         $this->pdf_dir = $this->params->get('pdf_tmp_dir');
         $this->pdf_logo = $this->params->get('pdf_logo_path');
 
@@ -162,7 +162,7 @@ class CronRegenerateInvoicesCommand extends Command
           function processNumber(int $number)
           {
               static $assignedNumbers = []; // Keeps track of numbers and their corresponding results
-              static $nextNumber = 	7580; // Starting value for the first number
+              static $nextNumber = 	8012; // Starting value for the first number
           
               // Check if the number has already been assigned a value
               if (isset($assignedNumbers[$number])) {
@@ -182,7 +182,7 @@ class CronRegenerateInvoicesCommand extends Command
         
 
           
-        if (date('d') <= 20) {
+        if (date('d') >= 20) {
         
             
 
@@ -191,7 +191,7 @@ class CronRegenerateInvoicesCommand extends Command
             $quittances = $this->manager
                 ->getRepository(Invoice::class)
                 ->findAvoirsTogenerate(50);
-                $number=7580;
+                $number=8012;
             foreach ($quittances as $quittance) {
                 
                 $data=$quittance->getData();

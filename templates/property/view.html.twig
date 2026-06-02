@@ -2,7 +2,21 @@
 {% import "macros/forms.html.twig" as mforms %}
 
 {% block title %}Viag2e | Bien #{{ property.id }} ({{ property.title }}){% endblock %}
-
+{% set typeLabels = {
+    (constant('App\\Entity\\File::TYPE_DOCUMENT')): 'Document',
+    (constant('App\\Entity\\File::TYPE_INVOICE')): 'Facture',
+    (constant('App\\Entity\\File::TYPE_RECAP')): 'Recap',
+    (constant('App\\Entity\\File::TYPE_AVOIR')): 'Avoir',
+    (constant('App\\Entity\\File::TYPE_FACTURE_MANUELLE')): 'Facture manuelle',
+    (constant('App\\Entity\\File::TYPE_MANDAT_SEPA')): 'Mandat sepa',
+    (constant('App\\Entity\\File::TYPE_MANDAT_GESTION')): 'Mandat de gestion',
+    (constant('App\\Entity\\File::TYPE_COURRIER_INDEXATION')): 'Courrier d\'indexation',
+    (constant('App\\Entity\\File::TYPE_COURRIER_PREMIER_CONTACT')): 'Courrier 1er contact',
+    (constant('App\\Entity\\File::TYPE_COURRIER_APPEL_CHARGES_COPRO')): 'Courrier appel des charges trimestrielles de copro',
+    (constant('App\\Entity\\File::TYPE_COURRIER_REGUL_CHARGES_COPRO')): 'Courrier régularisation charges copro',
+    (constant('App\\Entity\\File::TYPE_COURRIER_ABANDON_DUH')): 'Courrier abandon du DUH',
+    (constant('App\\Entity\\File::TYPE_COURRIER_LIBRE')): 'Courrier libre'
+} %}
 {% block body %}
 {% set isAdmin = is_granted('ROLE_ADMIN') %}
     <div class="m-subheader">
@@ -168,6 +182,10 @@
                     <li id="lien_fichiers" class="nav-item m-tabs__item">
                         <a class="nav-link m-tabs__link" data-toggle="tab" href="#m_tabs_fichier" role="tab"><i class="flaticon-attachment"></i>Fichiers</a>
                     </li>
+                    {% if property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
+                    <li class="autres_tabs nav-item m-tabs__item {% if not isAdmin %}d-none-2{% endif %}">
+                        <a class="nav-link m-tabs__link {% if buyer_tab %} active{% endif %}" data-toggle="tab" href="#m_tabs_buyer" role="tab"><i class="flaticon-cart"></i> Acheteur</a>
+                    </li>{% endif %}
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="m_tabs_bien" role="tabpanel">
@@ -180,7 +198,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <label for="form-mandataire" class="col-12 col-form-label">Mandataire </label>
+                                    <label for="form-mandataire" class="col-12 col-form-label">Mandant </label>
                                     <div class="col-12">
                                         {{ form_row(form.mandataire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mandataire', 'label': false}) }}
                                     </div>
@@ -234,10 +252,7 @@
                                     <div class="col-12">
                                         {{ form_row(form.firstname1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-firstname1', 'label': false}) }}
                                     </div>
-                                    <label for="form-dateofbirth1" class="col-12 col-form-label">Date de naissance </label>
-                                    <div class="col-12">
-                                        {{ form_row(form.dateofbirth1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dateofbirth1', 'label': false}) }}
-                                    </div>
+                                
                                     <label for="form-mail1" class="col-12 col-form-label">Adresse mail </label>
                                     <div class="col-12">
                                         {{ form_row(form.mail1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail1', 'label': false}) }}
@@ -273,10 +288,7 @@
                                     <div class="col-12">
                                         {{ form_row(form.firstname2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-firstname2', 'label': false}) }}
                                     </div>
-                                    <label for="form-dateofbirth2" class="col-12 col-form-label">Date de naissance </label>
-                                    <div class="col-12">
-                                        {{ form_row(form.dateofbirth2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dateofbirth2', 'label': false}) }}
-                                    </div>
+                                   
                                     <label for="form-mail2" class="col-12 col-form-label">Adresse mail </label>
                                     <div class="col-12">
                                         {{ form_row(form.mail2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mail2', 'label': false}) }}
@@ -613,9 +625,9 @@
                                         {{ form_row(form.ref_cadastrales, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ref_cadastrales', 'label': false}) }}
                                     </div>
 
-                                    <label for="form-lots_propriete" class="col-4 col-form-label">Lots de propriété</label>
+                                    <label for="form-lots_copropriete" class="col-4 col-form-label">Lots de copropriété</label>
                                     <div class="col-12">
-                                        {{ form_row(form.lots_propriete, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lots_propriete', 'label': false}) }}
+                                        {{ form_row(form.lots_copropriete, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lots_propriete', 'label': false}) }}
                                     </div>
                                 
 
@@ -800,7 +812,7 @@
                                         {{ form_row(form.initial_index_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-initial_index_object', 'label': false}) }}
                                     </div>
 
-                                    <label for="form-valeur_indice_reference_object" class="col-12 col-form-label">Valeur de l’indice de référence</label>
+                                    <label for="form-valeur_indice_reference_object" class="col-12 col-form-label">Valeur Indice de référence (si différent de l’indice initial)</label>
                                         <div class="col-12">
                                             {{ form_row(form.valeur_indice_reference_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-valeur_indice_reference_object', 'label': false}) }}
                                         </div>
@@ -822,10 +834,11 @@
 
                                     
 
-                                    <div class="col-12">
-                                        <h4>INDEXATION OG2I</h4>
-                                    </div>
                                     <div {% if not isAdmin %}style="display:none"{% endif %}>
+                                        <div class="col-12">
+                                            <h4>INDEXATION OG2I</h4>
+                                        </div>
+                                    
                                         <div class="col-12">
                                             <label for="form-clause_OG2I" >CLAUSE OG2I</label>
                                             <div >
@@ -848,20 +861,22 @@
                                             </span>
                                             </div>
                                         </div>
+
                                     </div>
                                     
 
                                     <div class="col-12" id="ogi2">
-                                        <label for="form-mois_indice_ref_og2_i" >Mois / année indice de référence</label>
-                                        <div >
-                                            {{ form_row(form.mois_indice_ref_og2_i, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mois_indice_ref_og2_i', 'label': false,'date_pattern': '<span style="display: none;">{{ day }}</span> {{ month }} <span class="delim">&#47;</span> {{ year }}' }) }}                            
-                                        </div>
+                                        <div {% if not isAdmin %}style="display:none"{% endif %}>
+                                            <label for="form-mois_indice_ref_og2_i" >Mois / année indice de référence</label>
+                                            <div >
+                                                {{ form_row(form.mois_indice_ref_og2_i, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mois_indice_ref_og2_i', 'label': false,'date_pattern': '<span style="display: none;">{{ day }}</span> {{ month }} <span class="delim">&#47;</span> {{ year }}' }) }}                            
+                                            </div>
 
-                                        <label for="form-valeur_indice_ref_og2_i_object" >Valeur Indice de référence</label>
+                                            <label for="form-valeur_indice_ref_og2_i_object" >Valeur Indice de référence</label>
                                             <div >
                                                 {{ form_row(form.valeur_indice_ref_og2_i_object, {'attr': {'class': 'form-control m-input'}, 'id': 'form-valeur_indice_ref_og2_i_object', 'label': false}) }}
                                             </div>
-
+                                        </div>
                                         
 
                                         <div class=" pad-15">
@@ -1109,8 +1124,18 @@
                                                         <option value="">Tous</option>
                                                         <option value="Document">Documents</option>
                                                         <option value="Facture">Factures</option>
+                                                        <option value="Facture manuelle">Facture manuelle</option>
                                                         <option value="Recap">Recap</option>
                                                         <option value="autres">Autres</option>
+                                                        <option value="Avoir">Avoir</option>
+                                                        <option value="Mandat sepa">Mandat sepa</option>
+                                                        <option value="Mandat de gestion">Mandat de gestion</option>
+                                                        <option value="Courrier d\'indexation">Courrier d'indexation</option>
+                                                        <option value="Courrier 1er contact">Courrier 1er contact</option>
+                                                        <option value="Courrier appel des charges trimestrielles de copro">Courrier appel des charges trimestrielles de copro</option>
+                                                        <option value="Courrier régularisation charges copro">Courrier régularisation charges copro</option>
+                                                        <option value="Courrier abandon du DUH">Courrier abandon du DUH</option>
+                                                        <option value="Courrier libre">Courrier libre</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1149,12 +1174,14 @@
                                 {% for invoice_file in invoices_files %}
                                     {% if invoice_file.file %}
                                         <tr>
-                                            <td>{{ invoice_file.file.date |date('d-M-Y H:m:s')}}</td>
+                                            <td>{{ invoice_file.file.date |date('d-M-Y H:i:s')}}</td>
                                             <td>{{ invoice_file.file.name }}</td>
                                             {% if isAdmin %}
                                                 <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_INVOICE') and invoice_file.file.invoice is not empty %}{{ invoice_file.file.invoice.formattednumber }}{% endif %}</td>
                                             {% endif %}
-                                            <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif invoice_file.file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
+                                            <td>
+                                            {{ typeLabels[invoice_file.file.type] }}
+                                            </td>
                                             <td><a href="{{ path('file_download', {'fileId': invoice_file.file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
                                             <td>{% if invoice_file.file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': invoice_file.file.driveId}) }}" data-name="{{ invoice_file.file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% endif %}</td>
                                         </tr>
@@ -1163,12 +1190,14 @@
                                 {% for invoice_file in invoices_files %}
                                     {% if invoice_file.file2 %}
                                         <tr>
-                                            <td>{{ invoice_file.file2.date |date('d-M-Y H:m:s')}}</td>
+                                            <td>{{ invoice_file.file2.date |date('d-M-Y H:i:s')}}</td>
                                             <td>{{ invoice_file.file2.name }}</td>
                                             {% if isAdmin %}
                                                 <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_INVOICE') and invoice_file.file2.invoice is not empty %}{{ invoice_file.file2.invoice.formattednumber }}{% endif %}</td>
                                             {% endif %}
-                                            <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif invoice_file.file2.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
+                                            <td>
+                                            {{ typeLabels[invoice_file.file2.type] }}
+                                            </td>
                                             <td><a href="{{ path('file_download', {'fileId': invoice_file.file2.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
                                             <td>{% if invoice_file.file2.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': invoice_file.file2.driveId}) }}" data-name="{{ invoice_file.file2.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% endif %}</td>
                                         </tr>
@@ -1177,13 +1206,16 @@
                                 {% for generated_file in generated_files %}
                                     {% if generated_file %}
                                         <tr>
-                                            <td>{{ generated_file.date |date('d-M-Y H:m:s')}}</td>
+                                            <td>{{ generated_file.date |date('d-M-Y H:i:s')}}</td>
                                             <td>{{ generated_file.name }}</td>
                                             {% if isAdmin %}
                                                 <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') and generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}</td>
                                             {% endif %}
-                                            <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}Document{% elseif generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') %}Facture{% else %}Recap{% endif %}</td>
-                                            <td><a href="{{ path('file_download', {'fileId': generated_file.driveId}) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
+                                            <td>
+                                            {{ typeLabels[generated_file.type] }}
+                                            
+                                            </td>
+                                            <td><a href="{{ path('file_download_local', { id: generated_file.id }) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
                                             <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_DOCUMENT') %}<a class="delete_link" href="#" data-link="{{ path('file_delete', {'fileId': generated_file.driveId}) }}" data-name="{{ generated_file.name }}" data-toggle="modal" data-target="#m_modal_delete_file"><i class="la la-remove"></i> Supprimer</a>{% endif %}</td>
                                         </tr>
                                     {% endif %}
@@ -1198,6 +1230,29 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {% if property.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
+                     
+                        <div class="tab-pane {% if buyer_tab %} active{% endif %} {% if not isAdmin %}d-none-2{% endif %}" id="m_tabs_buyer" role="tabpanel">buyer
+                            {{ form_start(form_buyer, {'attr': {'class': 'm-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed'}}) }}
+                                {{ mforms.group(form_buyer.buyerFirstname, 'buyer_firstname', 'Prénom', form_buyer.buyerLastname, 'buyer_lastname', 'Nom') }}
+                                {{ mforms.group(form_buyer.buyerAddress, 'buyer_address', 'Adresse', form_buyer.buyerPhone1, 'buyer_phone1', 'Téléphone') }}
+                                {{ mforms.group(form_buyer.buyerPostalCode, 'buyer_postal_code', 'Code postal', form_buyer.buyerPhone2, 'buyer_phone2', 'Téléphone2') }}
+                                {{ mforms.group(form_buyer.buyerCity, 'buyer_city', 'Ville', form_buyer.buyerMail1, 'buyer_mail1', 'Adresse mail') }}
+                                {{ mforms.group(form_buyer.buyerCountry, 'buyer_country', 'Pays', form_buyer.buyerMail2, 'buyer_mail2', 'Adresse mail 2', true) }}
+                                <div class="m-divider"><span></span>Relevé d'Identité Bancaire<span></span></div>
+                                {{ mforms.group(form_buyer.buyer_bank_establishment_code, 'buyer_bank_establishment_code', 'Code banque', form_buyer.buyer_bank_code_box, 'buyer_bank_code_box', 'Code guichet') }}
+                                {{ mforms.group(form_buyer.buyer_bank_account_number, 'buyer_bank_account_number', 'N° de compte', form_buyer.buyer_bank_key, 'buyer_bank_key', 'Clé RIB') }}
+                                {{ mforms.group(form_buyer.buyer_bank_domiciliation, 'buyer_bank_domiciliation', 'Domiciliation', null, null, null) }}
+                                <div class="m-divider"><span></span>Numéro International de Compte Bancaire (IBAN)<span></span></div>
+                                {{ mforms.group(form_buyer.buyer_bank_iban, 'buyer_bank_iban', 'N° de compte', form_buyer.buyer_bank_bic, 'buyer_bank_bic', 'Code banque (BIC)') }}
+                                <div class="m-divider"><span></span>Identifiant Créancier SEPA<span></span></div>
+                                {{ mforms.group(form_buyer.buyer_bank_ics, 'buyer_bank_ics', 'N° ICS', null, null, null) }}
+                                <input id="bouton_envoyer" class="btn btn-outline-success btn-block" type="submit" value="Enregistrer" />
+                            {{ form_end(form_buyer) }}
+                        </div>
+                    
+                    {% endif %}
                 </div>
                 
             </div>

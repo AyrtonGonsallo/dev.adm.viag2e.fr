@@ -732,6 +732,7 @@ class InvoiceController extends AbstractController
             }
             $cond_h_n=($filePath2 != -1)?true:false; //honoraires nuls ?
             $cond_r_n=($filePath != -1)?true:false; //rente nulle ?
+
             if($invoice->getCategory() == Invoice::CATEGORY_MANUAL){
                 if($data2["target"]==1){//mandant
                     $mailTarget=$invoice->getProperty()->getWarrant()->getMail1();
@@ -749,6 +750,7 @@ class InvoiceController extends AbstractController
                 
             }else{
                 if($data2['recursion'] ==Invoice::RECURSION_QUARTERLY){
+                    //charges de copro
                     $mailTarget=$invoice->getProperty()->getWarrant()->getMail1();
                     if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                         $mailTarget=$invoice->getProperty()->getWarrant()->getMail1();
@@ -758,51 +760,110 @@ class InvoiceController extends AbstractController
                            $mailTarget3=$invoice->getProperty()->getMail2();
                         }
                     }
-                  
-                    
                 }
-                if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
-                    if($cond_h_n){
-                        $mailTarget2=$invoice->getProperty()->getWarrant()->getMail1();
-                       
-                    }
-                    if($cond_r_n){
-                        $mailTarget1=$invoice->getProperty()->getBuyerMail1();
-                        
-                    }
-                }else{
-                    if($cond_h_n){
-                        $mailTarget2=$invoice->getProperty()->getWarrant()->getMail1();
-                       
-                    }
-                    if($cond_r_n){
-                        if($invoice->getProperty()->getDebirentierDifferent()){
-                            $mailTarget1=$invoice->getProperty()->getEmailDebirentier();
-    
-                        }else{
-                            $mailTarget1=$invoice->getProperty()->getWarrant()->getMail1();
-    
+
+                else if($data2['recursion'] ==Invoice::RECURSION_MONTHLY && $invoice->getCategory() == Invoice::CATEGORY_ANNUITY){
+                    //rentes honoraires
+                    if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){//si avis/quittances et vendeur
+                        if($cond_h_n){
+                            $mailTarget2=$invoice->getProperty()->getWarrant()->getMail1();
                         }
-                       
+                        if($cond_r_n){//la rente a l'acheteur ou au deb
+                            $mailTarget1_2='';
+                            if($invoice->getProperty()->getDebirentierDifferent()){//si deb diff acheteur au deb
+                                $mailTarget1=$invoice->getProperty()->getEmailDebirentier();
+                                $mailTarget1_2=$invoice->getProperty()->getEmailDebirentier2();
+                            }else{
+                                $mailTarget1=$invoice->getProperty()->getBuyerMail1();
+                            }
+                        }
+
+                    }else{//si avis/quittances et acheteur
+                        if($cond_h_n){
+                            $mailTarget2=$invoice->getProperty()->getWarrant()->getMail1();
+                        
+                        }
+                        if($cond_r_n){
+                            $mailTarget1_2='';
+                            if($invoice->getProperty()->getDebirentierDifferent()){
+                                $mailTarget1=$invoice->getProperty()->getEmailDebirentier();
+        
+                            }else{
+                                $mailTarget1=$invoice->getProperty()->getWarrant()->getMail1();
+        
+                            }
+                        
+                        }
                     }
                 }
+
+                else if($invoice->getCategory() == Invoice::CATEGORY_AVOIR){
+                    $target_exist = array_key_exists('target', $data2);
+                    //avoir
+                    if ($target_exist) {
+
+                        if($data2["target"]==1){//mandant
+                            $mailTarget=$invoice->getProperty()->getWarrant()->getMail1();
+                        }else if($data2["target"]==2){//proprietaire du bien
+                            $mailTarget=$invoice->getProperty()->getMail1();
+                            if($invoice->getProperty()->getMail2()){
+                                $mailTarget3=$invoice->getProperty()->getMail2();
+                            }
+                        }else if($data2["target"]==3){//acheteur
+                            $mailTarget=$invoice->getProperty()->getBuyerMail1();
+                        }
+                        else if($data2["target"]==4){//debirentier
+                            $mailTarget=$invoice->getProperty()->getEmailDebirentier();
+                        }
+                        
+                    }else{
+                        //rentes honoraires
+                        if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){//si avis/quittances et vendeur
+                            if($cond_h_n){
+                                $mailTarget2=$invoice->getProperty()->getWarrant()->getMail1();
+                            }
+                            if($cond_r_n){//la rente a l'acheteur ou au deb
+                                $mailTarget1_2='';
+                                if($invoice->getProperty()->getDebirentierDifferent()){//si deb diff acheteur au deb
+                                    $mailTarget1=$invoice->getProperty()->getEmailDebirentier();
+                                    $mailTarget1_2=$invoice->getProperty()->getEmailDebirentier2();
+                                }else{
+                                    $mailTarget1=$invoice->getProperty()->getBuyerMail1();
+                                }
+                            }
+
+                        }else{//si avis/quittances et acheteur
+                            if($cond_h_n){
+                                $mailTarget2=$invoice->getProperty()->getWarrant()->getMail1();
+                            
+                            }
+                            if($cond_r_n){
+                                $mailTarget1_2='';
+                                if($invoice->getProperty()->getDebirentierDifferent()){
+                                    $mailTarget1=$invoice->getProperty()->getEmailDebirentier();
+            
+                                }else{
+                                    $mailTarget1=$invoice->getProperty()->getWarrant()->getMail1();
+            
+                                }
+                            }
+                        }
+                    } 
+                }
+                
                 if($data2['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){
                     if($cond_h_n){
                         if(!empty($invoice->getMailCc())) {
                             $mailTarget3=$invoice->getMailCc();
+                        }  
+                    }
+                }else if($data2['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() != Warrant::TYPE_SELLERS){
+                    if($cond_h_n && $cond_r_n){
+                        if(!empty($invoice->getMailCc())) {
+                            $mailTarget3=$invoice->getMailCc();
                         }
-        
-                        
-                    }
-                    
-              }else if($data2['recursion'] !=Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getWarrant()->getType() != Warrant::TYPE_SELLERS){
-                if($cond_h_n && $cond_r_n){
-                    if(!empty($invoice->getMailCc())) {
-                        $mailTarget3=$invoice->getMailCc();
-                    }
-                }    
-                
-              }
+                    }   
+                }
             }
             $recap_mails="";
             if($invoice->getCategory() == Invoice::CATEGORY_MANUAL){
@@ -843,6 +904,9 @@ class InvoiceController extends AbstractController
             }else{
                 if($cond_r_n){
                     $recap_mails="la rente sera envoyée à ".$mailTarget1;
+                    if($mailTarget1_2){
+                        $recap_mails.=" et à ".$mailTarget1_2;
+                    }
                 }
                 if($cond_h_n){
                     $recap_mails.="les honoraires seront envoyés à ".$mailTarget2;
@@ -927,26 +991,35 @@ class InvoiceController extends AbstractController
 
     public function getTableHonoraryRates(Invoice $invoice)
     {
+     
         $data = $invoice->getData();
         if ($invoice->getCategory() === Invoice::CATEGORY_ANNUITY) {
-            return number_format($invoice->getData()['property']['honoraryRates'], 2, '.', ' ') . '(' . number_format($invoice->getData()['property']['honoraryRates'] - $invoice->getData()['property']['honoraryRatesTax'],2, '.', ' ') . ' HT)';
+            return number_format($data['property']['honoraryRates'], 2, '.', ' ') . '(' . number_format($data['property']['honoraryRates'] - $data['property']['honoraryRatesTax'],2, '.', ' ') . ' HT)';
         }
-        elseif ($invoice->getCategory() === Invoice::CATEGORY_MANUAL && $invoice->getData()['honoraryRates'] > -1) {
-            return number_format($invoice->getData()['honoraryRates'],2, '.', ' ') . '(' . number_format($invoice->getData()['honoraryRates'] - $invoice->getData()['honoraryRatesTax'], 2, '.', ' ') . ' HT)';
+        elseif ($invoice->getCategory() === Invoice::CATEGORY_MANUAL ) {
+            if($data['honoraryRates'] > -1 && $data['honoraryRatesTax'] == -1 ){
+                return number_format($data['honoraryRates'],2, '.', ' ') . '(' . number_format($data['honoraryRates'] - $data['honoraryRatesTax'], 2, '.', ' ') . ' HT)';
+            }else if($data['honoraryRates'] > -1 && $data['honoraryRatesTax'] != -1){
+                return number_format($data['honoraryRatesTax'] + $data['honoraryRates'],2, '.', ' ') . '(' . number_format($data['honoraryRates'] , 2, '.', ' ') . ' HT)';
+            }
         }
         elseif ($invoice->getCategory() === Invoice::CATEGORY_AVOIR) {
+            if(array_key_exists('honoraryRates',$data['property']))
+                return number_format($data['property']['honoraryRates'], 2, '.', ' ') . '(' . number_format($data['property']['honoraryRates'] - $data['property']['honoraryRatesTax'],2, '.', ' ') . ' HT)';
+        
             if (!empty($data['montantht']) && $data['montantht'] > 0) {
 
-                $ht  = $data['montantht'];
-                $tax = $ht * 0.2;
-                $ttc = $ht + $tax; // ⚠️ correction ici (tu avais $tax + $tax)
+                $ht = $data['montantht'];
+                $ttc = ($data['montantttc'] ?? 0) > 0
+                    ? $data['montantttc']
+                    : $ht;
 
-                return number_format($ttc, 2, '.', ' ') 
+                return number_format($ttc, 2, '.', ' ')
                     . ' (' . number_format($ht, 2, '.', ' ') . ' HT)';
-            } 
+            }
         }
-        elseif(array_key_exists('honoraryRates',$invoice->getData()['property']))
-            return number_format($invoice->getData()['property']['honoraryRates'], 2, '.', ' ') . '(' . number_format($invoice->getData()['property']['honoraryRates'] - $invoice->getData()['property']['honoraryRatesTax'],2, '.', ' ') . ' HT)';
+        elseif(array_key_exists('honoraryRates',$data['property']))
+            return number_format($data['property']['honoraryRates'], 2, '.', ' ') . '(' . number_format($data['property']['honoraryRates'] - $data['property']['honoraryRatesTax'],2, '.', ' ') . ' HT)';
         else
             return '-';
         
@@ -1151,15 +1224,22 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                             }
                             //envoyer la rente au buyer /acquereur/acheteur
                             if($cond_r_n){
+                                $bcc_rente = [
+                                    'ayrtongonsalloheroku@gmail.com',
+                                    $this->mail_from
+                                ];
+
                                 $mailTarget_r="";
                                 if($invoice->getProperty()->getDebirentierDifferent()){
                                     $mailTarget_r=$invoice->getProperty()->getEmailDebirentier();
+                                    $mailTarget2_r=$invoice->getProperty()->getEmailDebirentier2();
+                                    $bcc_rente[] = $mailTarget2_r;
                                 }else{
                                     $mailTarget_r=$invoice->getProperty()->getWarrant()->getMail1();
                                 }
                                 $message2 = (new Swift_Message($invoice->getMailSubject()))
                                     ->setFrom($this->getParameter('mail_from'))
-                                    ->setBcc(["userusernash@gmail.com", $this->getParameter('mail_from')])
+                                    ->setBcc($bcc_rente)
                                    // ->setTo($mailTarget_r)
                                      ->setTo( "userusernash@gmail.com")
                                     ->setBody($this->renderView('invoices/emails/notice_expiry.twig', ['type' => strtolower($invoice->getTypeString()), 'date' => "{$data['date']['month']} {$data['date']['year']}"]), 'text/html');

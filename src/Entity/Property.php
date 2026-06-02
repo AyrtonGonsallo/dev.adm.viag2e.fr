@@ -315,7 +315,7 @@ class Property
      /**
      * @ORM\Column(type="string", length=100, nullable=true)
      */
-    public $lots_propriete;
+    public $lots_copropriete;
     /**
      * @ORM\Column(type="smallint")
      */

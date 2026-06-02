@@ -2,7 +2,7 @@
 {% extends 'layout.html.twig' %}
 {% import "macros/forms.html.twig" as mforms %}
 
-{% block title %}Viag2e | Générer Courrier envoi de mandat de prélèvement SEPA pour le bien #{{ property.id }} ({{ property.title }}){% endblock %}
+{% block title %}Viag2e | Générer Mandat SEPA pour le bien #{{ property.id }} ({{ property.title }}){% endblock %}
 
 
 {% block body %}
@@ -28,7 +28,7 @@
                     <li class="m-nav__separator">-</li>
                     <li class="m-nav__item">
                         <a href="{{ path('property_view', {propertyId: property.id}) }}" class="m-nav__link">
-                            <span class="m-nav__link-text">Courrier envoi de mandat de prélèvement SEPA pour le bien #{{ property.id }} ({{ property.title }})</span>
+                            <span class="m-nav__link-text">Mandat SEPA pour le bien #{{ property.id }} ({{ property.title }})</span>
                         </a>
                     </li>
                 </ul>
@@ -42,7 +42,7 @@
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
                         <h3 class="m-portlet__head-text">
-                            Courrier envoi de mandat de prélèvement SEPA
+                            Mandat SEPA
                         </h3>
                     </div>
                 </div>

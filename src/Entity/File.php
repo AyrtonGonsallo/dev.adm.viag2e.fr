@@ -15,6 +15,16 @@ class File implements JsonSerializable
     public const TYPE_DOCUMENT = 1;
     public const TYPE_INVOICE = 2;
     public const TYPE_RECAP = 3;
+    public const TYPE_FACTURE_MANUELLE = 4;
+    public const TYPE_AVOIR = 5;
+    public const TYPE_MANDAT_SEPA = 6;
+    public const TYPE_MANDAT_GESTION = 7;
+    public const TYPE_COURRIER_INDEXATION = 8;
+    public const TYPE_COURRIER_PREMIER_CONTACT = 9;
+    public const TYPE_COURRIER_APPEL_CHARGES_COPRO = 10;
+    public const TYPE_COURRIER_REGUL_CHARGES_COPRO = 11;
+    public const TYPE_COURRIER_ABANDON_DUH = 12;
+    public const TYPE_COURRIER_LIBRE = 13;
 
     /**
      * @ORM\Id()
@@ -192,6 +202,18 @@ class File implements JsonSerializable
         // set the owning side of the relation if necessary
         if ($this !== $invoice->getFile()) {
             $invoice->setFile($this);
+        }
+
+        return $this;
+    }
+
+    public function setInvoice2(Invoice $invoice): self
+    {
+        $this->invoice = $invoice;
+
+        // set the owning side of the relation if necessary
+        if ($this !== $invoice->getFile2()) {
+            $invoice->setFile2($this);
         }
 
         return $this;

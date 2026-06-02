@@ -501,6 +501,10 @@ class DashboardController extends AbstractController
        
       
         $manager = $this->getDoctrine()->getManager();
+        $all_rappels = $manager
+            ->getRepository(Rappel::class)
+            ->findAllWithValidity();
+
         $rappels_valides = $manager
             ->getRepository(Rappel::class)
             ->findValidToday();
@@ -629,6 +633,7 @@ class DashboardController extends AbstractController
 
         return $this->render('dashboard/actualites.html.twig', [
             'rappels_valides' => $rappels_valides,
+            'all_rappels' => $all_rappels,
             'rappel_form' => $rappel_form->createView(),
         ]);
     }

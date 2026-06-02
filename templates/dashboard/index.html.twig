@@ -428,30 +428,32 @@
 
                             {% if rappels_valides is not empty %}
                                 {% for type, rappels in rappels_valides %}
-                                    <h5>{{ type}}</h5> {# ou directement: Rappel::REMIND_TYPES[type] si tu passes le tableau #}
+                                    {% if rappels is not empty %}
+                                        <h5>{{ type}}</h5> {# ou directement: Rappel::REMIND_TYPES[type] si tu passes le tableau #}
 
-                                    {% for rappel in rappels %}
-                                        <div class="rappel-item">
-                                            {{ rappel.getTypeString }} – 
-                                            Le {{ rappel.expiryLabel }} : {{ rappel.texte }}
+                                        {% for rappel in rappels %}
+                                            <div class="rappel-item">
+                                                {{ rappel.getTypeString }} – 
+                                                Le {{ rappel.expiryLabel }} : {{ rappel.texte }}
 
-                                            <!-- CHECK -->
-                                            <a href="{{ path('rappel_check', {id: rappel.id}) }}"
-                                            title="Marquer comme fait"
-                                            class="check"
-                                            onclick="return confirm('Marquer ce rappel comme effectué ?');">
-                                                <i class="la la-check text-success"></i>
-                                            </a>
+                                                <!-- CHECK -->
+                                                <a href="{{ path('rappel_check', {id: rappel.id}) }}"
+                                                title="Marquer comme fait"
+                                                class="check"
+                                                onclick="return confirm('Marquer ce rappel comme effectué ?');">
+                                                    <i class="la la-check text-success"></i>
+                                                </a>
 
-                                            <!-- DELETE -->
-                                            <a href="{{ path('rappel_delete', {id: rappel.id}) }}"
-                                            title="Supprimer"
-                                            class="delete"
-                                            onclick="return confirm('Supprimer définitivement ce rappel ?');">
-                                                <i class="la la-trash text-danger"></i>
-                                            </a>
-                                        </div>
-                                    {% endfor %}
+                                                <!-- DELETE -->
+                                                <a href="{{ path('rappel_delete', {id: rappel.id}) }}"
+                                                title="Supprimer"
+                                                class="delete"
+                                                onclick="return confirm('Supprimer définitivement ce rappel ?');">
+                                                    <i class="la la-trash text-danger"></i>
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
                                 {% endfor %}
                             {% else %}
                                 <div class="text-center">

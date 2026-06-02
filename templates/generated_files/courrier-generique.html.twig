@@ -49,48 +49,7 @@
                 </div>
             </div>
             <div class="m-portlet__body">
-                <div>
-
-                    <div class="">
-                        <strong>Variables disponibles :</strong><br><br>
-
-                        {% set tags = [
-                            'mois_indexation',
-                            'indice_de_base',
-                            'nouvel_indice',
-                            'civilite_destinataire',
-                            'nom_destinataire',
-                            'prenom_destinataire',
-                            'nom_du_bien',
-                            'adresse_du_bien',
-                            'montant_rente_initiale',
-                            'montant_rente_indexation_normale',
-                            'montant_rente_indexation_og2i',
-                            'montant_honoraires_indexation_og2i',
-                            'formule_indexation_og2i',
-                            'texte_indexation_honoraires',
-                            'date_prochaine_revision',
-                            'documents_a_fournir_indexation',
-                            'date_duh'
-                        ] %}
-
-                        {% for tag in tags %}
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-outline-primary copy-tag"
-                                data-tag="[{{ tag }}]"
-                                style="margin: 3px"
-                            >
-                                [{{ tag }}]
-                            </button>
-                        {% endfor %}
-                    </div>
-
-                    <div id="copy-feedback" class="text-success mt-2" style="display:none;">
-                        ✔ Variable copiée
-                    </div>
-
-                </div>
+                
                 {{ form_start(form) }}
                     <div class="form-group row">
                         <div class="col-lg-6">
@@ -221,13 +180,7 @@
             $("#tva").show();
         }
     });
-    $(document).on('click', '.copy-tag', function () {
-        let tag = $(this).data('tag');
-
-        navigator.clipboard.writeText(tag).then(function () {
-            $('#copy-feedback').fadeIn(200).delay(800).fadeOut(200);
-        });
-    });
+    
 
     
 

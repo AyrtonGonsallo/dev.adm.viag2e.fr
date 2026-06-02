@@ -11,59 +11,423 @@
   border: inherit;
 }
     -->
-    p {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
+  
 
 </style>
-<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 12pt"  backtop="1mm" backbottom="20mm" backleft="15mm" backright="15mm">
+<page backcolor="#FEFEFE" footer="date;time;page" style="font-size: 11pt;"  backtop="1mm" backbottom="20mm" backleft="8mm" backright="8mm">
     <bookmark title="Facture" level="0" ></bookmark>
     <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px">
         <tr>
-            <td style="text-align: left; width: 50%; border:none">
+            <td style="text-align: left; width: 30%; border:none">
                 <img style="width: 200px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
             </td>
-            <td style="width: 50%; border:none">
-                <span style="font-size: 13pt;color:#b6bec5"><b style="color:#b6bec5">SPÉCIALISTE TRANSACTIONS VIAGÈRES<br />EXPERTISE ET ACCOMPAGNEMENT</b></span><br />
-                
+            <td style="width: 70%; border:none">
+                <span style="font-size: 15pt;color:#000"><b style="color:#000">MANDAT DE GESTION VIAGÈRE N°{{data.numero_mandat}}</b></span><br />
+                <span style="font-size: 13pt;color:#000"><b style="color:#000">Hors établissement - Avec faculté de rétractation</b></span><br />
+                <span>Établi conformément aux dispositions des articles 1984 et suivants du Code Civil, de la loi n° 70-9 du 2 janvier 1970 et du décret n° 72-678 du 20 juillet 1972.</span>
             </td>
         </tr>
-        <tr>
-            <td style="text-align: left; width: 50%; display: flex; align-items: start; border:none">
-                Vincent GIBELIN - Directeur <br />
-                58, rue Fondaudège <br />
-                33000 BORDEAUX <br />
-                Tel : 05.56.21.91.44 - 06.67.11.61.83 <br />
-                Email : gestion@univers-viager.fr <br />
-                Site internet : www.univers-viager.fr <br />
-            </td>
-            <td style="width: 50%; border:none">
-               
-                {{ parameters.city|title }}, le {{ data.current_day }}
-                <br /><br />
-                <b style="text-align:left;">
-                    <br />
-                   
-
-                    {% if data.form.destinataire =='Crédirentier' %} {{data.property.getFirstname1()}} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %} {% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}
-                    {% if data.form.destinataire =='Crédirentier' %} {{data.property.getLastname1()}} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %} {% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}&nbsp;
-                    <br />
-                    {% if data.form.destinataire =='Crédirentier' %} {{data.property.getAddress() }} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getAddresseDebirentier() }}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}
-                    <br />
-                    {% if data.form.destinataire =='Crédirentier' %} {{data.property.getPostalCode() }} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getCodePostalDebirentier() }}{% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %} {% else %}{{data.property.getWarrant().getPostalCode() }}  {% endif %}
-                    {% if data.form.destinataire =='Crédirentier' %} {{data.property.getCity() }} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getVilleDebirentier() }}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %}{% else %}{{data.property.getWarrant().getCity() }}  {% endif %}<br />
-                </b>
-            </td>
-        </tr>
+        
     </table>
     <br />
     <br />
 
+<div style="color:#0070c0;font-weight:bold;">ENTRE LES SOUSSIGNÉES :</div>
+<br><br>
+<b>{{data.custom_datas.mandant_civilite1}} {{data.custom_datas.mandant_nom1}} {{data.custom_datas.mandant_prenom1}}
+</b> demeurant au {{data.custom_datas.mandant_address1}},
+ agissant en qualité de [_] <b>PROPRIETAIRE</b> [_] <b>CRÉDIRENTIER</b>, 
+m'engageant à produire toutes justifications de ce statut relatif au <b>BIEN</b> ci-dessous désigné, ci-après dénommé(es) « <b>Le MANDANT</b> ». <br> 
+ET <br> 
+La société <b>UNIVERS VIAGER</b>, représentée par Monsieur <b>Vincent GIBELIN</b>, son gérant, 
+<br> 
+<i style="font-size: 11px;">Siège social : 58, rue Fondaudège 33000 BORDEAUX<br> 
+Téléphone : 05 56 21 91 44 - Portable : 06 77 98 95 48<br> 
+Email : info@univers-viager.fr - Site internet : www.univers-viager.fr<br> 
+SARL au capital de 5 000 € - Immatriculée au RCS Bordeaux N°523 654 408<br> 
+Garantie financière GALIAN 89 rue de la Boétie 75008 PARIS Montant : 120 000 €<br> 
+Carte Professionnelle Transaction et Gestion n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br> 
+« Notre Agence ne détient aucun fonds pour le compte de ses clients » (cette déclaration ne concerne pas les rentes, provisions et régularisation de charges, ou plus généralement toutes sommes ou valeurs dont la perception est la conséquence de l’administration de biens d’autrui)
+</i><br> 
+ci-après dénommée « <b>Le MANDATAIRE</b> »,
 
+<br><br> 
+Le <b>MANDANT</b> confère par les présentes au MANDATAIRE, qui l'accepte, mandat d'administrer le <b>BIEN</b> ci-dessous désigné selon les modalités définies au paragraphe « Missions du <b>MANDATAIRE</b> ». 
+<br> <br> 
+
+<div style="background-color:#0070c0;font-weight:bold;color:white;text-align:center">DÉSIGNATION DU BIEN ET CONDITIONS PARTICULIÈRES DU MANDAT</div> 
+
+<br> 
+Dans un immeuble sis au {{data.custom_datas.adresse_bien}}<br> <br>
+{% if data.custom_datas.ref_cadastrales %}
+<u>Figurant ainsi au cadastre :</u> {{data.custom_datas.ref_cadastrales}}<br> <br>
+{% endif %}
+{% if data.custom_datas.lots_copropriete %}
+<u>Le(s) lot(s) de copropriété numéro(s) :</u> {{data.custom_datas.lots_copropriete}}<br> <br>
+{% endif %}
+
+<div style="color:#0070c0;font-weight:bold;text-decoration:underline">Le CRÉDIRENTIER</div> 
+
+{% if  data.custom_datas.credirentier_nom1 or data.custom_datas.credirentier_prenom1 %}
+<b>{% if data.custom_datas.credirentier_civilite1 %}{{data.custom_datas.credirentier_civilite1}}{% endif %} {% if data.custom_datas.credirentier_nom1 %}{{data.custom_datas.credirentier_nom1}}{% endif %} {% if data.custom_datas.credirentier_prenom1 %}{{data.custom_datas.credirentier_prenom1}}{% endif %}</b>{% if data.custom_datas.credirentier_address1 %}, demeurant au {{data.custom_datas.credirentier_address1}}{% endif %}
+<br>{% if data.custom_datas.credirentier_telephone1 %} Téléphone : {{data.custom_datas.credirentier_telephone1}}{% endif %}
+<br>{% if data.custom_datas.credirentier_mail1 %} Email : {{data.custom_datas.credirentier_mail1}}{% endif %}
+<br> 
+{% endif %}
+
+{% if  data.custom_datas.credirentier_nom2 or data.custom_datas.credirentier_prenom2 %}
+<b>{% if data.custom_datas.credirentier_civilite2 %}{{data.custom_datas.credirentier_civilite2}}{% endif %} {% if data.custom_datas.credirentier_nom2 %}{{data.custom_datas.credirentier_nom2}}{% endif %} {% if data.custom_datas.credirentier_prenom2 %}{{data.custom_datas.credirentier_prenom2}}{% endif %}</b>{% if data.custom_datas.credirentier_address2 %}, demeurant au {{data.custom_datas.credirentier_address2}}{% endif %}
+<br>{% if data.custom_datas.credirentier_telephone2 %} Téléphone : {{data.custom_datas.credirentier_telephone2}}{% endif %}
+<br>{% if data.custom_datas.credirentier_mail2 %} Email : {{data.custom_datas.credirentier_mail2}}{% endif %}
+<br> <br>
+{% endif %}
+
+<div style="color:#0070c0;font-weight:bold;text-decoration:underline">Le DÉBIRENTIER</div> 
+
+{% if  data.custom_datas.debirentier_nom1 or data.custom_datas.debirentier_prenom1 %}
+<b>{% if data.custom_datas.debirentier_civilite1 %}{{data.custom_datas.debirentier_civilite1}}{% endif %} {% if data.custom_datas.debirentier_nom1 %}{{data.custom_datas.debirentier_nom1}}{% endif %} {% if data.custom_datas.debirentier_prenom1 %}{{data.custom_datas.debirentier_prenom1}}{% endif %}</b>{% if data.custom_datas.debirentier_address1 %}, demeurant au {{data.custom_datas.debirentier_address1}}{% endif %}
+<br>{% if data.custom_datas.debirentier_telephone1 %} Téléphone : {{data.custom_datas.debirentier_telephone1}}{% endif %}
+<br>{% if data.custom_datas.debirentier_mail1 %} Email : {{data.custom_datas.debirentier_mail1}}{% endif %}
+<br> 
+{% endif %}
+
+{% if  data.custom_datas.debirentier_nom2 or data.custom_datas.debirentier_prenom2 %}
+<b>{% if data.custom_datas.debirentier_civilite2 %}{{data.custom_datas.debirentier_civilite2}}{% endif %} {% if data.custom_datas.debirentier_nom2 %}{{data.custom_datas.debirentier_nom2}}{% endif %} {% if data.custom_datas.debirentier_prenom2 %}{{data.custom_datas.debirentier_prenom2}}{% endif %}</b>{% if data.custom_datas.debirentier_address2 %}, demeurant au {{data.custom_datas.debirentier_address2}}{% endif %}
+<br>{% if data.custom_datas.debirentier_telephone2 %} Téléphone : {{data.custom_datas.debirentier_telephone2}}{% endif %}
+<br>{% if data.custom_datas.debirentier_mail2 %} Email : {{data.custom_datas.debirentier_mail2}}{% endif %}
+{% endif %}
+<br> <br>
+À date du présent mandat, la rente viagère perçue par le <b>CRÉDIRENTIER</b> est de {{data.custom_datas.nv_montant}} € mensuel net.<br> 
+La rente viagère sera indexée chaque année à la date et suivant l'indice de référence indiquée dans l'acte authentique de vente ou dans la convention signée entre les parties.
+<br> 
+Les honoraires mensuels relatifs au présent mandat sont de {{data.custom_datas.taux_honn}} % TTC du montant de la rente viagère (selon tarif applicable en vigueur). Ils correspondent, compte tenu du montant actuel de la rente viagère, à la somme de {{data.custom_datas.Montant_des_honoraires}} € TTC. Ils sont susceptibles de variation chaque année selon l'évolution du montant de la rente.
+<br><br><br><br><br>  
+
+<div style="background-color:#0070c0;font-weight:bold;color:white;text-align:center">MISSIONS DU MANDATAIRE</div>
+<br> 
+En considération du mandat présentement accordé, tous pouvoirs sont donnés au <b>MANDATAIRE</b> pour accomplir tous les actes d'administration et de gestion au nom et pour le compte du <b>MANDANT</b> suivants :
+<br><br> 
+[_] Appeler et encaisser toutes sommes représentatives des rentes viagères relatives au bien géré sur le compte bancaire du <b>MANDATAIRE</b> et les reverser au <b>CRÉDIRENTIER</b> à la périodicité convenue dans l'acte authentique de vente. Assurer le suivi des règlements.<br> 
+[_] Produire une attestation annuelle des rentes perçues ou versées à déclarer à l'administration fiscale.<br> 
+[_] Procéder à la révision annuelle de la rente viagère (indexation). <br> 
+[_] Si le bien est en copropriété procéder à l'encaissement et au décaissement des avances de charges trimestrielles dues par le <b>CRÉDIRENTIER</b> selon la répartition convenue entre les parties dans l'acte authentique de vente et procéder à réception du décompte annuel de charges transmis par le <b>DÉBIRENTIER</b> à la régularisation annuelle entre les parties. <br> 
+[_] En cas d'abandon de jouissance du bien de la part du CRÉDIRENTIER, modifier le montant de la rente selon les clauses prévues dans l'acte authentique de vente.<br> 
+[_] Vérifier annuellement la conformité et validité des assurances obligatoires pour le <b>CRÉDIRENTIER</b> / DEBIRENTIER.<br> 
+[_] Informer les parties de la répartition des charges relatives aux travaux selon les conventions passées dans l'acte à 1ère demande.<br> 
+[_] Demander une attestation annuelle de l'entretien des éléments d'équipements tels que chaudière, climatisation, pompe à chaleur, ramonage de la cheminée, etc ... <br> 
+[_] Prestations particulières et selon grille tarifaire : État des lieux et/ou visite du bien, etc…
+<br><br> 
+D'une manière générale, faire tout ce qui semblera utile aux intérêts du <b>MANDANT</b>.
+<br> Le <b>MANDATAIRE</b> s'engage à conseiller le <b>MANDANT</b> pendant toute la durée du mandat. 
+<br> Le <b>MANDATAIRE</b> est tenu par une obligation de moyens. Sa responsabilité ne saurait être engagée en cas de défaillance du DÉBIRENTIER.
+<br> <br><br> 
+
+<div style="color:#0070c0;font-weight:bold;text-decoration:underline">MANIEMENT DES FONDS</div>
+<br>
+Les fonds encaissés par le <b>MANDATAIRE</b> sont déposés sur un compte dédié conforme à la réglementation en vigueur, garantissant leur sécurité et leur traçabilité
+<br>
+<br>
+<br>
+<div style="color:#0070c0;font-weight:bold;text-decoration:underline">RÉDDITION DES COMPTES</div> 
+<br> 
+Dans le respect des dispositions de l’article 66 du décret du 20 juillet 1972 et à première demande, le <b>MANDATAIRE</b> rendra compte au <b>MANDANT</b> régulièrement des opérations de gérance réalisées.
+Un compte rendu de la gestion devra être délivré au <b>MANDANT</b> au moins une fois l’an.
+<br> 
+<br> 
+<br>
+<div style="color:#0070c0;font-weight:bold;text-decoration:underline">HONORAIRES DE GESTION</div> 
+<br> 
+Les honoraires se rapportant à la gestion viagère sont fixés au moyen d'une grille tarifaire indiquée ci-dessous. Ils seront prélevés sur le compte du <b>MANDANT</b>. 
+<br> Cette rémunération évoluera à chaque modification du tarif du mandataire. Toute modification tarifaire devra faire l'objet d'un accord express du <b>MANDANT</b>.
+{% for i in 0..18 %}<br>{% endfor %}
+
+<div style="text-align: center;">
+  <img style="width: 500px;" src="https://dev.adm.viag2e.fr/img/honor.png">
+</div>
+
+<br> <br> 
+Autres prestations : Sur devis. 
+<br> 
+<br> 
+La réalisation de missions n'entrant pas dans le périmètre de gestion courante définie ci-dessus ouvrira droit à des honoraires spécifiques perçus par le <b>MANDATAIRE</b> tels que fixés au Barème des Prestations Particulières en vigueur au jour de la réalisation par le <b>MANDATAIRE</b> de la ou des prestation(s) considérée(s).
+<br><br>  
+Dans le cadre du présent mandat, le <b>MANDANT</b> donne son accord pour l'envoi dématérialisé de ses comptes rendus de gestion à l'adresse courriel qu'il communique au MANDATAIRE, à défaut, les comptes rendus seront envoyés par voie postale.
+<br> 
+<br> 
+<br> 
+<div style="color:#0070c0;font-weight:bold;text-decoration:underline">OBLIGATIONS DU MANDANT</div>
+<br> Le <b>MANDANT</b> déclare, sous sa seule responsabilité, ne faire l'objet d'aucune mesure de protection de la personne (curatelle, tutelle, etc..). Il s'oblige à informer sans délai le <b>MANDATAIRE</b> de toute modification tant juridique que matérielle susceptible d'affecter le bien ou l'immeuble où il se situe, de façon provisoire ou définitive. Il s'engage à remettre au <b>MANDATAIRE</b> toutes pièces utiles à la gestion du bien.<br>
+ Le <b>MANDANT</b> donne expressément pouvoir au <b>MANDATAIRE</b> pour prendre contact avec leur assurance pour l'aider dans les démarches éventuelles (sous réserve de l'acceptation de la compagnie d'assurance). <br> 
+ Le <b>MANDANT</b> s'oblige à fournir au <b>MANDATAIRE</b> toute réponse, instruction, accord ou désaccord, aux demandes que le <b>MANDATAIRE</b> formulera auprès de lui, selon les missions et obligations décrites ci-dessus.
+ <br> <br> 
+ <br> 
+ <div style="color:#0070c0;font-weight:bold;text-decoration:underline">CLAUSE PÉNALE</div>
+  <br> Le non-respect par le <b>MANDANT</b> de ses engagements sera sanctionné par une indemnité au moins égale au montant des honoraires spécifiés plus haut. <br> 
+  Dans le cadre des présentes, toute fausse déclaration, omission ou engagement non respecté par le <b>MANDANT</b> à l'origine d'une procédure introduite contre le <b>MANDATAIRE</b> le condamnant au paiement d'une indemnité ou de dommages et intérêts sera réputée à la charge du <b>MANDANT</b>. Ce dernier sera appelé par le <b>MANDATAIRE</b> au remboursement de la totalité de l'éventuelle condamnation.
+  <br> <br> 
+  <br> 
+  <div style="color:#0070c0;font-weight:bold;text-decoration:underline">MANDAT : RÉTRACTATION</div>
+
+  <br> 
+  Le <b>MANDANT</b> a la faculté de renoncer au Mandat dans le délai de quatorze jours à compter de la date de signature des présentes.<br> 
+  Si le <b>MANDANT</b> entend utiliser cette faculté, il utilisera le formulaire joint ou procèdera à toute autre déclaration dénuée d'ambiguïté, exprimant sa volonté de se rétracter et l'adressera en recommandé avec demande d'avis de réception au <b>MANDATAIRE</b> désigné, dans un délai de 14 jours, qui commence à courir le jour de la signature des présentes, étant précisé que le jour de ce point de départ n'est pas compté, le décompte de ce délai commence le lendemain à 0 heure et expire le 14e jour à minuit. 
+  <br> Le <b>MANDANT</b> autorise expressément le <b>MANDATAIRE</b> à exécuter le MANDAT avant la fin du délai de 14 jours.
+  <br> L'exercice de la faculté de rétractation par le <b>MANDANT</b> ne donnera lieu à aucune indemnité ni frais. 
+
+<br> 
+  <br>  
+  <br>
+  <div style="color:#0070c0;font-weight:bold;text-decoration:underline">MANDAT : DURÉE ET RÉSILIATION</div> 
+  <br>
+
+  <b>
+    CE MANDAT VOUS EST CONSENTI POUR UNE DURÉE DE DIX ANS (10) PRENANT EFFET CE JOUR, RENOUVELABLE CHAQUE ANNEE PAR TACITE RECONDUCTION. 
+    <br><br> 
+    LE MANDAT POURRA ÊTRE RÉSILIÉ CHAQUE ANNÉE, À ÉCHÉANCE, PAR CHACUNE DES PARTIES, À CHARGE POUR CELLE QUI ENTEND Y METTRE FIN D'EN AVISER L'AUTRE PARTIE <u>TROIS MOIS</u> AVANT L'ÉCHÉANCE ANNUELLE PAR LETTRE RECOMMANDÉE AVEC AVIS DE RÉCEPTION.
+    <br><br> 
+    CEPENDANT LE PRÉSENT MANDAT SERA RÉSILIÉ DE FAIT AU MOMENT OU LE <b>MANDATAIRE</b> AURA CONNAISSANCE DU DÉCÈS DU CRÉDIRENTIER. 
+  </b>
+
+  <br><br> 
+
+  <u>Article L136-1 du Code de la consommation :</u>
+  <br> 
+  <i>
+  Modifié par la loi n°2014-344 du 17/03/14 - art.35. Le professionnel prestataire de services informe le consommateur par écrit, au plus tôt trois mois et au plus tard un mois avant le terme de la période autorisant le rejet de la reconduction, de la possibilité de ne pas reconduire le contrat qu'il a conclu avec une clause de reconduction tacite. Lorsque cette information ne lui a pas été adressée conformément aux dispositions du premier alinéa, le consommateur peut mettre gratuitement un terme au contrat, à tout moment à compter de la date de reconduction. Les avances effectuées après la dernière date de reconduction ou, s'agissant des contrats à durée indéterminée, après la date de transformation du contrat initial à durée déterminée, sont dans ce cas remboursées dans un délai de trente jours à compter de la date de résiliation, déduction faite des sommes correspondant, jusqu'à celle-ci, à l'exécution du contrat. À défaut de remboursement dans les conditions prévues ci-dessus, les sommes dues sont productives d'intérêts au taux légal. Les dispositions du présent article s'appliquent sans préjudice de celles qui soumettent légalement certains contrats à des règles particulières en ce qui concerne l'information du consommateur. Les trois alinéas précédents ne sont pas applicables aux exploitants des services d'eau potable et d'assainissement. Ils sont applicables aux consommateurs et aux non-professionnels.
+  </i> 
+  <br><br> 
+<br> 
+  <div style="color:#0070c0;font-weight:bold;text-decoration:underline">INFORMATIQUES ET LIBERTÉS</div> 
+
+  <br> 
+  Les données personnelles collectées dans le cadre de ce mandat sont conservées pendant toute la durée du mandat augmentée des délais légaux de prescription applicable et sont uniquement destinées au service de gestion viagère. Le <b>MANDANT</b> pourra exercer son droit d'accès et de rectification de ces données conformément à l'article 27 de la loi du 6 janvier 1978. 
+  <br> <br> 
+  Le <b>MANDANT</b> reconnaît expressément avoir pris connaissance préalablement à la signature des présentes de l'intégralité des caractéristiques des services définis au présent mandat, conformément aux articles L 111-1 et suivants du Code de la consommation.
+  
+  <br> <br><br> 
+  
+  <div style="color:#0070c0;font-weight:bold;text-decoration:underline">MEDIATION A LA CONSOMMATION</div> 
+  <br> 
+  En cas de litiges entre le professionnel et le consommateur, ceux-ci s'efforceront de trouver une solution amiable. <br> 
+  A défaut d'accord amiable, le consommateur a la possibilité de saisir gratuitement le médiateur de la consommation dont relève le professionnel, à savoir <b>AME CONSO</b>, dans un délai d'un an à compter de la réclamation écrite adressée au professionnel. <br> 
+  La saisine du médiateur de la consommation devra s'effectuer : 
+  <br> 
+  - Soit en complétant le formulaire prévu à cet effet sur le site internet de l'<b>AME CONSO</b> : www.mediationconso-ame.com
+  <br> 
+  - Soit par courrier adressé à l'<b>AME CONSO</b>, 11 Place Dauphine – 75001 PARIS.
+  <br><br> 
+  <b>LE MANDANT RECONNAÎT AVOIR PRIS CONNAISSANCE DES PAGES 1, 2, 3, 4 et 5 DE CE MANDAT.</b>
+  <br><br> 
+
+  Fait à 
+  {% for i in 0..60 %}&nbsp;{% endfor %} 
+  , le
+  
+  <br><br><br> 
+<div> 
+
+    {% for i in 0..10 %}&nbsp;{% endfor %}
+    Le <b>MANDANT</b> 
+    {% for i in 0..30 %}&nbsp;{% endfor %}
+    L'Agence – Le <b>MANDATAIRE</b><br> 
+    {% for i in 0..10 %}&nbsp;{% endfor %}
+    <br> « Lu et approuvé - Bon pour mandat » 
+    {% for i in 0..30 %}&nbsp;{% endfor %}
+    « Lu et approuvé - Mandat accepté » 
+
+</div> 
+
+{% for i in 0..8 %}<br>{% endfor %}
+
+Aucun mot	<br> 	      					 
+Aucune ligne	<br>      		        
+Aucun chiffre rayé comme nul<br> 
+
+{% for i in 0..8 %}<br>{% endfor %}
+
+<div>
+
+    <div style="text-align:center;font-weight:bold;text-decoration:underline">ANNULATION DE COMMANDE</div>
+    <br>
+    <div style="text-align:center;text-decoration:underline">Code de la consommation article, L. 121-21</div>
+    <br><br>
+    <u  style="font-weight:bold;">CONDITIONS</u>
+    <br><br>
+    {% for i in 0..5 %}&nbsp;{% endfor %}-&nbsp; Compléter et signer ce formulaire.
+    <br><br>
+    {% for i in 0..5 %}&nbsp;{% endfor %}-&nbsp; L’envoyer par lettre recommandée avec accusé de réception à : <b>UNIVERS VIAGER</b>, 58 rue Fondaudège, 33000 BORDEAUX
+    <br><br>
+    {% for i in 0..5 %}&nbsp;{% endfor %}-&nbsp; L’expédier au plus tard le quatorzième jour à partir du jour de la commande ou, si ce délai expire normalement un samedi, un dimanche ou un jour férié ou chômé, le premier jour ouvrable suivant.
+    <br><br>
+
+    Je soussigné, déclare annuler la commande ci-après :
+    <br><br>
+    <u style="font-weight:bold;">Nature du bien ou du service commandé :</u> 
+    <br><br>
+    {% for i in 0..120 %}.{% endfor %}
+    <br><br>
+    <u style="font-weight:bold;">Date de la commande :</u>  <br><br>
+    {% for i in 0..120 %}.{% endfor %}
+    <br><br>
+    <u style="font-weight:bold;">Nom du client :</u>  <br><br>
+    {% for i in 0..120 %}.{% endfor %}
+    <br><br>
+    <u style="font-weight:bold;">Adresse du client :</u>  <br><br>
+    {% for i in 0..120 %}.{% endfor %}
+    <br><br><br>
+
+    {% for i in 0..45 %}&nbsp;{% endfor %}Signature du (des) client(s) <br>
+    {% for i in 0..30 %}&nbsp;{% endfor %}(uniquement en cas de notification du présent formulaire)
+    <br><br><br><br><br><br><br>
+</div>
+
+
+<div>
+    <table cellspacing="0" style="width: 100%; text-align: center; font-size: 14px">
+        <tr>
+            <td style="text-align: left; width: 30%; border:none">
+                <img style="width: 200px;" src="{{ pdf_logo_path }}" alt="Logo"><br />
+            </td>
+            <td style="width: 70%; border:none">
+                <span style="font-size: 15pt;color:#000"><b style="color:#000">INFORMATIONS PRÉCONTRACTUELLES DU CONSOMMATEUR PRÉALABLES À LA SIGNATURE D’UN MANDAT DE GESTION hors établissement</b></span><br />
+            </td>
+        </tr>
+    </table>
+    <br>
+    <br>
+
+    Communication au consommateur : <br>
+    En application des articles L.111-1 et suivants du code de la consommation, l’agence immobilière <b>UNIVERS VIAGER</b> avec laquelle vous entrez en relation vous informe :
+    <br><br>
+    La société <b>UNIVERS VIAGER</b>, représentée par Monsieur <b>Vincent GIBELIN</b>,<br>
+    <i style="font-size:11px;font-weight:100">
+    Siège social : 58, rue Fondaudège 33000 BORDEAUX<br>
+    Téléphone : 05 56 21 91 44 - Portable : 06 77 98 95 48<br>
+    Email : info@univers-viager.fr - Site internet : www.univers-viager.fr<br>
+    SARL au capital de 5 000 € - Immatriculée au RCS Bordeaux N°523 654 408<br>
+    Garantie financière GALIAN 89 rue de la Boétie 75008 PARIS Montant : 120 000 €<br>
+    Carte Professionnelle Transaction et Gestion n° 3301 2016 000 008 687 délivrée par la CCI de Bordeaux<br>
+    </i>
+    <br><br>
+    L’agence <b>UNIVERS VIAGER</b> exerce l’activité d’agent immobilier est régie par la loi n°70-9 du 2 janvier 1970 réglementant les conditions d’exercice des activités relatives à certaines opérations portant sur les immeubles et les fonds de commerce et par son décret d’application n°72-678 du 20 juillet 1972. Ces textes peuvent être consultés gratuitement sur www.legifrance.gouv.fr <br>
+    <br><br>
+</div>
+<div>
+    <b>EN QUALITÉ DE MANDANT</b>, vous souhaitez nous mandater afin d’assurer la Gestion Viagère de votre bien. L’agent immobilier est tenu à une obligation de moyens et non de résultat. A cet effet, vous envisagez de nous confier un mandat de gestion viagère.
+    <br><br>
+    <div style="color:#0070c0;font-weight:bold;text-decoration:underline">MANDAT : DURÉE, RÉSILIATION ET RÉTRACTATION</div>
+    <br>
     
+    <b>CE MANDAT VOUS EST CONSENTI POUR UNE DURÉE DE DIX ANS (10) PRENANT EFFET CE JOUR, RENOUVELABLE CHAQUE ANNEE PAR TACITE RECONDUCTION.<br>
+        LE MANDAT POURRA ÊTRE RÉSILIÉ CHAQUE ANNÉE, À ÉCHÉANCE, PAR CHACUNE DES PARTIES, À CHARGE POUR CELLE QUI ENTEND Y METTRE FIN D’EN AVISER L’AUTRE PARTIE TROIS MOIS AVANT L’ÉCHÉANCE ANNUELLE PAR LETTRE RECOMMANDÉE AVEC AVIS DE RÉCEPTION.<br>
+    </b>
+    <br><br>
 
-    {{ data.form.texte |raw }}
+    Le <b>MANDANT</b> a la faculté de renoncer au Mandat dans le délai de quatorze jours à compter de la date de signature des présentes. Si le <b>MANDANT</b> entend utiliser cette faculté, il utilisera le formulaire joint ou procèdera à toute autre déclaration dénuée d’ambiguïté, exprimant sa volonté de se rétracter et l’adressera en recommandé avec demande d’avis de réception au <b>MANDATAIRE</b> désigné, dans un délai de 14 jours, qui commence à courir le jour de la signature des présentes, étant précisé que le jour de ce point de départ n’est pas compté, le décompte de ce délai commence le lendemain à 0 heure et expire le 14e jour à minuit. <br>
+    <br><br>
+    Le <b>MANDANT</b> autorise expressément le <b>MANDATAIRE</b> à exécuter le MANDAT avant la fin du délai de 14 jours.<br>
+    <br><br>
+    L’exercice de la faculté de rétractation par le <b>MANDANT</b> ne donnera lieu à aucune indemnité ni frais. Les prestations devant être exécutées par le MANDATAIRE, dans le cadre des présentes, ne débuteront qu’à l’expiration de ce délai de rétractation.
+ </div>   
+ <div>
+    <u style="font-weight:bold;">Article L136-1 du Code de la consommation :</u>
+    <br>
+    Modifié par la loi n°2014-344 du 17/03/14 - art.35. Le professionnel prestataire de services informe le consommateur par écrit, au plus tôt trois mois et au plus tard un mois avant le terme de la période autorisant le rejet de la reconduction, de la possibilité de ne pas reconduire le contrat qu’il a conclu avec une clause de reconduction tacite. Lorsque cette information ne lui a pas été adressée conformément aux dispositions du premier alinéa, le consommateur peut mettre gratuitement un terme au contrat, à tout moment à compter de la date de reconduction. Les avances effectuées après la dernière date de reconduction ou, s’agissant des contrats à durée indéterminée, après la date de transformation du contrat initial à durée déterminée, sont dans ce cas remboursées dans un délai de trente jours à compter de la date de résiliation, déduction faite des sommes correspondant, jusqu’à celle-ci, à l’exécution du contrat. 
+    <br><br>
+    À défaut de remboursement dans les conditions prévues ci-dessus, les sommes dues sont productives d’intérêts au taux légal. Les dispositions du présent article s’appliquent sans préjudice de celles qui soumettent légalement certains contrats à des règles particulières en ce qui concerne l’information du consommateur. 
+    <br><br>
+    Les trois alinéas précédents ne sont pas applicables aux exploitants des services d’eau potable et d’assainissement. Ils sont applicables aux consommateurs et aux non-professionnels.
+    <br><br>
+    À défaut de remboursement dans les conditions prévues ci-dessus, les sommes dues sont productives d’intérêts au taux légal. Les dispositions du présent article s’appliquent sans préjudice de celles qui soumettent légalement certains contrats à des règles particulières en ce qui concerne l’information du consommateur. Les trois alinéas précédents ne sont pas applicables aux exploitants des services d’eau potable et d’assainissement. Ils sont applicables aux consommateurs et aux non-professionnels.
+    <br><br>
+    <div style="color:#0070c0;font-weight:bold;text-decoration:underline">MISSIONS DU MANDATAIRE </div> 
+    <br>
+
+    En considération du mandat présentement accordé, tous pouvoirs sont donnés au <b>MANDATAIRE</b> pour accomplir tous les actes d’administration et de gestion au nom et pour le compte du <b>MANDANT</b> suivants :
+    [_] Appeler et encaisser toutes sommes représentatives des rentes viagères relatives au bien géré sur le compte bancaire du <b>MANDATAIRE</b> et les reverser au <b>CRÉDIRENTIER</b> à la périodicité convenue dans l’acte authentique de vente. Assurer le suivi des règlements.<br>
+    [_] Produire une attestation annuelle des rentes perçues ou versées à déclarer à l’administration fiscale.<br>
+    [_] Procéder à la révision annuelle de la rente viagère (indexation). <br>
+    [_] Si le bien est en copropriété procéder à l’encaissement et au décaissement des avances de charges trimestrielles dues par le <b>CRÉDIRENTIER</b> selon la répartition convenue entre les parties dans l’acte authentique de vente et procéder à réception du décompte annuel de charges transmis par le <b>DÉBIRENTIER</b> à la régularisation annuelle entre les parties. 	 <br>
+    [_] En cas d’abandon de jouissance du bien de la part du CRÉDIRENTIER, modifier le montant de la rente selon les clauses prévues dans l’acte authentique de vente.<br>
+    [_] Vérifier annuellement la conformité et validité des assurances obligatoires pour le <b>CRÉDIRENTIER</b> / DEBIRENTIER.<br>
+    [_] Informer les parties de la répartition des charges relatives aux travaux selon les conventions passées dans l’acte à 1ère demande.<br>
+    [_] Demander une attestation annuelle de l’entretien des éléments d’équipements tels que chaudière, climatisation, pompe à chaleur, ramonage de la cheminée, etc ...<br>
+    [_] Prestations particulières et selon grille tarifaire : État des lieux et/ou visite du bien, etc…<br><br>
+
+    D’une manière générale, faire tout ce qui nous semblera utile aux intérêts du <b>MANDANT</b>. <br>
+    Le <b>MANDATAIRE</b> s’engage à conseiller le <b>MANDANT</b> pendant toute la durée du mandat.<br>
+    Le <b>MANDATAIRE</b> est tenu par une obligation de moyens. Sa responsabilité ne saurait être engagée en cas de défaillance du DÉBIRENTIER.<br>
+    <br><br>
+
+    <div style="color:#0070c0;font-weight:bold;text-decoration:underline">MANIEMENT DES FONDS </div>
+    <br>
+
+    Les fonds encaissés par le MANDATAIRE sont déposés sur un compte dédié conforme à la réglementation en vigueur, garantissant leur sécurité et leur traçabilité.
+    <br>
+</div>
+
+<br><br>
+<div>
+   
+    <div style="color:#0070c0;font-weight:bold;text-decoration:underline"> HONORAIRES DE GESTION </div> 
+    <br><br> 
+    Les honoraires se rapportant à la gestion viagère sont fixés au moyen d’une grille tarifaire indiquée ci-dessous. Ils seront prélevés sur le compte du <b>MANDANT</b>. 
+
+    <br>
+    <br>
+    <br>
+   <div style="text-align: center;">
+    <img style="width: 500px;" src="https://dev.adm.viag2e.fr/img/honor.png">
+    </div>
+
+
+    Autres prestations : Sur devis.	<br>			
+    <br>
+    La réalisation de missions n’entrant pas dans le périmètre de gestion courante définie ci-dessus ouvrira droit à des honoraires spécifiques perçus par le <b>MANDATAIRE</b> tels que fixés au Barème des Prestations Particulières en vigueur au jour de la réalisation par le <b>MANDATAIRE</b> de la ou des prestation(s) considérée(s). <br>
+    Dans le cadre du présent mandat, LE <b>MANDANT</b> donne son accord pour l’envoi dématérialisé de ses comptes rendus de gestion à l’adresse courriel qu’il communique au MANDATAIRE, à défaut, les comptes rendus seront envoyés par voie postale.
+    <br><br><br>
+    <div style="color:#0070c0;font-weight:bold;text-decoration:underline">OBLIGATIONS DU MANDANT</div>
+    <br><br>
+
+    Le <b>MANDANT</b> déclare, sous sa seule responsabilité, ne faire l’objet d’aucune mesure de protection de la personne (curatelle, tutelle, etc..). Il s’oblige à informer sans délai le <b>MANDATAIRE</b> de toute modification tant juridique que matérielle susceptible d’affecter le bien ou l’immeuble où il se situe, de façon provisoire ou définitive. Il s’engage à remettre au <b>MANDATAIRE</b> toutes pièces utiles à la gestion du bien.
+    <br><br>
+    Le <b>MANDANT</b> donne expressément pouvoir au <b>MANDATAIRE</b> pour prendre contact avec leur assurance pour l’aider dans les démarches éventuelles.
+    <br><br>
+    Le <b>MANDANT</b> s’oblige à fournir au <b>MANDATAIRE</b> toute réponse, instruction, accord ou désaccord, aux demandes que le <b>MANDATAIRE</b> formulera auprès de lui, selon les missions et obligations décrites ci-dessus.
+    <br>
+</div>
+
+
+<div>
+    <div style="color:#0070c0;font-weight:bold;text-decoration:underline">CLAUSE PÉNALE</div>
+    <br><br>
+    Le non-respect par le <b>MANDANT</b> de ses engagements sera sanctionné par une indemnité au moins égale au montant des honoraires spécifiés plus haut. 
+    Dans le cadre des présentes, toute fausse déclaration, omission ou engagement non respecté par le <b>MANDANT</b> à l’origine d’une procédure introduite contre le <b>MANDATAIRE</b> le condamnant au paiement d’une indemnité ou de dommages et intérêts sera réputée à la charge du <b>MANDANT</b>. Ce dernier sera appelé par le <b>MANDATAIRE</b> au remboursement de la totalité de l’éventuelle condamnation.<br>
+    <br><br><br>
+    <div style="color:#0070c0;font-weight:bold;text-decoration:underline">INFORMATIQUES ET LIBERTÉS</div>
+    <br><br>
+    Les données personnelles collectées dans le cadre de ce mandat sont conservées pendant toute la durée du mandat augmentée des délais légaux de prescription applicable et sont uniquement destinées au service de gestion viagère. Le <b>MANDANT</b> pourra exercer son droit d’accès et de rectification de ces données conformément à l’article 27 de la loi du 6 janvier 1978. <br>
+    <br><br><br>
+    <div style="color:#0070c0;font-weight:bold;text-decoration:underline">MEDIATION A LA CONSOMMATION </div>	
+    <br><br>
+
+    En cas de litiges entre le professionnel et le consommateur, ceux-ci s’efforceront de trouver une solution amiable. <br>	
+    A défaut d’accord amiable, le consommateur a la possibilité de saisir gratuitement le médiateur de la consommation dont relève le professionnel, à savoir AME CONSO, dans un délai d’un an à compter de la réclamation écrite adressée au professionnel. <br>
+    La saisine du médiateur de la consommation devra s’effectuer : 	<br>
+    - Soit en complétant le formulaire prévu à cet effet sur le site internet de l’AME CONSO : www.mediationconso-ame.com<br>
+    - Soit par courrier adressé à l’AME CONSO, 11 Place Dauphine – 75001 PARIS.<br>
+    <br>
+    Le consommateur reconnaît avoir reçu le présent document d’informations précontractuelles de l’agence <b>UNIVERS VIAGER</b> préalablement à la conclusion de tout contrat. 
+    
+    <br>
+    <br><br>
+
+    Fait à{% for i in 0..60 %}&nbsp;{% endfor %}						
+    , le
+    <br><br>
+    Signature du <b>MANDANT</b>,
+</div>
+    
 </page>
 <page_footer>
     <table cellspacing="0" style="width: 100%; text-align: center; font-size: 10px;">

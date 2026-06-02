@@ -62,3 +62,6 @@
 #property_form_dernier_jour_paiement_rente_month{
     display: none ;
 }
+#form_status > div:nth-child(1){
+    display: none;
+}
