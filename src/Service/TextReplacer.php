@@ -192,7 +192,6 @@ class TextReplacer
                     $honorary= ($property->getInitialAmount()*($indice_m_u->getValue()/$property->initial_index_object->getValue()))*$property->honorary_rates_object->getValeur()/100;
                     if($property->honorary_rates_object && $honorary<$property->honorary_rates_object->getMinimum()){
                         $honorary=$property->honorary_rates_object->getMinimum();
-
                     }
                     $data = [
                         'date'       => $now_date,

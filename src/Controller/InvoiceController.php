@@ -1226,7 +1226,7 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                             if($cond_r_n){
                                 $bcc_rente = [
                                     'ayrtongonsalloheroku@gmail.com',
-                                    $this->mail_from
+                                    $this->getParameter('mail_from')
                                 ];
 
                                 $mailTarget_r="";
