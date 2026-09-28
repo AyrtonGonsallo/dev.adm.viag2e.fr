@@ -19,7 +19,7 @@
             </td>
             <td style="width: 50%; padding-top: 25px;">
                 <span style="font-size: 15pt"><b> {% if data.type == constant('App\\Entity\\Invoice::TYPE_NOTICE_EXPIRY') %}AVIS D'ECHEANCE{% else %}QUITTANCE{% endif %} {{ data.current_number }}</b></span><br />
-                Période <b>{{ data.form.period }} </b><br />
+                Période <b>{{ data.form.period|raw }} </b><br />
                 <small>{{ parameters.city|title }}, le {{ data.current_day }}</small>
                 <br /><br /><br /><br /><br /><br /><br />
                 <b>A l'attention de:</b><br />
@@ -31,7 +31,12 @@
                     
                 {% elseif data.target == constant('App\\Entity\\PendingInvoice::TARGET_PROPERTY') %}
                     {{ data.property.lastname1 }} {{ data.property.firstname1 }}<br />
-                    {{ data.property.address }}<br />
+                    {% if data.property.adresse_similaire_credirentier %}
+                    {{ data.property.getAdresseCredirentier1() }}
+                    {% else %}
+                    {{ data.property.address }}
+                    {% endif %}
+                    <br />
                     {{ data.property.postalcode }} {{ data.property.city }}
                 {% elseif data.target == 4 %}
                     {{ data.debirentier.prenom_debirentier }} {{ data.debirentier.nom_debirentier }}<br />

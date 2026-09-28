@@ -52,9 +52,9 @@
 
                 {% elseif data.recursion == constant('App\\Entity\\Invoice::RECURSION_MONTHLY')  %} 
                     {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
-                        {{ data.buyer.lastname }} {{ data.buyer.firstname }}<br />
-                        {{ data.buyer.address }}<br />
-                        {{ data.buyer.postalcode }} {{ data.buyer.city }}
+                        {{ data.warrant.lastname }} {{ data.warrant.firstname }}<br />
+                        {{ data.warrant.address }}<br />
+                        {{ data.warrant.postalcode }} {{ data.warrant.city }}
                     {% else %}
                         {% if data.property.is_og2i %}
                             {% if data.debirentier_different %}

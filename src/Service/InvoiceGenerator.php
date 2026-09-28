@@ -227,7 +227,6 @@ class InvoiceGenerator
                     $fileName = "/avoir_{$data['number']}R-file1.pdf";
                     $pdf->writeHTML($this->twig->render('invoices/avoir_otp_1.html.twig', ['numero'=> "{$data['old_number']}",'pdf_logo_path' => $this->pdf_logo, 'parameters' => $parameters, 'data' => $data]));
                     break;
-                    
 
                 case Invoice::RECURSION_QUARTERLY:
                     $fileName = "/avoir_quarterly{$data['number']}-file1.pdf";
@@ -323,6 +322,18 @@ class InvoiceGenerator
                 $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
                 $endDate_m_u->setTime(0, 0, 0);
                 // recuperer Valeur Indice de référence* (indexation)
+
+                 $comment = $property->initial_index_object->getComment();
+
+                $base = null;
+
+                if (stripos($comment, 'Base 2025') !== false) {
+                    $base = 'Base 2025';
+                    
+                } elseif (stripos($comment, 'Base 2015') !== false) {
+                    $base = 'Base 2015';
+                    
+                }
                 
                 $qb4=$this->manager->createQueryBuilder()
                 ->select("rh")
@@ -334,7 +345,16 @@ class InvoiceGenerator
                 ->setParameter('endmonth',  "%-%".$month_m_u."-%")
                 ->setParameter('end', $endDate_m_u)
                     ->orderBy('rh.date', 'DESC');
+
+                    
+                if ($base !== null) {
+                    $qb4
+                        ->andWhere('rh.comment LIKE :base')
+                        ->setParameter('base', $base);
+                }
                 $query4 = $qb4->getQuery();
+
+                
                 // Execute Query
                 if($query4->getResult()){
                     $indice_m_u = $query4->getResult()[0]; 
@@ -433,6 +453,18 @@ class InvoiceGenerator
                 $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
                 $endDate_m_u->setTime(0, 0, 0);
                 // recuperer Valeur Indice de référence* (indexation)
+
+                 $comment = $property->initial_index_object->getComment();
+
+                $base = null;
+
+                if (stripos($comment, 'Base 2025') !== false) {
+                    $base = 'Base 2025';
+                    
+                } elseif (stripos($comment, 'Base 2015') !== false) {
+                    $base = 'Base 2015';
+                    
+                }
                 
                 $qb4=$this->manager->createQueryBuilder()
                 ->select("rh")
@@ -444,6 +476,13 @@ class InvoiceGenerator
                 ->setParameter('endmonth',  "%-%".$month_m_u."-%")
                 ->setParameter('end', $endDate_m_u)
                     ->orderBy('rh.date', 'DESC');
+
+                    
+                if ($base !== null) {
+                    $qb4
+                        ->andWhere('rh.comment LIKE :base')
+                        ->setParameter('base', $base);
+                }
                 $query4 = $qb4->getQuery();
                 // Execute Query
                 if($query4->getResult()){
@@ -544,6 +583,18 @@ class InvoiceGenerator
                 $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
                 $endDate_m_u->setTime(0, 0, 0);
                 // recuperer Valeur Indice de référence* (indexation)
+
+                 $comment = $property->initial_index_object->getComment();
+
+                $base = null;
+
+                if (stripos($comment, 'Base 2025') !== false) {
+                    $base = 'Base 2025';
+                    
+                } elseif (stripos($comment, 'Base 2015') !== false) {
+                    $base = 'Base 2015';
+                    
+                }
                 
                 $qb4=$this->manager->createQueryBuilder()
                 ->select("rh")
@@ -555,6 +606,13 @@ class InvoiceGenerator
                 ->setParameter('endmonth',  "%-%".$month_m_u."-%")
                 ->setParameter('end', $endDate_m_u)
                     ->orderBy('rh.date', 'DESC');
+
+                    
+                if ($base !== null) {
+                    $qb4
+                        ->andWhere('rh.comment LIKE :base')
+                        ->setParameter('base', $base);
+                }
                 $query4 = $qb4->getQuery();
                 // Execute Query
                 if($query4->getResult()){
@@ -658,6 +716,18 @@ class InvoiceGenerator
                 $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month_og2i."-".date('Y'));
                 $endDate_og2i->setTime(0, 0, 0);
                 // recuperer Valeur Indice de référence* (indexation)
+
+                 $comment = $property->initial_index_object->getComment();
+
+                $base = null;
+
+                if (stripos($comment, 'Base 2025') !== false) {
+                    $base = 'Base 2025';
+                    
+                } elseif (stripos($comment, 'Base 2015') !== false) {
+                    $base = 'Base 2015';
+                    
+                }
                 
                 $qb4=$this->manager->createQueryBuilder()
                 ->select("rh")
@@ -668,6 +738,13 @@ class InvoiceGenerator
                 ->setParameter('end', $endDate_og2i)
                 ->setParameter('endmonth',  "%-%".$month_og2i."-%")
                     ->orderBy('rh.date', 'DESC');
+
+                    
+                if ($base !== null) {
+                    $qb4
+                        ->andWhere('rh.comment LIKE :base')
+                        ->setParameter('base', $base);
+                }
                 $query = $qb4->getQuery();
                 // Execute Query
                 if($query->getResult()){
@@ -796,6 +873,18 @@ class InvoiceGenerator
                 $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month_og2i."-".date('Y'));
                 $endDate_og2i->setTime(0, 0, 0);
                 // recuperer Valeur Indice de référence* (indexation)
+
+                 $comment = $property->initial_index_object->getComment();
+
+                $base = null;
+
+                if (stripos($comment, 'Base 2025') !== false) {
+                    $base = 'Base 2025';
+                    
+                } elseif (stripos($comment, 'Base 2015') !== false) {
+                    $base = 'Base 2015';
+                    
+                }
                 
                 $qb4=$this->manager->createQueryBuilder()
                 ->select("rh")
@@ -806,6 +895,13 @@ class InvoiceGenerator
                 ->setParameter('end', $endDate_og2i)
                 ->setParameter('endmonth',  "%-%".$month_og2i."-%")
                     ->orderBy('rh.date', 'DESC');
+
+                    
+                if ($base !== null) {
+                    $qb4
+                        ->andWhere('rh.comment LIKE :base')
+                        ->setParameter('base', $base);
+                }
                 $query = $qb4->getQuery();
                 // Execute Query
                 if($query->getResult()){
@@ -935,6 +1031,18 @@ class InvoiceGenerator
                 $endDate_og2i = \DateTime::createFromFormat('d-n-Y', "31-".$month_og2i."-".date('Y'));
                 $endDate_og2i->setTime(0, 0, 0);
                 // recuperer Valeur Indice de référence* (indexation)
+
+                 $comment = $property->initial_index_object->getComment();
+
+                $base = null;
+
+                if (stripos($comment, 'Base 2025') !== false) {
+                    $base = 'Base 2025';
+                    
+                } elseif (stripos($comment, 'Base 2015') !== false) {
+                    $base = 'Base 2015';
+                    
+                }
                 
                 $qb4=$this->manager->createQueryBuilder()
                 ->select("rh")
@@ -945,6 +1053,13 @@ class InvoiceGenerator
                 ->setParameter('end', $endDate_og2i)
                 ->setParameter('endmonth',  "%-%".$month_og2i."-%")
                     ->orderBy('rh.date', 'DESC');
+
+                    
+                if ($base !== null) {
+                    $qb4
+                        ->andWhere('rh.comment LIKE :base')
+                        ->setParameter('base', $base);
+                }
                 $query = $qb4->getQuery();
                 // Execute Query
                 if($query->getResult()){

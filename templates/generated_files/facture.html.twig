@@ -75,7 +75,7 @@
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <label for="form-montant" class="col-12 col-form-label">Montant <span class="m--font-danger">*</span></label>
+                            <label for="form-montant" class="col-12 col-form-label">Montant HT<span class="m--font-danger">*</span></label>
                             <div class="col-12">
                                 {{ form_row(form.montant, {'attr': {'class': 'form-control m-input'}, 'id': 'form-montant', 'label': false}) }}
                             </div>
@@ -167,7 +167,10 @@
                                     <tr>
                                         <td>{{ generated_file.date |date('d-M-Y H:m:s')}}</td>
                                         <td>{{ generated_file.name }}</td>
-                                        <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_FACTURE_MANUELLE') and generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}</td>
+                                        <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_FACTURE_MANUELLE') %}
+                                        {% if  generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}
+                                        {% if  generated_file.invoice2 is not empty %}{{ generated_file.invoice2.formattednumber }}{% endif %}
+                                        {% endif %}</td>
                                         <td>Facture manuelle</td>
                                         <td><a href="{{ path('file_download_local', { id: generated_file.id }) }}" target="_blank"><i class="la la-cloud-download"></i> Télécharger</a></td>
                                        
@@ -188,7 +191,63 @@
 
 {% block scripts %}
 <script type="text/javascript">
-    
+    $(function () {
+
+        function text_has_blank(){
+            let res = false;
+            const texte =$('#form_texte').val();
+            //console.log('texte',texte)
+
+            if (texte.includes('[resume]') || texte.includes('[montantht]')) {
+                res = true
+            } 
+            console.log('text_has_blank',res)
+            return res;
+        }
+
+        function verifierFormulaire() {
+
+            let valide = true;
+
+            const champs = [
+                '#form-email',
+                '#form-type',
+                '#form-montant',
+                '#form-facturation',
+                '#form-period',
+                '#form-motif',
+            ];
+
+            $.each(champs, function (_, champ) {
+                if ($.trim($(champ).val()) === '') {
+                    valide = false;
+                    return false; // break
+                }
+            });
+
+            if (valide) {
+                if(!text_has_blank()){// si le texte est pret pour la creation du fichier lui donner la possibilite de creer le fichier
+                    $('#form_status input').prop('disabled', false);
+                }
+                
+                $('input[type="submit"]').prop('disabled', false);
+            } else {
+                $('#form_status input')
+                    .prop('disabled', true);
+
+                $('input[type="submit"]').prop('disabled', true);
+            }
+        }
+
+        // Vérification au chargement
+        verifierFormulaire();
+        text_has_blank();
+
+        // Vérification à chaque modification
+        $('#form-email, #form-type, #form-montant, #form-facturation, #form-period, #form-motif')
+            .on('keyup change', verifierFormulaire);
+
+    });
 </script>
 
 <!-- Place the first <script> tag in your HTML's <head> -->

@@ -48,6 +48,9 @@ p {
 
                     {% if data.form.destinataire =='Crédirentier' %} {{data.property.getFirstname1()}} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier() }}{% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %} {% else %}{{data.property.getWarrant().getFirstname() }}  {% endif %}
                     {% if data.form.destinataire =='Crédirentier' %} {{data.property.getLastname1()}} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier() }}{% else %}{{data.property.getWarrant().getLastname() }}  {% endif %} {% else %}{{data.property.getWarrant().getLastname() }}  {% endif %}&nbsp;
+                    {% if data.form.destinataire =='Crédirentier' %} {{data.property.getFirstname2()}} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getPrenomDebirentier2() }}{% endif %}   {% endif %}
+                    {% if data.form.destinataire =='Crédirentier' %} {{data.property.getLastname2()}} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getNomDebirentier2() }} {% endif %}   {% endif %}&nbsp;
+                    
                     <br />
                     {% if data.form.destinataire =='Crédirentier' %} {{data.property.getAddress() }} {% elseif data.form.destinataire =='Débirentier' %} {% if data.property.getDebirentierDifferent() %}{{data.property.getAddresseDebirentier() }}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}{% else %}{{data.property.getWarrant().getAddress() }}  {% endif %}
                     <br />

@@ -167,9 +167,9 @@
                         <li class="m-menu__item{% if app.request.attributes.get('_route') == 'ipc' %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('ipc') }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-piggy-bank"></i><span class="m-menu__link-text">Ipc</span></a></li>
                         <li class="m-menu__item{% if app.request.attributes.get('_route') == 'honoraires_list' %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('honoraires_list') }}" class="m-menu__link "><span class="m-menu__item-here"></span><i class="m-menu__link-icon flaticon-piggy-bank"></i><span class="m-menu__link-text">Honoraires</span></a></li>
                         
-                        {% if isAdmin %}
+                        
                         <li class=" m-menu__item{% if app.request.attributes.get('_route') == 'files_list' %} m-menu__item--active{% endif %}" aria-haspopup="true"><a href="{{ path('files_list') }}" class="m-menu__link "><span class="m-menu__item-here"></span> <img alt="" src="{{ asset('img/flaticon-document.png') }}" style="width: 30px;" /><span class="m-menu__link-text">Liste des fichiers</span></a></li>
-                        {% endif %}
+                        
                     </ul>
                 </div>
 

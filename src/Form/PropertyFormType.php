@@ -21,7 +21,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 setlocale(LC_TIME, 'fr_FR.UTF8', 'fr.UTF8', 'fr_FR.UTF-8', 'fr.UTF-8');
@@ -29,6 +29,13 @@ setlocale(LC_TIME, 'fr_FR.UTF8', 'fr.UTF8', 'fr_FR.UTF-8', 'fr.UTF-8');
 class PropertyFormType extends AbstractType
 {
     
+ private $authorizationChecker;
+
+    public function __construct(AuthorizationCheckerInterface $authorizationChecker)
+    {
+        $this->authorizationChecker = $authorizationChecker;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -114,9 +121,13 @@ class PropertyFormType extends AbstractType
 
             ->add('propertyType', ChoiceType::class, ['choices' => array_flip(Property::GOOD_TYPES), 'choice_translation_domain' => false])
               ->add('assurance_habitation', CheckboxType::class, ['required' => false])
-            ->add('date_assurance_habitation', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy','years' => range(date("Y")-5, date("Y")+7) ])
+            ->add('date_assurance_habitation', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy','years' => range(date("Y")-5, date("Y")+7) ]);
+
+            if($this->authorizationChecker->isGranted('ROLE_ADMIN')){
+                    $builder->add('debirentier_different', CheckboxType::class, ['required' => false]);
+            }
             
-            ->add('adresse_similaire_credirentier', CheckboxType::class, ['required' => false])
+            $builder->add('adresse_similaire_credirentier', CheckboxType::class, ['required' => false])
             ->add('good_address', TextType::class, ['required' => false])
             ->add('postalCode', TextType::class, ['required' => false])
             ->add('city', TextType::class, ['required' => false])
@@ -134,7 +145,7 @@ class PropertyFormType extends AbstractType
             ->add('mois_indice_initial', DateType::class, ['required' => false, 'format' => 'dd-MMM-yyyy','years' => range(date("Y")-22, date("Y")) ])
             ->add('initial_index_object', EntityType::class, [
                 'required' => false,
-                'disabled' => true,
+                'disabled' => $this->authorizationChecker->isGranted('ROLE_ADMIN')?false:true,
                 'class' => RevaluationHistory::class,
                 'query_builder' => function (EntityRepository $er)  use($options){
                     
@@ -148,7 +159,7 @@ class PropertyFormType extends AbstractType
                     
                 },
                 'choice_label' => function (RevaluationHistory $rh): string {
-                    return $rh->getValue().' '.$rh->getType().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp()));
+                    return $rh->getValue().' '.$rh->getType().' mois de '.utf8_encode(strftime('%B %Y',$rh->getDate()->getTimestamp())).' '.$rh->getComment();
                 },
                 'choice_value' => 'id',
                 'required' => false,
@@ -203,7 +214,7 @@ class PropertyFormType extends AbstractType
                     
                 },
                 'choice_label' => function (RevaluationHistory $rh): string {
-                    return $rh->getValue().' '.$rh->getType().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp()));
+                    return $rh->getValue().' '.$rh->getType().' mois de '.utf8_encode(strftime('%B %Y',$rh->getDate()->getTimestamp())).' '.$rh->getComment();
                 },
                 'choice_value' => 'id',
                 'required' => false,
@@ -227,7 +238,7 @@ class PropertyFormType extends AbstractType
                 
                 },
                 'choice_label' => function (RevaluationHistory $rh): string {
-                    return $rh->getValue().' mois de '.(strftime('%B %Y',$rh->getDate()->getTimestamp()));
+                    return $rh->getValue().' mois de '.utf8_encode(strftime('%B %Y',$rh->getDate()->getTimestamp()));
                 },
                 'choice_value' => 'id',
                 'required' => false,
@@ -235,7 +246,8 @@ class PropertyFormType extends AbstractType
             ])
 
 
-            ->add('date_remise_cles', DateType::class)
+            ->add('date_remise_cles', DateType::class,  ['required' => false, 'format' => 'dd-MMM-yyyy', 'years' => range(2010, date('Y') + 6)])
+
             ->add('pourcentage_revaluation_rente', TextType::class, ['required' => false])
             ->add('acte_abandon_duh_drive_id', TextareaType::class, ['required' => false])
 

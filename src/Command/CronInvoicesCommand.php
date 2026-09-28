@@ -342,25 +342,49 @@ class CronInvoicesCommand extends Command
                     $type_indice=($property->getIndexationOG2I())?"OGI":get_label($property->getIntitulesIndicesInitial());
                     $indice = $property->valeur_indice_reference_object;
                     $month_m_u=$property->initial_index_object->getDate()->format('m');
-                    if($property->getIndexationOG2I()){
-                        $month_m_u=$property->valeur_indice_ref_og2_i_object->getDate()->format('m');
+
+
+                    $comment = $property->initial_index_object->getComment();
+
+                    $base = null;
+
+                    if (stripos($comment, 'Base 2025') !== false) {
+                        $base = 'Base 2025';
+                        $io->note('Indice base 2025');
+                    } elseif (stripos($comment, 'Base 2015') !== false) {
+                        $base = 'Base 2015';
+                        $io->note('Indice base 2015');
                     }
-                    
-                    $endDate_m_u = \DateTime::createFromFormat('d-n-Y', "31-".$month_m_u."-".date('Y'));
+
+                    if ($property->getIndexationOG2I()) {
+                        $month_m_u = $property->valeur_indice_ref_og2_i_object->getDate()->format('m');
+                    }
+
+                    $endDate_m_u = \DateTime::createFromFormat(
+                        'd-n-Y',
+                        "31-$month_m_u-" . date('Y')
+                    );
                     $endDate_m_u->setTime(0, 0, 0);
-                    // recuperer Valeur Indice de référence* (indexation)
-                    
-                    $qb4=$this->manager->createQueryBuilder()
-                    ->select("rh")
-                    ->from('App\Entity\RevaluationHistory', 'rh')
-                    ->where('rh.type LIKE :key')
-                    ->andWhere('rh.date <= :end')
-                    ->andWhere('rh.date like  :endmonth')
-                    ->setParameter('key', $type_indice)
-                    ->setParameter('endmonth',  "%-%".$month_m_u."-%")
-                    ->setParameter('end', $endDate_m_u)
+
+                    $qb4 = $this->manager->createQueryBuilder()
+                        ->select('rh')
+                        ->from('App\Entity\RevaluationHistory', 'rh')
+                        ->where('rh.type LIKE :key')
+                        ->andWhere('rh.date <= :end')
+                        ->andWhere('rh.date LIKE :endmonth')
+                        ->setParameter('key', $type_indice)
+                        ->setParameter('endmonth', "%-%{$month_m_u}-%")
+                        ->setParameter('end', $endDate_m_u)
                         ->orderBy('rh.date', 'DESC');
+
+                    if ($base !== null) {
+                        $qb4
+                            ->andWhere('rh.comment LIKE :base')
+                            ->setParameter('base', "%{$base}%");
+                    }
+
                     $query4 = $qb4->getQuery();
+                    
                     // Execute Query
                     if($query4->getResult()){
                         $indice_m_u = $query4->getResult()[0]; 

@@ -33,7 +33,7 @@ class Property
     
     
     public const TYPES_CIVILITE = [
-        self::TYPE_CIVILITE_A => 'Aucune',
+        self::TYPE_CIVILITE_A => '',
         self::TYPE_CIVILITE_MR => 'Monsieur',
         self::TYPE_CIVILITE_MME => 'Madame',
         self::TYPE_CIVILITE_MLE => 'Mademoiselle',

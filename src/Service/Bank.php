@@ -74,7 +74,18 @@ class Bank
                     $PmtTpInf->addChild('LclInstrm')->addChild('Cd', 'CORE');
                     $PmtTpInf->addChild('SeqTp', 'RCUR'); // TODO
 
-                    $PmtInf->addChild('ReqdColltnDt', $invoice['date']->format('Y-m-d'));
+                    $date = new \DateTime();
+
+                    do {
+                        $date->modify('+1 day');
+                    } while (in_array($date->format('N'), [6, 7])); // 6 = samedi, 7 = dimanche
+
+                    $PmtInf->addChild(
+                        'ReqdColltnDt',
+                        ($invoice['type'] == 1)
+                            ? $date->format('Y-m-d')
+                            : $invoice['date']->format('Y-m-d')
+                    );                  
                     $PmtInf->addChild('Cdtr')->addChild('Nm', 'Viag2E');
                     $PmtInf->addChild('CdtrAcct')->addChild('Id')->addChild('IBAN', $iban);
                     $PmtInf->addChild('CdtrAgt')->addChild('CdtrAgt')->addChild('BIC', $bic);
@@ -151,6 +162,10 @@ class Bank
             }
 
             if($data['recursion'] == Invoice::RECURSION_QUARTERLY && $invoice->getProperty()->getHideExportQuarterly()) {
+                continue;
+            }
+
+             if(empty( $invoice->getPayer()['rum'])) {// bug 28/09/2026 ne pas remplir si le rum est vide
                 continue;
             }
 
@@ -235,6 +250,10 @@ class Bank
             $amount = $this->getAmount($data,$invoice->getProperty()->hide_honorary_export,$invoice->getProperty()->getHideExportMonthly());
 
             if($amount <= 0) {
+                continue;
+            }
+
+             if(empty( $invoice->getPayer()['rum'])) {// bug 28/09/2026 ne pas remplir si le rum est vide
                 continue;
             }
 
@@ -326,6 +345,9 @@ class Bank
             if($amount <= 0) {
                 continue;
             }
+             if(empty( $invoice->getPayer()['rum'])) {// bug 28/09/2026 ne pas remplir si le rum est vide
+                continue;
+            }
 
             if(empty($this->data[$invoice->getProperty()->getId()])) {
                 $this->data[$invoice->getProperty()->getId()] = [];
@@ -413,6 +435,7 @@ class Bank
             }*/
 
             $amount = $this->getAmount($data,0,0);
+            //il écris ici /dev.adm.viag2e.fr/var/log
             Logger::getInstance()->logInfo(
                 "facture {$invoice->getProperty()->getId()} - titre : {$invoice->getProperty()->getTitle()} - getamount : {$amount} - type : {$invoice->getType()} - recursion : {$data['recursion']}",
                 [
@@ -432,6 +455,10 @@ class Bank
                 ]
             );
             if($amount <= 0) {
+                continue;
+            }
+            
+            if(empty( $invoice->getPayer()['rum'])) {// bug 28/09/2026 ne pas remplir si le rum est vide
                 continue;
             }
 
@@ -478,9 +505,16 @@ class Bank
     {
         switch ($data['recursion']) {
             case Invoice::RECURSION_OTP:
-                $amount = isset($data['amount']) && $data['amount'] !== null
+                if(isset($data['former_type'])){//facture manuelle peut etre ttc ou ht
+                    $amount = isset($data['montantttc']) && $data['montantttc'] >0
+                        ? $data['montantttc']
+                        : (isset($data['montantht']) ? $data['montantht'] : 0);
+                }else{
+                    $amount = isset($data['amount']) && $data['amount'] !== null
                     ? $data['amount']
                     : (isset($data['montantttc']) ? $data['montantttc'] : 0);
+                }
+                
             
                 return number_format($amount, 2, '.', '');
                 break;

@@ -299,3 +299,30 @@ si proble json mal formatted utiliser utf8_encode( pour strftime()
 
 
 
+triouver les debirentiers differents
+SELECT p.id,p.title,p.debirentier_different,p.nom_debirentier,p.prenom_debirentier,w.firstname,w.lastname FROM `property` p, warrant w where p.warrant_id=w.id order by p.id desc;
+
+
+indexations et plafonnement : 
+
+sans og2i https://adm.univers-viager.com/property/view/130
+
+montant initial 1200
+indice de ref 102.5
+indice initial 93.64
+rente = montant initial *indice de ref/indice initial = 1200*102.5/93.64 = 1313.54
+on a pas implementé de plafonnement ici
+
+
+og2i https://adm.univers-viager.com/property/view/122
+
+montant initial 1500
+indice de ref 119.89
+indice initial 119.01
+Valeur Indice de référence og2i = 119.89
+plaff = 2
+rdb = montant initial*indice initial/indice de ref = 1500*119.01/119.89 = 1511.0915
+rente finale = rdb * indice de ref / Valeur Indice de référence og2i = 1511.0915 * 119.89 / 119.89 = 1511.0915
+valeur plafonnement  = rdb *(1+2/100) = 1541.3133350138644
+
+comme rente finale < valeur plafonnement on prends rente finale

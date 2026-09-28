@@ -78,6 +78,11 @@ class File implements JsonSerializable
     private $invoice;
 
     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Invoice", mappedBy="file2", cascade={"persist", "remove"})
+     */
+    public $invoice2;
+
+    /**
      * @ORM\OneToOne(targetEntity=Recap::class, mappedBy="file", cascade={"persist", "remove"})
      */
     private $recap;

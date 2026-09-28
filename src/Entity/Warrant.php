@@ -19,6 +19,11 @@ class Warrant
     public const TYPE_BUYERS = 1;
     public const TYPE_SELLERS = 2;
 
+    public const WARRANT_TYPES = [
+        self::TYPE_BUYERS => 'Acquereur',
+        self::TYPE_SELLERS => 'Vendeur',
+    ];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

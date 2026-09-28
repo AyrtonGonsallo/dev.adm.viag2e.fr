@@ -693,7 +693,7 @@ class InvoiceController extends AbstractController
             else{
                 $honoraire=$this->getTableHonoraryRates($invoice);
             }
-            if($invoice->getCategoryString()=='Rente'){
+            if($invoice->getCategoryString()=='Rente' || $invoice->getCategoryString()=='Honoraires'){
                 $date=$invoice->getData()['date']["month_n"]."/".$invoice->getData()['date']["year"];
             }else if($invoice->getCategoryString()=='Frais de co-pro'){
                 $date=$invoice->getData()['date']["year"];
@@ -915,7 +915,7 @@ class InvoiceController extends AbstractController
             }
             $status_choice=($invoice->getStatus() >= Invoice::STATUS_PAYED) ? '<span class="'.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</span>' : '<a id="invoice_'.$invoice->getId().'" href="#" data-id="'.$invoice->getId().'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_status" class="invoice-status m--font-bold '.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</a>';
             if($invoice->getType()===2){
-                $status_choice='<span class="'.$invoice->getStatusClass().'">'.$invoice->getStatusString().'</span>';
+                $status_choice='<span class="'.$invoice->getStatusClass().'">Payée</span>';
             }
            
             if($invoice->getCategory()===Invoice::CATEGORY_AVOIR){
@@ -926,8 +926,11 @@ class InvoiceController extends AbstractController
                 $resend='<a href="#" class="invoice-mail" data-id="'.$invoice->getId().'" data-message="'.$recap_mails.'" data-number="'.$invoice->getFormattedNumber().'" data-toggle="modal" data-target="#m_modal_invoice_mail"><i class="la la-envelope" title="Renvoyer"></i> Renvoyer</a>';
             }
             $selected_column = !empty($invoice->getPayer()['ics'])
-                ? "<input type='checkbox' name='invoice_".$invoice->getId()."' value='invoice_".$invoice->getId()."'>"
-                : '<div><input type="checkbox" name="invoice_'.$invoice->getId().'" value="invoice_'.$invoice->getId().'"><span class="text-danger"><i class="la la-warning"></i> non sepa</span></div>';            
+                ? "<div><input type='checkbox' name='invoice_".$invoice->getId()."' value='invoice_".$invoice->getId()."'></div>"
+                : '<div><input type="checkbox" name="invoice_'.$invoice->getId().'" value="invoice_'.$invoice->getId().'"><span class="text-danger"><i class="la la-warning"></i> non sepa</span></div>'; 
+                if($invoice->getStatus()==3){
+                    $selected_column .= '<div><span class="text-danger"><i class="la la-warning"></i> Erreur d\'envoi</span></div>'; 
+                }           
             $data[] = [
                 'Selected' =>$selected_column,
                 'Date' => $date,
@@ -968,8 +971,23 @@ class InvoiceController extends AbstractController
         if ($invoice->getCategory() === Invoice::CATEGORY_CONDOMINIUM_FEES) {
             return number_format($data['property']['condominiumFees'], 2, '.', ' ');
         }
-        elseif ($invoice->getCategory() === Invoice::CATEGORY_GARBAGE || $invoice->getCategory() === Invoice::CATEGORY_MANUAL) {
+        elseif ($invoice->getCategory() === Invoice::CATEGORY_GARBAGE ) {
             return number_format($data['amount'],2, '.', ' ');
+        }
+        elseif ($invoice->getCategory() === Invoice::CATEGORY_MANUAL) {
+            if (!empty($data['former_type'])) {
+                
+                $ht = $data['montantht'];
+                $ttc = ($data['montantttc'] ?? 0) > 0
+                    ? $data['montantttc']
+                    : $ht;
+                return number_format($ttc, 2, '.', ' ')
+                    . ' (' . number_format($ht, 2, '.', ' ') . ' HT)';
+                
+            }else{
+                return number_format($data['amount'],2, '.', ' ');
+            }
+            
         }
 		elseif($invoice->getCategory() == Invoice::CATEGORY_REGULE_CONDOMINIUM_FEES) {
             return number_format($data['montantttc'],2, '.', ' ');

@@ -14,6 +14,8 @@ use App\Entity\Honoraire;
 use App\Entity\Warrant;
 use App\Form\PropertyFormType;
 use App\Form\PropertycreateFormType;
+use App\Form\PropertyWarrantcreateFormType;
+use App\Form\WarrantPropertyFormType;
 use App\Form\PropertyCoproFormType;
 use App\Form\PropertyFormBuyerType;
 use App\Form\PropertyPaymentFormType;
@@ -150,7 +152,7 @@ class PropertyController extends AbstractController
             $property->setWarrant($warrant);
             $property->setCreationUser($this->getUser());
             $property->setEditionUser($this->getUser());
-            $property->setGoodAddress($property->getAddress()." ".$property->getPostalCode()." ".$property->getCity());
+            $property->setGoodAddress($property->getAddress());
             
 
             if (empty($property->getRevaluationIndex())) {
@@ -193,6 +195,101 @@ class PropertyController extends AbstractController
         return $this->render('property/create.html.twig', [
             'form'    => $form->createView(),
             'warrant' => $warrant
+        ]);
+    }
+
+
+
+    /**
+     * @Route("/property/add", name="property_add")
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function add(Request $request)
+    {
+        
+        $property = new Property();
+        $form = $this->createForm(PropertyWarrantcreateFormType::class, $property);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var Property $property */
+            $property = $form->getData();
+
+            $warrant = $property->getWarrant();
+
+            if (empty($warrant)) {
+                $this->addFlash('danger', 'Mandat introuvable');
+                return $this->redirectToRoute('dashboard', [], 302);
+            }
+
+            $property->setType($warrant->getType());
+
+
+
+            $property->date_duh=new DateTime();
+            $property->setMoisIndiceInitial(new DateTime());
+            $property->setCoordonneesSyndic("");
+           // $property->setIntitulesIndicesInitial(2);
+            $property->climatisation_pompe_chaleur=0;
+            $property->chaudiere=0;
+            $property->valeur_indice_ref_og2_i=0;
+            
+            
+            $property->hide_honorary_export=0;
+            $property->setDebirentierDifferent(0);
+            $property->bank_rum_1="";
+            $property->setAnnuitiesDisabled(0);
+            $property->setShowDuh(0);
+            $property->setIndexationOG2I(0);
+            $property->bank_ics_1="FR12ZZZ886B32";
+            $property->setClauseOG2I(0);
+            $property->setWarrant($warrant);
+            $property->setCreationUser($this->getUser());
+            $property->setEditionUser($this->getUser());
+            $property->setGoodAddress($property->getAddress());
+            
+
+            if (empty($property->getRevaluationIndex())) {
+                $property->setRevaluationIndex(0.0);
+            }
+            if (!$property->getInitialAmount() || $property->getInitialAmount()<1) {
+                $property->setInitialAmount(0.0);
+                $property->setHonorariesDisabled(true);
+                $property->setBillingDisabled(true);
+                $property->setAnnuitiesDisabled(true);
+
+            }
+            if (!$property->honorary_rates_object) {
+                $property->setHonorariesDisabled(true);
+                $property->hide_honorary_export=1;
+            }
+            if (!$property->getRevaluationDate() || !$property->initial_index_object || !$property->getMoisIndiceInitial()) {
+                $property->setNoIndexation(1);
+            }
+            
+            if($property->initial_index_object){
+                $property->valeur_indexation_normale=$property->valeur_indice_reference_object->getValue();
+
+            }else{
+                $property->valeur_indexation_normale=0;
+
+            }
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($property);
+
+            $param = $manager->getRepository(Parameter::class)->findOneBy(['name' => 'count_properties']);
+            $param->setValue($param->getValue() + 1);
+
+            $manager->flush();
+
+            $this->addFlash('success', 'Bien créé');
+            return $this->redirectToRoute('warrant_view', ['type' => Warrant::getTypeName($warrant->getType()), 'warrantId' => $warrant->getId()]);
+        }
+
+        return $this->render('property/create_with_warrant.html.twig', [
+            'form'    => $form->createView(),
         ]);
     }
 
@@ -781,9 +878,32 @@ class PropertyController extends AbstractController
         $properties = $this->getDoctrine()
         ->getRepository(Property::class)
         ->findAll();
+
+         $warrant = new Warrant();
+		 $warrant->setBankIcs('FR12ZZZ886B32');
+        $form = $this->createForm(WarrantPropertyFormType::class, $warrant);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $warrant = $form->getData();
+            $warrant->setCreationUser($this->getUser());
+            $warrant->setEditionUser($this->getUser());
+
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($warrant);
+
+            $param = $manager->getRepository(Parameter::class)->findOneBy(['name' => ($warrant->getType() == Warrant::TYPE_BUYERS) ? 'count_warrants_b' : 'count_warrants_s']);
+            $param->setValue($param->getValue() + 1);
+
+            $manager->flush();
+
+            $this->addFlash('success', 'Mandat créé');
+           // return $this->redirectToRoute('warrant_view', ['type' => $request->get('type'), 'warrantId' => $warrant->getId()]);
+        }
         
         return $this->render('property/list.html.twig', [
             'properties' => $properties,
+            'form'      => $form->createView()
         ]);
     }
 
@@ -870,3 +990,5 @@ class PropertyController extends AbstractController
         return $this->redirect($route);
     }
 }
+
+

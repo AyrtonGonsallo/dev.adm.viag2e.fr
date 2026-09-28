@@ -483,6 +483,7 @@ class Invoice implements JsonSerializable
                     'firstname' => $data['property']['firstname'],
                     'lastname'  => $data['property']['lastname'],
                     'bic'       => $this->getProperty()->bank_bic_1,
+                    'rum'       => $this->getProperty()->bank_rum_1,
                     'iban'      => str_replace(' ', '', $this->getProperty()->bank_iban_1),
                     'ics'       => $this->getProperty()->bank_ics_1,
                 ];
@@ -497,6 +498,7 @@ class Invoice implements JsonSerializable
                             'bic'       => $this->getProperty()->getWarrant()->getBankBic(),
                             'iban'      => str_replace(' ', '', $this->getProperty()->getWarrant()->getBankIban()),
                             'ics'       => $this->getProperty()->getWarrant()->getBankIcs(),
+                            'rum'       => $this->getProperty()->getWarrant()->getrum(),
                         ];
                     } elseif ($data['warrant']['firstname'] == $this->getProperty()->getBuyerFirstname() && $data['warrant']['lastname'] == $this->getProperty()->getBuyerLastname()) {
                         $this->payer = [
@@ -506,6 +508,7 @@ class Invoice implements JsonSerializable
                             'bic'       => $this->getProperty()->getBuyerBankBic(),
                             'iban'      => str_replace(' ', '', $this->getProperty()->getBuyerBankIban()),
                             'ics'       => $this->getProperty()->getBuyerBankIcs(),
+                            'rum'       => $this->getProperty()->getWarrant()->getrum(),
                         ];
                     }
                 } else {
@@ -516,6 +519,7 @@ class Invoice implements JsonSerializable
                         'bic'       => $this->getProperty()->bank_bic_1,
                         'iban'      => str_replace(' ', '', $this->getProperty()->bank_iban_1),
                         'ics'       => $this->getProperty()->bank_ics_1,
+                        'rum'       => $this->getProperty()->bank_rum_1,
                     ];
                 }
             }
@@ -529,6 +533,7 @@ class Invoice implements JsonSerializable
                             'bic'       => $this->getProperty()->getWarrant()->getBankBic(),
                             'iban'      => str_replace(' ', '', $this->getProperty()->getWarrant()->getBankIban()),
                             'ics'       => $this->getProperty()->getWarrant()->getBankIcs(),
+                            'rum'       => $this->getProperty()->getWarrant()->getrum(),
                         ];
                     } elseif ($data['warrant']['firstname'] == $this->getProperty()->getBuyerFirstname() && $data['warrant']['lastname'] == $this->getProperty()->getBuyerLastname()) {
                         $this->payer = [
@@ -538,6 +543,7 @@ class Invoice implements JsonSerializable
                             'bic'       => $this->getProperty()->getBuyerBankBic(),
                             'iban'      => str_replace(' ', '', $this->getProperty()->getBuyerBankIban()),
                             'ics'       => $this->getProperty()->getBuyerBankIcs(),
+                            'rum'       => $this->getProperty()->getWarrant()->getrum(),
                         ];
                     }
                 } else {
@@ -548,6 +554,7 @@ class Invoice implements JsonSerializable
                         'bic'       => $this->getProperty()->bank_bic_1,
                         'iban'      => str_replace(' ', '', $this->getProperty()->bank_iban_1),
                         'ics'       => $this->getProperty()->bank_ics_1,
+                        'rum'       => $this->getProperty()->bank_rum_1,
                     ];
                 }
             }
@@ -561,6 +568,7 @@ class Invoice implements JsonSerializable
                             'bic'       => $this->getProperty()->getWarrant()->getBankBic(),
                             'iban'      => str_replace(' ', '', $this->getProperty()->getWarrant()->getBankIban()),
                             'ics'       => $this->getProperty()->getWarrant()->getBankIcs(),
+                            'rum'       => $this->getProperty()->getWarrant()->getrum(),
                         ];
                     }
                     elseif($data['target'] === PendingInvoice::TARGET_PROPERTY) {
@@ -571,6 +579,7 @@ class Invoice implements JsonSerializable
                             'bic'       => $this->getProperty()->bank_bic_1,
                             'iban'      => str_replace(' ', '', $this->getProperty()->bank_iban_1),
                             'ics'       => $this->getProperty()->bank_ics_1,
+                            'rum'       => $this->getProperty()->bank_rum_1,
                         ];
                     }
                     elseif($data['target'] === PendingInvoice::TARGET_BUYER) {
@@ -581,6 +590,7 @@ class Invoice implements JsonSerializable
                             'bic'       => $this->getProperty()->getBuyerBankBic(),
                             'iban'      => str_replace(' ', '', $this->getProperty()->getBuyerBankIban()),
                             'ics'       => $this->getProperty()->getBuyerBankIcs(),
+                            'rum'       => null,
                         ];
                     }
                 }

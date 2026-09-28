@@ -109,7 +109,7 @@ class InvoiceRepository extends ServiceEntityRepository
         elseif (!$isAdmin) {
             // Non-admin, aucun filtre fourni → limiter aux 2 statuts
             $query->andWhere('i.status IN (:statuses)')
-            ->setParameter('statuses', [4, 2]);
+            ->setParameter('statuses', [4, 2,1]);
         }
         
 

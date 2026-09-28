@@ -148,7 +148,7 @@
                                                     {{ form_row(form.title, {'attr': {'class': 'form-control m-input'}, 'id': 'form-title', 'label': false}) }}
                                                 </div>
 
-                                                <label for="form-mandataire" class="col-xl-3 col-lg-3 col-form-label">Mandataire</label>
+                                                <label for="form-mandataire" class="col-xl-3 col-lg-3 col-form-label">Mandant</label>
                                                 <div class="col-xl-9 col-lg-9">
                                                     {{ form_row(form.mandataire, {'attr': {'class': 'form-control m-input'}, 'id': 'form-mandataire', 'label': false}) }}
                                                 </div>
@@ -181,12 +181,7 @@
                                                     {{ form_row(form.lastname1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lastname1', 'label': false}) }}
                                                 </div>
                                             </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-dateofbirth1"> Date de naissance:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.dateofbirth1, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dateofbirth1', 'label': false}) }}
-                                                </div>
-                                            </div>
+                                         
                                             <div class="form-group m-form__group row">
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-mail1">Adresse mail:</label>
                                                 <div class="col-xl-9 col-lg-9">
@@ -232,12 +227,7 @@
                                                     {{ form_row(form.lastname2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-lastname2', 'label': false}) }}
                                                 </div>
                                             </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-dateofbirth2">Date de naissance 2:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.dateofbirth2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-dateofbirth2', 'label': false}) }}
-                                                </div>
-                                            </div>
+                                           
                                             <div class="form-group m-form__group row">
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-mail2">Adresse mail 2:</label>
                                                 <div class="col-xl-9 col-lg-9">
@@ -286,12 +276,7 @@
                                                     {{ form_row(form.nom_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-nom_debirentier', 'label': false}) }}
                                                 </div>
                                             </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-addresse_debirentier"> Adresse:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.addresse_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_debirentier', 'label': false}) }}
-                                                </div>
-                                            </div>
+                                           
                                             <div class="form-group m-form__group row">
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-telephone_debirentier"> Téléphone:</label>
                                                 <div class="col-xl-9 col-lg-9">
@@ -304,10 +289,22 @@
                                                     {{ form_row(form.email_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-email_debirentier', 'label': false}) }}
                                                 </div>
                                             </div>
+											 <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-addresse_debirentier"> Adresse:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.addresse_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_debirentier', 'label': false}) }}
+                                                </div>
+                                            </div>
                                             <div class="form-group m-form__group row">
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-code_postal_debirentier">Code postal:</label>
                                                 <div class="col-xl-9 col-lg-9">
                                                     {{ form_row(form.code_postal_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_debirentier', 'label': false}) }}
+                                                </div>
+                                            </div>
+											 <div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-ville_debirentier">Ville:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.ville_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_debirentier', 'label': false}) }}
                                                 </div>
                                             </div>
                                             <div class="form-group m-form__group row">
@@ -316,12 +313,7 @@
                                                     {{ form_row(form.pays_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-pays_debirentier', 'label': false}) }}
                                                 </div>
                                             </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-ville_debirentier">Ville:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.ville_debirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_debirentier', 'label': false}) }}
-                                                </div>
-                                            </div>
+                                           
 
                                             <h3 class="section-title">Débirentier 2</h3>
                                             
@@ -343,12 +335,7 @@
                                                     {{ form_row(form.nom_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-nom_debirentier2', 'label': false}) }}
                                                 </div>
                                             </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-addresse_debirentier2"> Adresse:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.addresse_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_debirentier2', 'label': false}) }}
-                                                </div>
-                                            </div>
+                                            
                                              <div class="form-group m-form__group row">
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-telephone_debirentier2"> Téléphone:</label>
                                                 <div class="col-xl-9 col-lg-9">
@@ -361,10 +348,22 @@
                                                     {{ form_row(form.email_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-email_debirentier2', 'label': false}) }}
                                                 </div>
                                             </div>
+											<div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-addresse_debirentier2"> Adresse:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.addresse_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-addresse_debirentier2', 'label': false}) }}
+                                                </div>
+                                            </div>
                                             <div class="form-group m-form__group row">
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-code_postal_debirentier2">Code postal:</label>
                                                 <div class="col-xl-9 col-lg-9">
                                                     {{ form_row(form.code_postal_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-code_postal_debirentier2', 'label': false}) }}
+                                                </div>
+                                            </div>
+											<div class="form-group m-form__group row">
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-ville_debirentier2">Ville:</label>
+                                                <div class="col-xl-9 col-lg-9">
+                                                    {{ form_row(form.ville_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_debirentier2', 'label': false}) }}
                                                 </div>
                                             </div>
                                             <div class="form-group m-form__group row">
@@ -373,12 +372,7 @@
                                                     {{ form_row(form.pays_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-pays_debirentier2', 'label': false}) }}
                                                 </div>
                                             </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-ville_debirentier2">Ville:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.ville_debirentier2, {'attr': {'class': 'form-control m-input'}, 'id': 'form-ville_debirentier2', 'label': false}) }}
-                                                </div>
-                                            </div>
+                                            
                                         </div>
 
 
@@ -390,11 +384,24 @@
                                                 </h3>
                                             </div>
                                             <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-address">Adresse:</label>
+                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-address">Adresse du bien:</label>
                                                 <div class="col-xl-9 col-lg-9">
                                                     {{ form_row(form.address, {'attr': {'class': 'form-control m-input'}, 'id': 'form-address', 'label': false}) }}
                                                 </div>
                                             </div>
+											
+											<div class="form-group m-form__group row">
+											
+											 		<label for="form-adresse_similaire_credirentier" class="col-12 col-form-label">Adresse similaire à celle de(s) crédirentier(s)</label>
+													<div class="col-12">
+														<span class="m-switch m-switch--outline m-switch--icon m-switch--brand">
+															<label>
+																{{ form_widget(form.adresse_similaire_credirentier, {'attr': {'class': 'form-control m-input'}, 'id': 'form-adresse_similaire_credirentier', 'label': false}) }}
+																<span></span>
+															</label>
+														</span>
+													</div>
+												</div>
                                            
                                             <div class="form-group m-form__group row">
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-postalCode">Code postal:</label>
@@ -430,68 +437,7 @@
                                             <div class="m-form__heading">
                                                 <h3 class="m-form__heading-title">Propriétés</h3>
                                             </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-goodType"> Type de viager:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.goodType, {'attr': {'class': 'form-control m-input'}, 'id': 'form-goodType', 'label': false}) }}
-                                                </div>
-                                            </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-propertyType">Type de bien:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    <div class="m-typeahead">
-                                                        {{ form_row(form.propertyType, {'attr': {'class': 'form-control m-input'}, 'id': 'form-propertyType', 'label': false}) }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-constructionYear">Année de construction:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.constructionYear, {'attr': {'class': 'form-control m-input'}, 'id': 'form-constructionYear', 'label': false}) }}
-                                                </div>
-                                            </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-livingSpace">Surface habitable:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.livingSpace, {'attr': {'class': 'form-control m-input'}, 'id': 'form-livingSpace', 'label': false}) }}
-                                                </div>
-                                            </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-groundSurface">Surface du terrain:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.groundSurface, {'attr': {'class': 'form-control m-input'}, 'id': 'form-groundSurface', 'label': false}) }}
-                                                </div>
-                                            </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-heatingType"> Type de chauffage:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.heatingType, {'attr': {'class': 'form-control m-input'}, 'id': 'form-heatingType', 'label': false}) }}
-                                                </div>
-                                            </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-fireplace">Cheminée:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.fireplace, {'attr': {'class': 'form-control m-input'}, 'id': 'form-fireplace', 'label': false}) }}
-                                                </div>
-                                            </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-garage">Garage:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.garage, {'attr': {'class': 'form-control m-input'}, 'id': 'form-garage', 'label': false}) }}
-                                                </div>
-                                            </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-parking">Parking:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.parking, {'attr': {'class': 'form-control m-input'}, 'id': 'form-parking', 'label': false}) }}
-                                                </div>
-                                            </div>
-                                            <div class="form-group m-form__group row">
-                                                <label class="col-xl-3 col-lg-3 col-form-label" for="form-cellar">Cave:</label>
-                                                <div class="col-xl-9 col-lg-9">
-                                                    {{ form_row(form.cellar, {'attr': {'class': 'form-control m-input'}, 'id': 'form-cellar', 'label': false}) }}
-                                                </div>
-                                            </div>
+                                           
                                              <div class="form-group m-form__group row">
                                                 <label class="col-xl-3 col-lg-3 col-form-label" for="form-date_remise_cles">Date de remise des clés:</label>
                                                 <div class="col-xl-9 col-lg-9">
@@ -607,7 +553,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="form-group m-form__group row">
-                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-abandonmentIndex">Indice d'abandon:</label>
+                                                    <label class="col-xl-3 col-lg-3 col-form-label" for="form-abandonmentIndex">% d’augmentation de la rente si abandon du DUH</label>
                                                     <div class="col-xl-9 col-lg-9">
                                                         {{ form_row(form.abandonmentIndex, {'attr': {'class': 'form-control m-input'}, 'id': 'form-abandonmentIndex', 'label': false}) }}
                                                     </div>

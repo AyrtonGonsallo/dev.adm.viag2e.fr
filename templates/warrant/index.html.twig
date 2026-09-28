@@ -426,6 +426,14 @@
                             </div>
                         </div>
                     {% endif %}
+
+                    <div class="form-group m-form__group row">
+                        <label for="form-type" class="col-2 col-form-label">Type <span class="m--font-danger">*</span></label>
+                        <div class="col-10">
+                            {{ form_row(form.type, {'attr': {'class': 'form-control m-input'}, 'id': 'form-type', 'label': false}) }}
+                        </div>
+                    </div>
+
                     <div class="form-group m-form__group row">
                         <label for="form-firstname" class="col-2 col-form-label">Prénom <span class="m--font-danger">*</span></label>
                         <div class="col-10">

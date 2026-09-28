@@ -59,9 +59,17 @@
 .tox-promotion{
     display: none !important;
 }
-#property_form_dernier_jour_paiement_rente_month{
+#property_form_dernier_jour_paiement_rente_month,#propertycreate_form_dernier_jour_paiement_rente_month,#property_warrantcreate_form_dernier_jour_paiement_rente_month{
     display: none ;
 }
 #form_status > div:nth-child(1){
     display: none;
+}
+.section-title-property-create{
+    text-transform: uppercase !important;
+    font-weight: bolder !important;
+    text-decoration: underline !important;
+    color: #0087ff !important;
+    font-size: 22px !important;
+    margin-top:20px !important;
 }

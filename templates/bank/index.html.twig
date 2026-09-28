@@ -101,7 +101,7 @@
                             <td>{{ export.period }}</td>
                             <td>{{ export.messageId }}</td>
                             <td>{{ export.typestring }}</td>
-                            <td>{{ export.date|date('d-m-Y H:i') }}</td>
+                            <td><span style="display:none;">{{ export.date|date('Y-m-d H:i:s') }}</span>{{ export.date|date('d-m-Y H:i') }}</td>
                             <td>{% if export.driveId == 'notstored' %}-{% else %}<a href="{{ path('file_export_download', {'fileId': export.driveId}) }}" target="_blank"><i class="la la-cloud-download" title="Télécharger"></i> Télécharger</a>{% endif %}</td>
                         </tr>
                     {% endfor %}
