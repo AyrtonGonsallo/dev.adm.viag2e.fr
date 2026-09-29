@@ -629,7 +629,6 @@ class TextReplacer
                 $ville_bien = $property->getCity();
                 $num_mandat = $property->num_mandat_gestion;
                 $condominiumFees = $property->getCondominiumFees();
-                $syndic_quote_part = $property->syndic_quote_part;
 
                 switch ($former_destinataire) {
                     case 'Crédirentier':
@@ -928,13 +927,13 @@ class TextReplacer
                         );
                         $client_texte = str_replace(
                             '[syndic_quote_part]',
-                            $syndic_quote_part,
+                            $condominiumFees,
                             $client_texte
                         );
                         $client_texte = str_replace(
                             '[syndic_quote_part_cpc]',
-                            $syndic_quote_part
-                                ? ' <br><input type="checkbox"> D’autre part, en ce qui concerne les charges de copropriété, il est convenu que le(s) crédirentier(s) versent une avance trimestrielle de la quote-part locative au(x) débirentier(s). Compte tenu du montant de cette quote-part du dernier décompte annuel de charges de copropriété, nous provisionnerons la somme trimestrielle de ' . $syndic_quote_part . ' €.'
+                            $condominiumFees
+                                ? ' <br><input type="checkbox"> D’autre part, en ce qui concerne les charges de copropriété, il est convenu que le(s) crédirentier(s) versent une avance trimestrielle de la quote-part locative au(x) débirentier(s). Compte tenu du montant de cette quote-part du dernier décompte annuel de charges de copropriété, nous provisionnerons la somme trimestrielle de ' . $condominiumFees . ' €.'
                                 : '',
                             $client_texte
                         );

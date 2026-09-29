@@ -96,14 +96,16 @@
                             <td>Honoraires H.T</td>
                             <td>{{ (data.montantht)|number_format(2, '.', ' ') }} €</td>
                         </tr>
-                        <tr>
-                            <td>TVA {{ parameters.tva }}%</td>
-                            <td>{{ (data.montantht*0.2)|number_format(2, '.', ' ') }} €</td>
-                        </tr>
-                        <tr>
-                            <td>Total TTC des honoraires</td>
-                            <td>{{ (data.montantht + (data.montantht * 0.2))|number_format(2, '.', ' ') }} €</td>
-                        </tr>
+                        {% if data.montantttc > 0 %}
+                            <tr>
+                                <td>TVA {{ parameters.tva }}%</td>
+                                <td>{{ (data.montantttc*0.2)|number_format(2, '.', ' ') }} €</td>
+                            </tr>
+                            <tr>
+                                <td>Total TTC des honoraires</td>
+                                <td>{{ (data.montantttc )|number_format(2, '.', ' ') }} €</td>
+                            </tr>
+                        {% endif %}
                         </tbody>
                     </table>
                 {% endif %}

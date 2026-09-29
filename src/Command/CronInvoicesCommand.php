@@ -1356,6 +1356,17 @@ class CronInvoicesCommand extends Command
                 $fichier_de_rente=( $data["montantttc"]>0);
                 $fichier_d_honoraire=null;
                 $data["amount"]=$data["montantttc"];
+            }else if($category ==Invoice::CATEGORY_MANUAL){
+
+                if (in_array($data["former_type"], [1, 3, 4], true)) {
+                    $fichier_de_rente=true;
+                    $fichier_d_honoraire=null;
+                    
+                }else{
+                    $fichier_d_honoraire=true;
+                    $fichier_de_rente=null;
+                }
+              
             }else{
                 $fichier_de_rente=( $data["amount"]>0);
                 $fichier_d_honoraire=( $data["montantht"]>0);
@@ -1368,7 +1379,7 @@ class CronInvoicesCommand extends Command
             }
             $io->note("invoice manuel, fichier de type ".$type);
             if(($fichier_de_rente)){
-                if($data['montantttc']>0){
+                if($data['montantttc']>0 && empty($data['former_type'])){
                     $filePath = $this->generator->generateManualRegulFile($data, $parameters);
                 }else{
                     $filePath = $this->generator->generateFile($data, $parameters);                

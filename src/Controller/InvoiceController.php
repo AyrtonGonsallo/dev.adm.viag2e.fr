@@ -1251,7 +1251,9 @@ public function getTableHonoraryRatesHt(Invoice $invoice)
                                 if($invoice->getProperty()->getDebirentierDifferent()){
                                     $mailTarget_r=$invoice->getProperty()->getEmailDebirentier();
                                     $mailTarget2_r=$invoice->getProperty()->getEmailDebirentier2();
-                                    $bcc_rente[] = $mailTarget2_r;
+                                    if($mailTarget2_r){
+                                    	$bcc_rente[] = $mailTarget2_r;
+									}
                                 }else{
                                     $mailTarget_r=$invoice->getProperty()->getWarrant()->getMail1();
                                 }

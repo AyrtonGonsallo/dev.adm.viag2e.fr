@@ -93,8 +93,18 @@
                     <tbody>
                     <tr>
                         <td>{{ data.label }}</td>
-                        <td>{{ data.amount|number_format(2, '.', ' ') }} €</td>
+                        <td>{{ data.montantht|number_format(2, '.', ' ') }} €</td>
                     </tr>
+                    {% if data.montantttc > 0 %}
+                            <tr>
+                                <td>TVA {{ parameters.tva }}%</td>
+                                <td>{{ (data.montantttc*0.2)|number_format(2, '.', ' ') }} €</td>
+                            </tr>
+                            <tr>
+                                <td>Total TTC</td>
+                                <td>{{ (data.montantttc )|number_format(2, '.', ' ') }} €</td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
                

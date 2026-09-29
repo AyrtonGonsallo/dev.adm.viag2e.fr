@@ -261,7 +261,6 @@ class PropertyFormType extends AbstractType
             ->add('syndic_password', PasswordType::class, ['required' => false])
             ->add('date_reg_fin', DayType::class, )
             ->add('date_reg_debut', DayType::class, )
-            ->add('syndic_quote_part', TextType::class, ['required' => false])
             ->add('syndic_dernier_decompte', TextType::class, ['required' => false])
             
             ->add('no_indexation', CheckboxType::class, ['required' => false])
