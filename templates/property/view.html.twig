@@ -1200,8 +1200,10 @@
                                     {% if invoice_file.file %}
                                         <tr>
                                              <td>
-                                                <span style="display:none;">{{ invoice_file.file.date|date('Y-m-d H:i:s') }}</span>
-                                                {{ invoice_file.file.date|date('d-M-Y H:i:s') }}
+                                                {% if invoice_file.file.date is not null %}
+                                                    <span style="display:none;">{{ invoice_file.file.date|date('Y-m-d H:i:s') }}</span>
+                                                    {{ invoice_file.file.date|date('d-M-Y H:i:s') }}
+                                                {% endif %}
                                             </td>
                                             <td>{{ invoice_file.file.name }}</td>
                                             {% if isAdmin %}
@@ -1218,9 +1220,12 @@
                                 {% for invoice_file in invoices_files %}
                                     {% if invoice_file.file2 %}
                                         <tr>
+                                            
                                             <td>
-                                                <span style="display:none;">{{ invoice_file.file2.date|date('Y-m-d H:i:s') }}</span>
-                                                {{ invoice_file.file2.date |date('d-M-Y H:i:s')}}
+                                                {% if invoice_file.file2.date is not null %}
+                                                    <span style="display:none;">{{ invoice_file.file2.date|date('Y-m-d H:i:s') }}</span>
+                                                    {{ invoice_file.file2.date|date('d-M-Y H:i:s') }}
+                                                {% endif %}
                                             </td>
                                             <td>{{ invoice_file.file2.name }}</td>
                                             {% if isAdmin %}
@@ -1238,9 +1243,12 @@
                                     {% if generated_file %}
                                         <tr>
                                             <td>
-                                                <span style="display:none;">{{ generated_file.date|date('Y-m-d H:i:s') }}</span>
-                                                {{ generated_file.date |date('d-M-Y H:i:s')}}
+                                                {% if generated_file.date is not null %}
+                                                    <span style="display:none;">{{ generated_file.date|date('Y-m-d H:i:s') }}</span>
+                                                    {{ generated_file.date|date('d-M-Y H:i:s') }}
+                                                {% endif %}
                                             </td>
+                                            
                                             <td>{{ generated_file.name }}</td>
                                             {% if isAdmin %}
                                                 <td>{% if generated_file.type is constant('App\\Entity\\File::TYPE_INVOICE') and generated_file.invoice is not empty %}{{ generated_file.invoice.formattednumber }}{% endif %}</td>

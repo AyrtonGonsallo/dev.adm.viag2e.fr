@@ -721,6 +721,7 @@ class InvoiceController extends AbstractController
             }
 
             $mailTarget3="";
+            $mailTarget2="";
             $filePath = -1;
             $filePath2 = -1;
             $data2 = $invoice->getData();
@@ -760,9 +761,7 @@ class InvoiceController extends AbstractController
                            $mailTarget3=$invoice->getProperty()->getMail2();
                         }
                     }
-                }
-
-                else if($data2['recursion'] ==Invoice::RECURSION_MONTHLY && $invoice->getCategory() == Invoice::CATEGORY_ANNUITY){
+                }else if($data2['recursion'] ==Invoice::RECURSION_MONTHLY && $invoice->getCategory() == Invoice::CATEGORY_ANNUITY){
                     //rentes honoraires
                     if($invoice->getProperty()->getWarrant()->getType() === Warrant::TYPE_SELLERS){//si avis/quittances et vendeur
                         if($cond_h_n){
@@ -795,15 +794,14 @@ class InvoiceController extends AbstractController
                         
                         }
                     }
-                }
-
-                else if($invoice->getCategory() == Invoice::CATEGORY_AVOIR){
+                }else if($invoice->getCategory() == Invoice::CATEGORY_AVOIR){
                     $target_exist = array_key_exists('target', $data2);
                     //avoir
                     if ($target_exist) {
 
                         if($data2["target"]==1){//mandant
-                            $mailTarget=$invoice->getProperty()->getWarrant()->getMail1();
+                            $mailTarget = $invoice->getProperty()->getWarrant()->getMail1();
+                            $mailTarget2 = $mailTarget;
                         }else if($data2["target"]==2){//proprietaire du bien
                             $mailTarget=$invoice->getProperty()->getMail1();
                             if($invoice->getProperty()->getMail2()){
@@ -984,7 +982,16 @@ class InvoiceController extends AbstractController
                 return number_format($ttc, 2, '.', ' ')
                     . ' (' . number_format($ht, 2, '.', ' ') . ' HT)';
                 
-            }else{
+            }else if(!empty($data['montantht']) && $data['montantht'] > 0) {
+
+                $ht  = $data['montantht'];
+                $tax = $ht * 0.2;
+                $ttc = $ht + $tax;
+
+                return number_format($ttc, 2, '.', ' ') 
+                    . ' (' . number_format($ht, 2, '.', ' ') . ' HT)';
+            }
+            else{
                 return number_format($data['amount'],2, '.', ' ');
             }
             
@@ -999,6 +1006,14 @@ class InvoiceController extends AbstractController
                 return number_format($data['amount'],2, '.', ' ');
             else if(array_key_exists('condominiumFees',$data['property']) && $data['property']['condominiumFees'] > 0)
                 return number_format($data['property']['condominiumFees'], 2, '.', ' ');
+            else if(!empty($data['montantht']) && $data['montantht'] > 0) {
+                $ht  = $data['montantht'];
+                $tax = $ht * 0.2;
+                $ttc = $ht + $tax;
+
+                return number_format($ttc, 2, '.', ' ') 
+                    . ' (' . number_format($ht, 2, '.', ' ') . ' HT)';
+            } 
             else
                 return number_format($data['amount'],2, '.', ' ');
         }

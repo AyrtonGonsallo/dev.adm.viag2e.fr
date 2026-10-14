@@ -671,15 +671,16 @@ class GeneratedFilesController extends AbstractController
                 }
                 else if(in_array($former_type, [4], true) && $type_is_manuelle){
                     //si manuelle
-                    if($dataFacture['former_type']){
+                    if (isset($dataFacture['former_type'])) {
                         // on a des factures manulles de type different 
                         // 'Rente' => 1,'Honoraires' => 2,'Co-pro' => 3,'Autre' => 4 
                         if($dataFacture['former_type']==1){
                             $former_montant = (float) $dataFacture['amount'];
                             $former_montant_f = number_format($former_montant, 2, '.', ' ');
                             $is_rente =true;
-                        }else if($dataFacture['former_type']==2){
+                        }else if($dataFacture['former_type']==2){//honoraires peut etre ht ou ttc
                             $former_montant_ttc = (float) $dataFacture['montantttc'];
+                            $former_montant_tva = 0;
                             if($former_montant_ttc>0){
                                 
                                 $former_montant_ht = (float) $dataFacture['montantht'];
@@ -695,19 +696,52 @@ class GeneratedFilesController extends AbstractController
                             
                             $is_honoraires=true;
 
-                        }else if($dataFacture['former_type']==3){
-                            $former_montant = (float) $dataFacture['amount'];
-                            $former_montant_f = number_format($former_montant, 2, '.', ' ');
-                            $is_rente =true;
+                        }else if($dataFacture['former_type']==3){//copro peut etre ht ou ttc
+                        
 
-                        }else if($dataFacture['former_type']==4){
+                            $former_montant_ttc = (float) $dataFacture['montantttc'];
+                            if($former_montant_ttc>0){
+                                
+                                $former_montant_ht = (float) $dataFacture['montantht'];
+                                $former_montant_tva = $former_montant_ttc - $former_montant_ht;
+                                $former_montant_ht_f = number_format($former_montant_ht, 2, '.', ' ');
+                                $former_montant_tva_f = number_format($former_montant_tva, 2, '.', ' ');
+                                $former_montant_ttc_f = number_format($former_montant_ttc, 2, '.', ' ');
+
+                            }else{
+                                $former_montant_ht = (float) $dataFacture['montantht'];
+                                $former_montant_ht_f = number_format($former_montant_ht, 2, '.', ' ');
+                            }
+                            $is_rente =true;
+                           
+
+                        }else if($dataFacture['former_type']==4){//Autre
                             $former_montant = (float) $dataFacture['amount'];
                             $former_montant_f = number_format($former_montant, 2, '.', ' ');
                             $is_rente =true;
 
                         }
 
-                    }
+                    }else{
+						//ancien modele donc si amount > 1 rente et lire amount 
+                        //si montantht > 1 honoraire et lire montantht
+
+                        if($dataFacture['montantht']> 0){
+                            $former_montant_ht  = (float) $dataFacture['montantht'];
+                            $former_montant_tva = $former_montant_ht * 0.20;
+                            $former_montant_ttc = $former_montant_ht + $former_montant_tva;
+                            $former_montant_ht_f = number_format($former_montant_ht, 2, '.', ' ');
+                            $former_montant_tva_f = number_format($former_montant_tva, 2, '.', ' ');
+                            $former_montant_ttc_f = number_format($former_montant_ttc, 2, '.', ' ');
+                            $is_honoraires=true;
+                        }
+                        else if($dataFacture['amount']>0){
+                            $former_montant = (float) $dataFacture['amount'];
+                            $former_montant_f = number_format($former_montant, 2, '.', ' ');
+                            $is_rente =true;
+                            
+                        }
+					}
                 }else{
                     //il s'est trompé
                     return $this->render('generated_files/avoir.html.twig', [
@@ -733,7 +767,7 @@ class GeneratedFilesController extends AbstractController
                 try {
                     if(in_array($former_status, [1, 3], true)){
 
-                    //'Rente' => 1,'Honoraire' => 2,'Copro' => 3,'Manuelle' => 4
+                        //'Rente' => 1,'Honoraire' => 2,'Copro' => 3,'Manuelle' => 4
 
                         $defaultText = str_replace(
                             '[facture]',
@@ -747,9 +781,91 @@ class GeneratedFilesController extends AbstractController
                             $defaultText
                         );
 
-                       
+                       if(in_array($former_type, [4], true)){//facturemanuelle
+						    if($is_honoraires){
+							    $resume='Coût des honoraires de la période';
+                                $total='Total TTC des honoraires';
+                                $defaultText = str_replace(
+                                    '[montantht]',
+                                    'Honoraires H.T<td>'.$former_montant_ht_f. ' €',
+                                    $defaultText
+                                );
 
-                        if(in_array($former_type, [1, 3], true) || $is_rente){//rente , copro, rente manuelle
+                                if($former_montant_tva>0){
+                                    $defaultText = str_replace(
+                                        '[tva]',
+                                        'Tva 20%<td>'.$former_montant_tva_f. ' €',
+                                        $defaultText
+                                    );
+                                    $defaultText = str_replace(
+                                        '[montantttc]',
+                                        'Total TTC des honoraires<td>'.$former_montant_ttc_f. ' €',
+                                        $defaultText
+                                    );
+
+                                }else{
+                                    $defaultText = str_replace(
+                                        '[tva]',
+                                        '',
+                                        $defaultText
+                                    );
+                                    $defaultText = str_replace(
+                                        '[montantttc]',
+                                        '',
+                                        $defaultText
+                                    );
+                                }
+                            
+                                
+							   
+						   }else if($is_rente){
+							    
+                                $resume='Détails de l\'appel de la période';
+                                $total='Détails de l\'appel de la période';
+
+                                if($former_montant_ttc_f){
+                                    $defaultText = str_replace(
+                                        '[montantht]',
+                                        'Détails de l\'appel de la période <td>'.$former_montant_ht_f. ' €',
+                                        $defaultText
+                                    );
+
+                                    $defaultText = str_replace(
+                                        '[tva]',
+                                        'Tva 20% <td>'.$former_montant_tva_f. ' €',
+                                        $defaultText
+                                    );
+                                    $defaultText = str_replace(
+                                        '[montantttc]',
+                                        'Total TTC <td>'.$former_montant_ttc_f. ' €',
+                                        $defaultText
+                                    );
+
+                                }else{
+                                    $defaultText = str_replace(
+                                        '[montantht]',
+                                        'Détails de l\'appel de la période<td>'.$former_montant_ht_f. ' €',
+                                        $defaultText
+                                    );
+                                    $defaultText = str_replace(
+                                        '[tva]',
+                                        '',
+                                        $defaultText
+                                    );
+                                    $defaultText = str_replace(
+                                        '[montantttc]',
+                                        '',
+                                        $defaultText
+                                    );
+
+                                }
+                                
+
+                            }
+						   
+
+                        
+                        }else if(in_array($former_type, [1,3], true) || $is_rente){//rente , rente manuelle
                             $resume='Détails de l\'appel de la période';
                             $total='Détails de l\'appel de la période';
                             $defaultText = str_replace(
@@ -768,7 +884,8 @@ class GeneratedFilesController extends AbstractController
                                 $defaultText
                             );
 
-                        }else if(in_array($former_type, [2], true) || $is_honoraires){//honoraires ou hono manuel
+                        }
+                        else if(in_array($former_type, [2], true) || $is_honoraires){//honoraires ou hono manuel
                             if (($dataFacture['former_type'] ?? null) == 2) {// hono manuel
                                 $former_montant_ttc = (float) $dataFacture['montantttc'];
                                 if($former_montant_ttc>0){
@@ -832,10 +949,9 @@ class GeneratedFilesController extends AbstractController
                                     $defaultText
                                 );
                             }
-                            
-
-                          
                         }
+
+
                          $defaultText = str_replace(
                             '[resume]',
                             $resume,
@@ -845,7 +961,7 @@ class GeneratedFilesController extends AbstractController
                         
                         
 
-                        $message = 'Aperçu créé avec succès';
+                        $message = 'Aperçu créé avec succès '.$former_type.' '.$is_rente.' '.$is_honoraires;
 
 
 

@@ -326,3 +326,11 @@ rente finale = rdb * indice de ref / Valeur Indice de référence og2i = 1511.09
 valeur plafonnement  = rdb *(1+2/100) = 1541.3133350138644
 
 comme rente finale < valeur plafonnement on prends rente finale
+
+
+
+
+UPDATE `property` SET `last_quarterly_invoice` = '2026-10-15' WHERE last_quarterly_invoice ='2026-06-15';
+select id,title,last_quarterly_invoice,condominium_fees from `property` where `last_quarterly_invoice` > '2026-03-15';
+
+changer les dates !

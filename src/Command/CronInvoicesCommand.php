@@ -292,6 +292,8 @@ class CronInvoicesCommand extends Command
                 $debirentier    = [
                     'nom_debirentier'         => $pendingInvoice->getProperty()->getNomDebirentier(),
                     'prenom_debirentier'       => $pendingInvoice->getProperty()->getPrenomDebirentier(),
+                    'nom_debirentier2'         => $pendingInvoice->getProperty()->getNomDebirentier2(),
+                    'prenom_debirentier2'       => $pendingInvoice->getProperty()->getPrenomDebirentier2(),
                     'addresse_debirentier'  => $pendingInvoice->getProperty()->getAddresseDebirentier(),
                     'code_postal_debirentier'   => $pendingInvoice->getProperty()->getCodePostalDebirentier(),
                     'ville_debirentier'    => $pendingInvoice->getProperty()->getVilleDebirentier(),
@@ -777,6 +779,8 @@ class CronInvoicesCommand extends Command
                                 $debirentier    = [
                                     'nom_debirentier'         =>  $property->getNomDebirentier(),
                                     'prenom_debirentier'       =>  $property->getPrenomDebirentier(),
+                                    'nom_debirentier2'         =>  $property->getNomDebirentier2(),
+                                    'prenom_debirentier2'       =>  $property->getPrenomDebirentier2(),
                                     'addresse_debirentier'  =>  $property->getAddresseDebirentier(),
                                     'code_postal_debirentier'   =>  $property->getCodePostalDebirentier(),
                                     'ville_debirentier'    =>  $property->getVilleDebirentier(),
@@ -851,6 +855,8 @@ class CronInvoicesCommand extends Command
                         $debirentier    = [
                             'nom_debirentier'         =>  $property->getNomDebirentier(),
                             'prenom_debirentier'       =>  $property->getPrenomDebirentier(),
+                            'nom_debirentier2'         =>  $property->getNomDebirentier2(),
+                            'prenom_debirentier2'       =>  $property->getPrenomDebirentier2(),
                             'addresse_debirentier'  =>  $property->getAddresseDebirentier(),
                             'code_postal_debirentier'   =>  $property->getCodePostalDebirentier(),
                             'ville_debirentier'    =>  $property->getVilleDebirentier(),
@@ -911,6 +917,8 @@ class CronInvoicesCommand extends Command
                 $debirentier    = [
                     'nom_debirentier'         =>  $property->getNomDebirentier(),
                     'prenom_debirentier'       =>  $property->getPrenomDebirentier(),
+                    'nom_debirentier2'         =>  $property->getNomDebirentier2(),
+                    'prenom_debirentier2'       =>  $property->getPrenomDebirentier2(),
                     'addresse_debirentier'  =>  $property->getAddresseDebirentier(),
                     'code_postal_debirentier'   =>  $property->getCodePostalDebirentier(),
                     'ville_debirentier'    =>  $property->getVilleDebirentier(),

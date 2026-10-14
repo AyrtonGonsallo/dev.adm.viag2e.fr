@@ -24,9 +24,12 @@
                 <br /><br /><br /><br /><br /><br /><br />
                 <b>A l'attention de:</b><br />
                 {% if data.warrant.type == constant('App\\Entity\\Warrant::TYPE_SELLERS') %}
-                    {{ data.buyer.lastname }} {{ data.buyer.firstname }}<br />
-                    {{ data.buyer.address }}<br />
-                    {{ data.buyer.postalcode }} {{ data.buyer.city }}
+                    {{ data.debirentier.prenom_debirentier }} {{ data.debirentier.nom_debirentier }}<br />
+                    {% if data.debirentier.prenom_debirentier2 %}
+                        {{data.debirentier.prenom_debirentier2 }} {{data.debirentier.nom_debirentier2 }}<br />
+                    {% endif %}
+                    {{ data.debirentier.addresse_debirentier }}<br />
+                    {{ data.debirentier.code_postal_debirentier }} {{ data.debirentier.ville_debirentier }}
                 {% else %}
                     {% if data.property.is_og2i %}
                         {% if data.debirentier_different %}
